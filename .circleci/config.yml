@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-27-alpha
+    steps:
+      - checkout
+      - run: ./gradlew :lib:androidDependencies
+      - run: ./gradlew :lib:lintRelease
+      - run: ./gradlew :lib:testReleaseUnitTest
+      - store_artifacts:
+          path: lib/build/reports
+          destination: reports
+      - store_test_results:
+          path: lib/build/test-results

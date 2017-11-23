@@ -1,0 +1,63 @@
+apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task javadocJar(type: Jar, dependsOn: dokka) {
+    classifier = 'javadoc'
+    from dokka.outputDirectory
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.kotlin.srcDirs
+}
+
+publishing {
+    publications {
+        Publication(MavenPublication) {
+            artifact("$buildDir/outputs/aar/lib-release.aar")
+            groupId 'co.infinum'
+            artifact sourcesJar
+            artifact javadocJar
+            artifactId 'goldfinger'
+            version "${versions.name}"
+
+            pom.withXml {
+                def root = asNode()
+                def dependenciesNode = root.appendNode('dependencies')
+
+                // Iterate over the implementation dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.implementation.allDependencies.each {
+                    // Ensure dependencies such as fileTree are not included in the pom.
+                    if (it.name != 'unspecified') {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    publications = ['Publication']
+
+    pkg {
+        repo = 'android'
+        name = 'goldfinger'
+        userOrg = 'infinum'
+        publicDownloadNumbers = true
+
+        version {
+            name = versions.name
+            vcsTag = "v${versions.name}"
+        }
+    }
+}
