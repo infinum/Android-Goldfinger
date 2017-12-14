@@ -1,0 +1,17 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion versions.targetSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        applicationId "co.infinum.goldfinger.example"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+    }
+}
+
+dependencies {
+    implementation "com.android.support:appcompat-v7:${versions.google}"
+    implementation "co.infinum:goldfinger:${versions.name}"
+}
