@@ -43,7 +43,7 @@ In case you don't want default Fingerprint authentication implementation, you ca
 Default implementations will be used if custom implementation is not provided.
 
 ```java
-new Goldfinger.Builder(Context).
+new Goldfinger.Builder(Context)
   .logger(Logger)
   .cryptoCreator(CryptoCreator)
   .crypto(Crypto)

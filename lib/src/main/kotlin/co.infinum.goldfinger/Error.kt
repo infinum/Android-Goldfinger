@@ -14,7 +14,7 @@ enum class Error {
     /** The operation was canceled because the API is locked out due to too many attempts. */
     LOCKOUT,
     /** CryptoCreator failed to initialize CryptoObject. */
-    CRYPTO_OBJECT_INITIALIZATION,
+    CRYPTO_OBJECT_INIT,
     /** Crypto failed to decrypt the value. */
     DECRYPTION_FAILED,
     /** Crypto failed to encrypt the value. */

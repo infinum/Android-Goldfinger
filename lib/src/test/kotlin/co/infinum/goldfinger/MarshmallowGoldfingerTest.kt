@@ -5,7 +5,6 @@ import android.test.mock.MockContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
@@ -55,6 +54,6 @@ class MarshmallowGoldfingerTest {
         `when`(cryptoCreator.createDecryptionCryptoObject("keyName")).thenReturn(null)
         goldfinger.decrypt("keyName", "value", callback)
         verify(cryptoCreator).createDecryptionCryptoObject("keyName")
-        verify(callback).onError(Error.CRYPTO_OBJECT_INITIALIZATION)
+        verify(callback).onError(Error.CRYPTO_OBJECT_INIT)
     }
 }
