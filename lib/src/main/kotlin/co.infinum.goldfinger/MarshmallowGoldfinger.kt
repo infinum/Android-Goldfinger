@@ -46,7 +46,7 @@ internal class MarshmallowGoldfinger constructor(
 
         if (cryptoObject == null) {
             logger.log("CryptoObject not initialized.")
-            callback.onError(Error.CRYPTO_OBJECT_INITIALIZATION)
+            callback.onError(Error.CRYPTO_OBJECT_INIT)
             return
         }
 
