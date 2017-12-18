@@ -1,92 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
     <EditText
-        android:id="@+id/secretInput"
+        android:id="@+id/secretInputView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Totally secret input"
-        android:maxLength="16"/>
+        android:layout_margin="16dp"
+        android:hint="@string/hint"
+        android:textColor="#333333"
+        android:textSize="16sp"/>
 
-    <Button
+    <TextView
         android:id="@+id/encryptButton"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@color/accent"
-        android:text="Encrypt"
-        android:textColor="#fff"
-        android:textSize="16sp"/>
+        android:layout_margin="16dp"
+        android:enabled="false"
+        android:text="@string/encrypt"/>
 
     <TextView
-        android:id="@+id/encryptedTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="16sp"/>
-
-    <Button
         android:id="@+id/decryptButton"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@color/accent"
-        android:text="Decrypt"
-        android:textColor="#fff"
-        android:textSize="16sp"/>
+        android:layout_margin="16dp"
+        android:enabled="false"
+        android:text="@string/decrypt"/>
 
     <TextView
-        android:id="@+id/decryptedTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textSize="16sp"/>
-
-    <Button
         android:id="@+id/authenticateButton"
+        style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@color/accent"
-        android:text="Authenticate"
-        android:textColor="#fff"
-        android:textSize="16sp"/>
+        android:layout_margin="16dp"
+        android:enabled="false"
+        android:text="@string/authenticate"/>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/statusView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_fingerprint"
-            android:tint="@color/black"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="Fingerprint status:"/>
-
-        <TextView
-            android:id="@+id/statusTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:text="Inactive"/>
-
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/textRegular"
+        android:textSize="16sp"/>
 
 </LinearLayout>

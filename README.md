@@ -5,7 +5,7 @@ Android library to simplify Fingerprint authentication integration.
 ## Usage
 #### Download
 ```gradle
-implementation 'co.infinum:goldfinger:${latest_version}'
+implementation 'co.infinum:goldfinger:0.3.3'
 ```
 
 #### Initialization
