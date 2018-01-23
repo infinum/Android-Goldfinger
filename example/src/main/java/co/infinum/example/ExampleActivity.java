@@ -45,7 +45,7 @@ public class ExampleActivity extends AppCompatActivity {
         secretInputView = findViewById(R.id.secretInputView);
         statusView = findViewById(R.id.statusView);
 
-        goldfinger = new Goldfinger.Builder(this).build();
+        goldfinger = new Goldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
 
         secretInputView.addTextChangedListener(onTextChangedListener);
         initListeners();

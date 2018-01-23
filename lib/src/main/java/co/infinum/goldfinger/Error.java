@@ -27,7 +27,7 @@ public enum Error {
      */
     LOCKOUT,
     /**
-     * CryptoCreator failed to initialize CryptoObject.
+     * CryptoFactory failed to initialize CryptoObject.
      */
     CRYPTO_OBJECT_INIT,
     /**

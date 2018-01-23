@@ -13,15 +13,17 @@ class MarshmallowGoldfinger implements Goldfinger {
     private static final String KEY_AUTH_MODE = "<Goldfinger authentication mode>";
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private final CryptoCreator cryptoCreator;
+    private final CryptoFactory cryptoFactory;
     private final Crypto crypto;
     private final FingerprintManagerCompat fingerprintManagerCompat;
+    private final Logger logger;
     private CancellableAuthenticationCallback cancellableAuthenticationCallback;
 
-    MarshmallowGoldfinger(Context context, CryptoCreator cryptoCreator, Crypto crypto) {
-        this.cryptoCreator = cryptoCreator;
+    MarshmallowGoldfinger(Context context, CryptoFactory cryptoFactory, Crypto crypto, Logger logger) {
+        this.cryptoFactory = cryptoFactory;
         this.crypto = crypto;
         this.fingerprintManagerCompat = FingerprintManagerCompat.from(context);
+        this.logger = logger;
     }
 
     @Override
@@ -51,25 +53,29 @@ class MarshmallowGoldfinger implements Goldfinger {
 
     private void startFingerprintAuthentication(String keyName, String value, Mode mode, Callback callback) {
         cancel();
+
+        logger.log("Creating CryptoObject");
         FingerprintManagerCompat.CryptoObject cryptoObject = null;
         switch (mode) {
             case AUTHENTICATION:
-                cryptoObject = cryptoCreator.createAuthenticationCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createAuthenticationCryptoObject(keyName);
                 break;
             case DECRYPTION:
-                cryptoObject = cryptoCreator.createDecryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createDecryptionCryptoObject(keyName);
                 break;
             case ENCRYPTION:
-                cryptoObject = cryptoCreator.createEncryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createEncryptionCryptoObject(keyName);
                 break;
         }
 
         if (cryptoObject == null) {
+            logger.log("Failed to create CryptoObject");
             callback.onError(Error.CRYPTO_OBJECT_INIT);
             return;
         }
 
-        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, mode, value, callback);
+        logger.log("Starting authentication [keyName=%s; value=%s]", keyName, value);
+        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, logger, mode, value, callback);
         fingerprintManagerCompat.authenticate(cryptoObject,
                 0,
                 cancellableAuthenticationCallback.cancellationSignal,

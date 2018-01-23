@@ -16,20 +16,21 @@ import static org.mockito.Mockito.when;
 public class CancellableAuthenticationCallbackTest {
 
     @Mock Crypto crypto;
+    @Mock Logger logger;
     @Mock Goldfinger.Callback callback;
     @Mock FingerprintManagerCompat.CryptoObject cryptoObject;
     private CancellableAuthenticationCallback cancellableCallback;
 
     @Test
     public void onAuthenticationError_delegated() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.ENCRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.ENCRYPTION, "", callback);
         cancellableCallback.onAuthenticationError(0, "");
         verify(callback).onError(Error.UNKNOWN);
     }
 
     @Test
     public void onAuthenticationError_canceled() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.ENCRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.ENCRYPTION, "", callback);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationError(0, "");
         verify(callback, never()).onError(Error.UNKNOWN);
@@ -37,7 +38,7 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationSucceeded_encryptionOk() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.ENCRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.ENCRYPTION, "", callback);
         when(crypto.encrypt(cryptoObject, "")).thenReturn("");
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).encrypt(cryptoObject, "");
@@ -46,7 +47,7 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationSucceeded_encryptionFailed() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.ENCRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.ENCRYPTION, "", callback);
         when(crypto.encrypt(cryptoObject, "")).thenReturn(null);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).encrypt(cryptoObject, "");
@@ -55,7 +56,7 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationSucceeded_decryptionOk() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.DECRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.DECRYPTION, "", callback);
         when(crypto.decrypt(cryptoObject, "")).thenReturn("");
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).decrypt(cryptoObject, "");
@@ -64,7 +65,7 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationSucceeded_decryptionFailed() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.DECRYPTION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.DECRYPTION, "", callback);
         when(crypto.decrypt(cryptoObject, "")).thenReturn(null);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).decrypt(cryptoObject, "");
@@ -73,14 +74,14 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationSucceeded_authenticated() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(callback).onSuccess("");
     }
 
     @Test
     public void onAuthenticationSucceeded_canceled() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(callback, never()).onSuccess("");
@@ -88,14 +89,14 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationHelp_delegated() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.onAuthenticationHelp(-1, "");
         verify(callback).onWarning(Warning.FAILURE);
     }
 
     @Test
     public void onAuthenticationHelp_canceled() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationHelp(0, "");
         verify(callback, never()).onWarning(Warning.FAILURE);
@@ -103,14 +104,14 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationFailed_delegated() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.onAuthenticationFailed();
         verify(callback).onWarning(Warning.FAILURE);
     }
 
     @Test
     public void onAuthenticationFailed_canceled() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationFailed();
         verify(callback, never()).onWarning(Warning.FAILURE);
@@ -118,14 +119,14 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void cancel_delegated() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.cancel();
         assertEquals(true, cancellableCallback.cancellationSignal.isCanceled());
     }
 
     @Test
     public void cancel_canceled() {
-        cancellableCallback = new CancellableAuthenticationCallback(crypto, Mode.AUTHENTICATION, "", callback);
+        cancellableCallback = new CancellableAuthenticationCallback(crypto, logger, Mode.AUTHENTICATION, "", callback);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.cancel();
         assertEquals(true, cancellableCallback.cancellationSignal.isCanceled());
