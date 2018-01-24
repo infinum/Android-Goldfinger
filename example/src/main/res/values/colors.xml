@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#3F51B5</color>
-    <color name="primaryDark">#303F9F</color>
-    <color name="accent">#FF4081</color>
+    <color name="primary">#ff5722</color>
+    <color name="primaryDark">#e64a19</color>
+    <color name="accent">#ff536dfe</color>
+    <color name="accentDisabled">#70536dfe</color>
     <color name="error">#c21d1d</color>
     <color name="ok">#21a921</color>
-    <color name="black">#000000</color>
+    <color name="textRegular">#333</color>
+    <color name="warning">@color/primaryDark</color>
 </resources>

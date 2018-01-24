@@ -1,11 +1,14 @@
 buildscript {
 
+    ext.sdk = [
+            min    : 16,
+            target : 27,
+            compile: 27
+    ]
+
     ext.versions = [
-            minSdk    : 16,
-            targetSdk : 27,
+            goldfinger: '0.3.3',
             buildTools: '26.0.2',
-            name      : '0.1.4',
-            kotlin    : '1.2.0',
             google    : '27.0.2'
     ]
 
@@ -16,9 +19,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.15"
     }
 }
 
