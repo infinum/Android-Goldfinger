@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Goldfinger</string>
+    <string name="encrypt">Encrypt</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="authenticate">Authenticate</string>
+    <string name="hint">Super secret input</string>
+    <string name="status">Status:</string>
+    <string name="fingerprint_not_available">Fingerprint is not available. Device must have Fingerprint sensor, enabled Lock screen and at least 1 enrolled Fingerprint.</string>
+    <string name="authenticate_user">Authenticate Fingerprint</string>
 </resources>

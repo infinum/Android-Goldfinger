@@ -2,52 +2,52 @@ package co.infinum.example;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import co.infinum.goldfinger.Error;
 import co.infinum.goldfinger.Goldfinger;
-import co.infinum.goldfinger.Logger;
 import co.infinum.goldfinger.Warning;
 
 public class ExampleActivity extends AppCompatActivity {
 
-    EditText secretInput;
-    View encryptButton;
-    View decryptButton;
-    View authenticateButton;
-    TextView encryptedTextView;
-    TextView decryptedTextView;
-    TextView statusTextView;
-    Goldfinger goldfinger;
-    String encryptedValue = "";
-    String decryptedValue = "";
+    private static final String KEY_NAME = "Example";
+
+    private View encryptButton;
+    private View decryptButton;
+    private View authenticateButton;
+    private TextView statusView;
+    private EditText secretInputView;
+    private Goldfinger goldfinger;
+
+    private String encryptedValue;
+
+    private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
+        @Override
+        void onTextChanged(String text) {
+            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasEnrolledFingerprint());
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_example);
-        secretInput = findViewById(R.id.secretInput);
+
         encryptButton = findViewById(R.id.encryptButton);
         decryptButton = findViewById(R.id.decryptButton);
         authenticateButton = findViewById(R.id.authenticateButton);
-        encryptedTextView = findViewById(R.id.encryptedTextView);
-        decryptedTextView = findViewById(R.id.decryptedTextView);
-        statusTextView = findViewById(R.id.statusTextView);
-        goldfinger = new Goldfinger.Builder(this).logger(new Logger() {
-            @Override
-            public void log(Throwable t) {
-                t.printStackTrace();
-            }
+        secretInputView = findViewById(R.id.secretInputView);
+        statusView = findViewById(R.id.statusView);
 
-            @Override
-            public void log(String message) {
-                Log.e("Goldfinger", message);
-            }
-        }).build();
+        goldfinger = new Goldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
+
+        secretInputView.addTextChangedListener(onTextChangedListener);
         initListeners();
     }
 
@@ -55,70 +55,88 @@ public class ExampleActivity extends AppCompatActivity {
         encryptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                statusTextView.setText("Waiting for finger");
-                goldfinger.encrypt("customKey", secretInput.getText().toString(), new Goldfinger.Callback() {
-                    @Override
-                    public void onSuccess(String value) {
-                        encryptedValue = value;
-                        encryptedTextView.setText("Encrypted value - " + value);
-                    }
-
-                    @Override
-                    public void onWarning(Warning warning) {
-                        statusTextView.setText("Warning - " + warning.name());
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        statusTextView.setText("Error - " + error.name());
-                    }
-                });
+                resetStatusText();
+                encryptSecretValue();
             }
         });
+
         decryptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                statusTextView.setText("Waiting for finger");
-                goldfinger.decrypt("customKey", encryptedValue, new Goldfinger.Callback() {
-                    @Override
-                    public void onSuccess(String value) {
-                        decryptedValue = value;
-                        decryptedTextView.setText("Decrypted value - " + value);
-                    }
-
-                    @Override
-                    public void onWarning(Warning warning) {
-                        statusTextView.setText("Warning - " + warning.name());
-                    }
-
-                    @Override
-                    public void onError(Error error) {
-                        statusTextView.setText("Error - " + error.name());
-                    }
-                });
+                resetStatusText();
+                decryptEncryptedValue();
             }
         });
 
         authenticateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                statusTextView.setText("Waiting for finger");
-                goldfinger.authenticate(new Goldfinger.Callback() {
-                    @Override
-                    public void onSuccess(String value) {
-                        statusTextView.setText("User authenticated");
-                    }
+                resetStatusText();
+                authenticateUserFingerprint();
+            }
+        });
+    }
 
-                    @Override
-                    public void onWarning(Warning warning) {
-                        statusTextView.setText("Warning - " + warning.name());
-                    }
+    private void resetStatusText() {
+        statusView.setTextColor(ContextCompat.getColor(this, R.color.textRegular));
+        statusView.setText(getString(R.string.authenticate_user));
+    }
 
-                    @Override
-                    public void onError(Error error) {
-                        statusTextView.setText("Error - " + error.name());
-                    }
-                });
+    private void authenticateUserFingerprint() {
+        goldfinger.authenticate(new Goldfinger.Callback() {
+            @Override
+            public void onSuccess(String value) {
+                onSuccessResult(value);
+            }
+
+            @Override
+            public void onWarning(Warning warning) {
+                onWarningResult(warning);
+            }
+
+            @Override
+            public void onError(Error error) {
+                onErrorResult(error);
+            }
+        });
+    }
+
+    private void encryptSecretValue() {
+        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString(), new Goldfinger.Callback() {
+            @Override
+            public void onSuccess(String value) {
+                encryptedValue = value;
+                decryptButton.setEnabled(true);
+                onSuccessResult(value);
+            }
+
+            @Override
+            public void onWarning(Warning warning) {
+                onWarningResult(warning);
+            }
+
+            @Override
+            public void onError(Error error) {
+                onErrorResult(error);
+            }
+        });
+    }
+
+    private void decryptEncryptedValue() {
+        goldfinger.decrypt(KEY_NAME, encryptedValue, new Goldfinger.Callback() {
+            @Override
+            public void onSuccess(String value) {
+                onSuccessResult(value);
+            }
+
+            @Override
+            public void onWarning(Warning warning) {
+                onWarningResult(warning);
+            }
+
+            @Override
+            public void onError(Error error) {
+                onErrorResult(error);
             }
         });
     }
@@ -127,34 +145,34 @@ public class ExampleActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        boolean fingerprintAllowed = true;
-        String statusText = "Allowed";
-        if (!goldfinger.hasFingerprintHardware()) {
-            statusText = "No fingerprint hardware.";
-            fingerprintAllowed = false;
-        } else if (!goldfinger.hasEnabledLockScreen()) {
-            statusText = "Lock screen not enabled.";
-            fingerprintAllowed = false;
-        } else if (!goldfinger.hasEnrolledFingerprint()) {
-            statusText = "No enrolled fingerprints";
-            fingerprintAllowed = false;
-        }
+        authenticateButton.setEnabled(goldfinger.hasEnrolledFingerprint());
 
-        if (!fingerprintAllowed) {
-            disableView(secretInput);
-            disableView(encryptButton);
-            disableView(decryptButton);
+        if (goldfinger.hasFingerprintHardware()
+                && goldfinger.hasEnrolledFingerprint()) {
+            authenticateButton.setEnabled(true);
+        } else {
+            authenticateButton.setEnabled(false);
+            statusView.setText(getString(R.string.fingerprint_not_available));
+            statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
         }
-        statusTextView.setText(statusText);
     }
 
-    public void disableView(View view) {
-        view.setEnabled(false);
-        view.setAlpha(0.5f);
+    private void onSuccessResult(String value) {
+        onResult("onSuccess", value);
+        statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
     }
 
-    public void enableView(View view) {
-        view.setEnabled(true);
-        view.setAlpha(1f);
+    private void onErrorResult(Error error) {
+        onResult("onError", error.toString());
+        statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
+    }
+
+    private void onWarningResult(Warning warning) {
+        onResult("onWarning", warning.toString());
+        statusView.setTextColor(ContextCompat.getColor(this, R.color.warning));
+    }
+
+    private void onResult(String methodName, String value) {
+        statusView.setText(String.format(Locale.US, "%s - [%s]", methodName, value));
     }
 }

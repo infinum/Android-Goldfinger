@@ -1,21 +1,5 @@
-apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
-
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-}
-
-task javadocJar(type: Jar, dependsOn: dokka) {
-    classifier = 'javadoc'
-    from dokka.outputDirectory
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.kotlin.srcDirs
-}
 
 publishing {
     publications {
@@ -23,9 +7,9 @@ publishing {
             artifact("$buildDir/outputs/aar/lib-release.aar")
             groupId 'co.infinum'
             artifact sourcesJar
-            artifact javadocJar
+            artifact javadocsJar
             artifactId 'goldfinger'
-            version "${versions.name}"
+            version versions.goldfinger
 
             pom.withXml {
                 def root = asNode()
@@ -47,6 +31,9 @@ publishing {
 }
 
 bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_API_KEY')
+    publish = true
     publications = ['Publication']
 
     pkg {
@@ -56,8 +43,33 @@ bintray {
         publicDownloadNumbers = true
 
         version {
-            name = versions.name
-            vcsTag = "v${versions.name}"
+            name = versions.goldfinger
         }
     }
 }
+
+task javadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.source
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    classifier = 'javadoc'
+    from javadocs.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: assemble) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.source
+}
+
+task generateReadme {
+    doFirst {
+        def readmeFile = new File("${project.rootDir}/README.md")
+        def content = readmeFile.text
+        content = content.replaceAll("'co\\.infinum\\:goldfinger\\:.+?'", "'co.infinum:goldfinger:${versions.goldfinger}'")
+        readmeFile.setText(content)
+    }
+}
+
+preBuild.dependsOn ':lib:generateReadme'

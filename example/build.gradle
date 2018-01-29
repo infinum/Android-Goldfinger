@@ -1,17 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion versions.targetSdk
+    compileSdkVersion sdk.compile
     buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "co.infinum.goldfinger.example"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
     }
 }
 
 dependencies {
     implementation "com.android.support:appcompat-v7:${versions.google}"
-    implementation "co.infinum:goldfinger:${versions.name}"
+    implementation project(':lib')
 }
