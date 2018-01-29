@@ -19,46 +19,47 @@ import static org.mockito.Mockito.when;
 public class MarshmallowGoldfingerTest {
 
     private Context context = new MockContext();
-    @Mock private CryptoCreator cryptoCreator;
+    @Mock private CryptoFactory cryptoFactory;
     @Mock private FingerprintManagerCompat.CryptoObject cryptoObject;
     @Mock private Crypto crypto;
     @Mock private Goldfinger.Callback callback;
+    @Mock private Logger logger;
     private Goldfinger goldfinger;
 
     @Before
     public void init() {
-        goldfinger = new MarshmallowGoldfinger(context, cryptoCreator, crypto);
+        goldfinger = new MarshmallowGoldfinger(context, cryptoFactory, crypto, logger);
     }
 
     @Test
     public void decrypt_started() {
-        when(cryptoCreator.createDecryptionCryptoObject("keyName")).thenReturn(cryptoObject);
+        when(cryptoFactory.createDecryptionCryptoObject("keyName")).thenReturn(cryptoObject);
         goldfinger.decrypt("keyName", "value", callback);
-        verify(cryptoCreator).createDecryptionCryptoObject("keyName");
+        verify(cryptoFactory).createDecryptionCryptoObject("keyName");
         verify(callback, never()).onError(Error.UNKNOWN);
     }
 
     @Test
     public void encrypt_started() {
-        when(cryptoCreator.createEncryptionCryptoObject("keyName")).thenReturn(cryptoObject);
+        when(cryptoFactory.createEncryptionCryptoObject("keyName")).thenReturn(cryptoObject);
         goldfinger.encrypt("keyName", "value", callback);
-        verify(cryptoCreator).createEncryptionCryptoObject("keyName");
+        verify(cryptoFactory).createEncryptionCryptoObject("keyName");
         verify(callback, never()).onError(Error.UNKNOWN);
     }
 
     @Test
     public void authenticate_started() {
-        when(cryptoCreator.createAuthenticationCryptoObject(anyString())).thenReturn(cryptoObject);
+        when(cryptoFactory.createAuthenticationCryptoObject(anyString())).thenReturn(cryptoObject);
         goldfinger.authenticate(callback);
-        verify(cryptoCreator).createAuthenticationCryptoObject(anyString());
+        verify(cryptoFactory).createAuthenticationCryptoObject(anyString());
         verify(callback, never()).onError(Error.UNKNOWN);
     }
 
     @Test
     public void cryptoObjectNull() {
-        when(cryptoCreator.createDecryptionCryptoObject("keyName")).thenReturn(null);
+        when(cryptoFactory.createDecryptionCryptoObject("keyName")).thenReturn(null);
         goldfinger.decrypt("keyName", "value", callback);
-        verify(cryptoCreator).createDecryptionCryptoObject("keyName");
+        verify(cryptoFactory).createDecryptionCryptoObject("keyName");
         verify(callback).onError(Error.CRYPTO_OBJECT_INIT);
     }
 }

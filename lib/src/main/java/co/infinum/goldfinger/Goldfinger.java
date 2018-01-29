@@ -2,7 +2,6 @@ package co.infinum.goldfinger;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
 public interface Goldfinger {
@@ -66,17 +65,12 @@ public interface Goldfinger {
     class Builder {
 
         private final Context context;
-        private CryptoCreator cryptoCreator;
+        private CryptoFactory cryptoFactory;
         private Crypto crypto;
-        private ExceptionHandler exceptionHandler;
+        private boolean logEnabled = false;
 
         public Builder(Context context) {
             this.context = context;
-        }
-
-        public Builder setExceptionHandler(ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler;
-            return this;
         }
 
         public Builder setCrypto(Crypto crypto) {
@@ -84,8 +78,13 @@ public interface Goldfinger {
             return this;
         }
 
-        public Builder setCryptoCreator(CryptoCreator cryptoCreator) {
-            this.cryptoCreator = cryptoCreator;
+        public Builder setCryptoFactory(CryptoFactory cryptoFactory) {
+            this.cryptoFactory = cryptoFactory;
+            return this;
+        }
+
+        public Builder setLogEnabled(boolean logEnabled) {
+            this.logEnabled = logEnabled;
             return this;
         }
 
@@ -99,11 +98,11 @@ public interface Goldfinger {
 
         @RequiresApi(Build.VERSION_CODES.M)
         private Goldfinger buildMarshmallowInstance() {
-            ExceptionHandler finalExceptionHandler = exceptionHandler != null ? exceptionHandler : new ExceptionHandler.Default();
-            Crypto finalCrypto = crypto != null ? crypto : new Crypto.Default(finalExceptionHandler);
-            CryptoCreator finalCryptoCreator =
-                    cryptoCreator != null ? cryptoCreator : new CryptoCreator.Default(context, finalExceptionHandler);
-            return new MarshmallowGoldfinger(context, finalCryptoCreator, finalCrypto);
+            Logger logger = new Logger(logEnabled);
+            Crypto finalCrypto = crypto != null ? crypto : new Crypto.Default(logger);
+            CryptoFactory finalCryptoFactory =
+                    cryptoFactory != null ? cryptoFactory : new CryptoFactory.Default(context, logger);
+            return new MarshmallowGoldfinger(context, finalCryptoFactory, finalCrypto, logger);
         }
     }
 }

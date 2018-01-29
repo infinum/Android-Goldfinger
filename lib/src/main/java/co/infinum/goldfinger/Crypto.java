@@ -20,10 +20,10 @@ public interface Crypto {
 
     class Default implements Crypto {
 
-        private final ExceptionHandler exceptionHandler;
+        private final Logger logger;
 
-        Default(ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler;
+        Default(Logger logger) {
+            this.logger = logger;
         }
 
         @Nullable
@@ -31,9 +31,10 @@ public interface Crypto {
         public String encrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
             try {
                 byte[] encryptedBytes = cryptoObject.getCipher().doFinal(value.getBytes());
-                return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+                String encryptedValue = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+                return encryptedValue;
             } catch (Exception e) {
-                exceptionHandler.onException(e);
+                logger.log(e);
                 return null;
             }
         }
@@ -43,9 +44,10 @@ public interface Crypto {
         public String decrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
             try {
                 byte[] decodedBytes = Base64.decode(value, Base64.DEFAULT);
-                return new String(cryptoObject.getCipher().doFinal(decodedBytes));
+                String decryptedValue = new String(cryptoObject.getCipher().doFinal(decodedBytes));
+                return decryptedValue;
             } catch (Exception e) {
-                exceptionHandler.onException(e);
+                logger.log(e);
                 return null;
             }
         }

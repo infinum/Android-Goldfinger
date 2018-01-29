@@ -17,7 +17,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 
-public interface CryptoCreator {
+public interface CryptoFactory {
 
     /**
      * Create CryptoObject for authentication call. Return null if invalid.
@@ -38,24 +38,24 @@ public interface CryptoCreator {
     FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName);
 
     @RequiresApi(Build.VERSION_CODES.M)
-    class Default implements CryptoCreator {
+    class Default implements CryptoFactory {
 
         private static final String KEY_SHARED_PREFS = "<Goldfinger IV>";
         private static final String KEY_KEYSTORE = "AndroidKeyStore";
 
-        private final ExceptionHandler exceptionHandler;
+        private Logger logger;
         private KeyStore keyStore;
         private KeyGenerator keyGenerator;
         private final SharedPreferences sharedPrefs;
 
-        Default(Context context, ExceptionHandler exceptionHandler) {
-            this.exceptionHandler = exceptionHandler;
+        Default(Context context, Logger logger) {
+            this.logger = logger;
             this.sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE);
             try {
                 keyStore = KeyStore.getInstance(KEY_KEYSTORE);
                 keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_KEYSTORE);
             } catch (Exception e) {
-                exceptionHandler.onException(e);
+                logger.log(e);
             }
         }
 
@@ -87,7 +87,7 @@ public interface CryptoCreator {
                 Cipher cipher = createCipher(keyName, mode, key);
                 return new FingerprintManagerCompat.CryptoObject(cipher);
             } catch (Exception e) {
-                exceptionHandler.onException(e);
+                logger.log(e);
                 return null;
             }
         }
