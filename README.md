@@ -13,7 +13,7 @@ implementation 'co.infinum:goldfinger:1.0.0-rc1'
 #### Initialize
 
 ```java
-Goldfinger.Builder(Context).build()
+Goldfinger.Builder(context).build()
 ```
 
 #### Check prerequisites
@@ -70,16 +70,16 @@ Goldfinger wraps everything mentioned and provides an intuitive and easy-to-use 
 If you don’t like Default implementations, you can easily modify them using `Goldfinger.Builder` object.
 
 ```java
-Goldfinger.Builder(Context)
-  .setLogEnabled(Boolean)
-  .setCryptoCreator(CryptoCreator)
-  .setCrypto(Crypto)
+Goldfinger.Builder(context)
+  .setLogEnabled(true)
+  .setCryptoCreator(cryptoCreator)
+  .setCrypto(crypto)
   .build()
 ```
 
 #### Logging
 
-Logging is **off** by default. You can change it via the `Goldfinger.Builder#setLogEnabled(Boolean)` method.
+Logging is **off** by default. You can enable it by calling `Goldfinger.Builder(context).setLogEnabled(true)`.
 
 #### `CryptoFactory`
 
@@ -139,4 +139,6 @@ Feedback and code contributions are very much welcome. Just make a pull request 
 
 Maintained and sponsored by [Infinum](http://www.infinum.co).
 
-<img src='https://infinum.co/infinum.png' width='264'>
+<a href='https://infinum.co'>
+  <img src='https://infinum.co/infinum.png' href='https://infinum.co' width='264'>
+</a>
