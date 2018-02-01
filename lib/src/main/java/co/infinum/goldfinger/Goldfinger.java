@@ -22,14 +22,20 @@ public interface Goldfinger {
     void authenticate(Callback callback);
 
     /**
-     * Authenticate user via Fingerprint, automatically load IV vector
-     * from given keyName and decrypt given value.
+     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * {@link Crypto} implementation is used to automatically decrypt given value.
+     *
+     * @param keyName unique key identifier, {@link java.security.Key} saved under this value is loaded from {@link java.security.KeyStore}
+     * @param value   String value which will be decrypted if user successfully authenticates
      */
     void decrypt(String keyName, String value, Callback callback);
 
     /**
-     * Authenticate user via Fingerprint, automatically save IV vector
-     * to given keyName and encrypt given value.
+     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * {@link Crypto} implementation is used to automatically encrypt given value.
+     *
+     * @param keyName unique key identifier, {@link java.security.Key} is stored to {@link java.security.KeyStore} under this value
+     * @param value   String value which will be encrypted if user successfully authenticates
      */
     void encrypt(String keyName, String value, Callback callback);
 
@@ -41,20 +47,28 @@ public interface Goldfinger {
     interface Callback {
 
         /**
-         * User successfully authenticated and value is encrypted/decrypted.
-         * For authentication call, empty string is returned and value can be ignored.
+         * User successfully authenticated.
+         *
+         * @param value This value can be one of:
+         *              1) Empty string - if {@link #authenticate(Callback)} is used
+         *              2) Encrypted string - if {@link #encrypt(String, String, Callback)} is used
+         *              3) Decrypted string - if {@link #decrypt(String, String, Callback)} is used
          */
         void onSuccess(String value);
 
         /**
          * Authentication failed but authentication is still active
          * and user can retry fingerprint authentication.
+         *
+         * @see Warning
          */
         void onWarning(Warning warning);
 
         /**
          * Authentication or initialization error happened and fingerprint authentication
          * is not active.
+         *
+         * @see Error
          */
         void onError(Error error);
     }
