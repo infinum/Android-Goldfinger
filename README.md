@@ -1,5 +1,7 @@
 # Goldfinger [![JCenter](https://api.bintray.com/packages/infinum/android/goldfinger/images/download.svg)](https://bintray.com/infinum/android/goldfinger/_latestVersion) [![CircleCI Status](https://circleci.com/gh/infinum/Android-Goldfinger/tree/master.svg?style=shield&circle-token=141a7164e06f4e97602260e076110778f16a8d02)](https://bintray.com/infinum/android/goldfinger/_latestVersion)
 
+<img src='./logo.svg' width='264'/>
+
 Android library to simplify Fingerprint authentication implementation.
 
 ## Quick guide
@@ -45,6 +47,8 @@ goldfinger.authenticate(new Goldfinger.Callback() {
   }
 });
 ```
+
+You can see all Goldfinger methods [here](./lib/src/main/java/co/infinum/goldfinger/Goldfinger.java).
 
 ## Fingerprint authentication flow
 
