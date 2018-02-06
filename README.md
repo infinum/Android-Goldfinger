@@ -2,8 +2,6 @@
 
 <img src='./logo.svg' width='264'/>
 
-Android library to simplify Fingerprint authentication implementation.
-
 ## Quick guide
 
 #### Add dependency
