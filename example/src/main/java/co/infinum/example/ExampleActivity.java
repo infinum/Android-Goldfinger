@@ -157,6 +157,12 @@ public class ExampleActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        goldfinger.cancel();
+    }
+
     private void onSuccessResult(String value) {
         onResult("onSuccess", value);
         statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
