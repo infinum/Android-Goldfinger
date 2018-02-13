@@ -5,25 +5,32 @@ import android.support.v4.os.CancellationSignal;
 
 class CancellableAuthenticationCallback extends FingerprintManagerCompat.AuthenticationCallback {
 
+    private static final long IGNORE_CANCEL_MS = 100;
+
     private final Crypto crypto;
     private final Logger logger;
     private final Mode mode;
     private final String value;
     private final Goldfinger.Callback callback;
-    final CancellationSignal cancellationSignal = new CancellationSignal();
+    private final long initializationTime;
+    private final Clock clock;
+    final CancellationSignal cancellationSignal;
 
-    CancellableAuthenticationCallback(Crypto crypto, Logger logger, Mode mode, String value, Goldfinger.Callback callback) {
+    CancellableAuthenticationCallback(Crypto crypto, Logger logger, Clock clock, Mode mode, String value, Goldfinger.Callback callback) {
         this.crypto = crypto;
         this.logger = logger;
         this.mode = mode;
         this.value = value;
         this.callback = callback;
+        this.clock = clock;
+        this.initializationTime = clock.currentTimeMs();
+        this.cancellationSignal = new CancellationSignal();
     }
 
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
-        if (!cancellationSignal.isCanceled()) {
-            Error error = Error.fromId(errMsgId);
+        Error error = Error.fromId(errMsgId);
+        if (shouldReactToError(error)) {
             logger.log("Error [%s]", error);
             callback.onError(error);
         }
@@ -31,8 +38,8 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
 
     @Override
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
+        Warning warning = Warning.fromId(helpMsgId);
         if (!cancellationSignal.isCanceled()) {
-            Warning warning = Warning.fromId(helpMsgId);
             logger.log("Warning [%s]", warning);
             callback.onWarning(warning);
         }
@@ -83,5 +90,10 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
         if (!cancellationSignal.isCanceled()) {
             cancellationSignal.cancel();
         }
+    }
+
+    private boolean shouldReactToError(Error error) {
+        return !cancellationSignal.isCanceled()
+                && (error != Error.CANCELED || clock.isBeforeNow(initializationTime + IGNORE_CANCEL_MS));
     }
 }

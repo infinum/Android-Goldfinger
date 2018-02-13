@@ -75,7 +75,7 @@ class MarshmallowGoldfinger implements Goldfinger {
         }
 
         logger.log("Starting authentication [keyName=%s; value=%s]", keyName, value);
-        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, logger, mode, value, callback);
+        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, logger, Clock.instance(), mode, value, callback);
         fingerprintManagerCompat.authenticate(cryptoObject,
                 0,
                 cancellableAuthenticationCallback.cancellationSignal,
@@ -86,7 +86,6 @@ class MarshmallowGoldfinger implements Goldfinger {
     @Override
     public void cancel() {
         if (cancellableAuthenticationCallback != null) {
-            mainHandler.removeCallbacksAndMessages(null);
             cancellableAuthenticationCallback.cancel();
             cancellableAuthenticationCallback = null;
         }
