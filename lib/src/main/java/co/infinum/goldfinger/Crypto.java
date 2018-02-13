@@ -31,8 +31,7 @@ public interface Crypto {
         public String encrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
             try {
                 byte[] encryptedBytes = cryptoObject.getCipher().doFinal(value.getBytes());
-                String encryptedValue = Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
-                return encryptedValue;
+                return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
             } catch (Exception e) {
                 logger.log(e);
                 return null;
@@ -44,8 +43,7 @@ public interface Crypto {
         public String decrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
             try {
                 byte[] decodedBytes = Base64.decode(value, Base64.DEFAULT);
-                String decryptedValue = new String(cryptoObject.getCipher().doFinal(decodedBytes));
-                return decryptedValue;
+                return new String(cryptoObject.getCipher().doFinal(decodedBytes));
             } catch (Exception e) {
                 logger.log(e);
                 return null;

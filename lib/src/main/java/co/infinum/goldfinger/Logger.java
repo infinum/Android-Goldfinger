@@ -22,7 +22,7 @@ class Logger {
 
     void log(Throwable t) {
         if (enabled) {
-            Log.e(TAG, t.getMessage());
+            Log.e(TAG, t.toString());
         }
     }
 }
