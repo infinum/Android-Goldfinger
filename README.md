@@ -7,7 +7,7 @@
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.0.0-rc1'
+implementation 'co.infinum:goldfinger:1.0.0'
 ```
 
 #### Initialize

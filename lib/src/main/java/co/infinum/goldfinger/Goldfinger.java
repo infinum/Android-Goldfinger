@@ -116,7 +116,8 @@ public interface Goldfinger {
             Crypto finalCrypto = crypto != null ? crypto : new Crypto.Default(logger);
             CryptoFactory finalCryptoFactory =
                     cryptoFactory != null ? cryptoFactory : new CryptoFactory.Default(context, logger);
-            return new MarshmallowGoldfinger(context, finalCryptoFactory, finalCrypto, logger);
+            AsyncCryptoFactory asyncCryptoFactory = new AsyncCryptoFactory(finalCryptoFactory);
+            return new MarshmallowGoldfinger(context, asyncCryptoFactory, finalCrypto, logger);
         }
     }
 }
