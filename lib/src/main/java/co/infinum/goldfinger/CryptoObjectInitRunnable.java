@@ -1,13 +1,17 @@
 package co.infinum.goldfinger;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 
 class CryptoObjectInitRunnable implements Runnable {
 
+    private final static Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private final AsyncCryptoFactory.Callback callback;
     private final CryptoFactory cryptoFactory;
     private final String keyName;
     private final Mode mode;
-    private final AsyncCryptoFactory.Callback callback;
 
     CryptoObjectInitRunnable(CryptoFactory cryptoFactory, String keyName, Mode mode, AsyncCryptoFactory.Callback callback) {
         this.cryptoFactory = cryptoFactory;
@@ -18,7 +22,7 @@ class CryptoObjectInitRunnable implements Runnable {
 
     @Override
     public void run() {
-        FingerprintManagerCompat.CryptoObject cryptoObject = null;
+        final FingerprintManagerCompat.CryptoObject cryptoObject;
         switch (mode) {
             case AUTHENTICATION:
                 cryptoObject = cryptoFactory.createAuthenticationCryptoObject(keyName);
@@ -29,10 +33,18 @@ class CryptoObjectInitRunnable implements Runnable {
             case ENCRYPTION:
                 cryptoObject = cryptoFactory.createEncryptionCryptoObject(keyName);
                 break;
+            default:
+                cryptoObject = null;
+                break;
         }
 
         if (!callback.canceled) {
-            callback.onCryptoObjectCreated(cryptoObject);
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    callback.onCryptoObjectCreated(cryptoObject);
+                }
+            });
         }
     }
 }

@@ -1,5 +1,7 @@
 package co.infinum.goldfinger;
 
+import android.hardware.fingerprint.FingerprintManager;
+
 public enum Warning {
     /**
      * The image acquired was good.
@@ -32,17 +34,17 @@ public enum Warning {
 
     static Warning fromId(int id) {
         switch (id) {
-            case 0:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_GOOD:
                 return GOOD;
-            case 1:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_PARTIAL:
                 return PARTIAL;
-            case 2:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_INSUFFICIENT:
                 return INSUFFICIENT;
-            case 3:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_IMAGER_DIRTY:
                 return DIRTY;
-            case 4:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_SLOW:
                 return TOO_SLOW;
-            case 5:
+            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_FAST:
                 return TOO_FAST;
             default:
                 return FAILURE;

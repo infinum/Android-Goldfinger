@@ -1,5 +1,7 @@
 package co.infinum.goldfinger;
 
+import android.hardware.fingerprint.FingerprintManager;
+
 public enum Error {
     /**
      * The hardware is unavailable.
@@ -45,17 +47,17 @@ public enum Error {
 
     static Error fromId(int id) {
         switch (id) {
-            case 1:
+            case FingerprintManager.FINGERPRINT_ERROR_HW_UNAVAILABLE:
                 return UNAVAILABLE;
-            case 2:
+            case FingerprintManager.FINGERPRINT_ERROR_UNABLE_TO_PROCESS:
                 return UNABLE_TO_PROCESS;
-            case 3:
+            case FingerprintManager.FINGERPRINT_ERROR_TIMEOUT:
                 return TIMEOUT;
-            case 4:
+            case FingerprintManager.FINGERPRINT_ERROR_NO_SPACE:
                 return NOT_ENOUGH_SPACE;
-            case 5:
+            case FingerprintManager.FINGERPRINT_ERROR_CANCELED:
                 return CANCELED;
-            case 7:
+            case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT:
                 return LOCKOUT;
             default:
                 return UNKNOWN;
