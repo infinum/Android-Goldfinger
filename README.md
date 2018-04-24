@@ -7,7 +7,7 @@
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.0.1'
+implementation 'co.infinum:goldfinger:1.1.0'
 ```
 
 #### Initialize
@@ -35,18 +35,50 @@ goldfinger.authenticate(new Goldfinger.Callback() {
   }
 
   @Override
-  public void onWarning(Warning warning) {
-    /* Authentication failed, Fingerprint authentication still active */
-  }
-
-  @Override
   public void onError(Error error) {
-    /* Critical error, Fingerprint authentication not active */
+    /* Error, can be either critical or non-critical */
   }
 });
 ```
 
-You can see all Goldfinger methods [here](./lib/src/main/java/co/infinum/goldfinger/Goldfinger.java).
+You can see all Goldfinger methods [here](./core/src/main/java/co/infinum/goldfinger/Goldfinger.java).
+
+## Rx module
+
+Goldfinger has separate Rx module in case you want to use reactive approach.
+
+#### Add dependencies
+
+```gradle
+implementation 'co.infinum:goldfinger:1.1.0'
+implementation 'co.infinum:goldfinger:1.1.0'
+```
+
+#### Initialize
+
+```java
+RxGoldfinger.Builder(context).build()
+```
+
+#### Authenticate
+
+```java
+goldfinger.authenticate().subscribe(new Observer<GoldfingerEvent>() {
+
+  ...
+
+  @Override
+  public void onNext(GoldfingerEvent event) {
+    if (event instanceof GoldfingerEvent.OnSuccess) {
+      /* Authenticated */
+    } else if (event instanceof GoldfingerEvent.OnError) {
+      /* Error, can be either critical or non-critical */
+    }
+  }
+});
+```
+
+You can see all RxGoldfinger methods [here](./rx/src/main/java/co/infinum/goldfinger/rx/RxGoldfinger.java).
 
 ## Fingerprint authentication flow
 
@@ -106,7 +138,7 @@ new CryptoFactory() {
 
 All methods should return a `CryptoObject` instance or a `null` value if an error happens during object creation.
 
-You can find the default implementation [here](./lib/src/main/java/co/infinum/goldfinger/CryptoFactory.java).
+You can find the default implementation [here](./core/src/main/java/co/infinum/goldfinger/CryptoFactory.java).
 
 #### Crypto
 
@@ -127,7 +159,7 @@ new Crypto() {
 
 `Crypto` methods receive an unlocked `CryptoObject` that ciphers data and a `String` value as data you should cipher. The return value should be ciphered data or `null` if an error happens.
 
-The default `Crypto` implementation can be found [here](./lib/src/main/java/co/infinum/goldfinger/Crypto.java).
+The default `Crypto` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/Crypto.java).
 
 ## Known issues
 

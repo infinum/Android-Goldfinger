@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion sdk.compile
+    compileSdkVersion sdk.target
 
     defaultConfig {
         applicationId "co.infinum.goldfinger.example"
@@ -11,6 +11,8 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:${versions.google}"
-    implementation project(':lib')
+    implementation deps.appcompat
+    implementation deps.rxjava
+    implementation project(':core')
+    implementation project(':rx')
 }
