@@ -1,0 +1,26 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion sdk.target
+
+    defaultConfig {
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
+        versionName versions.goldfinger
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation deps.appcompat
+    testImplementation deps.junit
+    testImplementation deps.mockito
+}
+
+apply from: '../tasks.gradle'
+apply from: 'bintray.gradle'
+
+preBuild.dependsOn ':core:generateReadme'

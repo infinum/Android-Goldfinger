@@ -1,0 +1,29 @@
+task javadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.source
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+afterEvaluate {
+    javadocs.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    classifier = 'javadoc'
+    from javadocs.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: assemble) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.source
+}
+
+task generateReadme {
+    doFirst {
+        def readmeFile = new File("${project.rootDir}/README.md")
+        def content = readmeFile.text
+        content = content.replaceAll("'co\\.infinum:goldfinger(-rx)?:.+?'", "'co.infinum:goldfinger:${versions.goldfinger}'")
+        readmeFile.setText(content)
+    }
+}
