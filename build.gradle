@@ -1,15 +1,23 @@
 buildscript {
 
     ext.sdk = [
-            min    : 16,
-            target : 27,
-            compile: 27
+        min   : 16,
+        target: 27,
     ]
 
     ext.versions = [
-            goldfinger: '1.0.1',
-            buildTools: '26.0.2',
-            google    : '27.0.2'
+        goldfinger: '1.1.0',
+        google    : '27.1.1',
+        junit     : '4.12',
+        mockito   : '2.10.0',
+        rxjava    : '2.1.13'
+    ]
+
+    ext.deps = [
+        appcompat: "com.android.support:appcompat-v7:${versions.google}",
+        junit    : "junit:junit:${versions.junit}",
+        mockito  : "org.mockito:mockito-core:${versions.mockito}",
+        rxjava   : "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
     ]
 
     repositories {
@@ -18,7 +26,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
