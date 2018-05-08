@@ -51,7 +51,7 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 
 ```gradle
 implementation 'co.infinum:goldfinger:1.1.0'
-implementation 'co.infinum:goldfinger:1.1.0'
+implementation 'co.infinum:goldfinger-rx:1.1.0'
 ```
 
 #### Initialize
