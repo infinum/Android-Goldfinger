@@ -6,11 +6,14 @@ jobs:
       - image: circleci/android:api-27-alpha
     steps:
       - checkout
-      - run: ./gradlew :lib:androidDependencies
-      - run: ./gradlew :lib:lintRelease
-      - run: ./gradlew :lib:testReleaseUnitTest
+      - run: ./gradlew :core:androidDependencies
+      - run: ./gradlew :core:lintRelease
+      - run: ./gradlew :core:testReleaseUnitTest
+      - run: ./gradlew :rx:androidDependencies
+      - run: ./gradlew :rx:lintRelease
+      - run: ./gradlew :rx:testReleaseUnitTest
       - store_artifacts:
-          path: lib/build/reports
+          path: core/build/reports
           destination: reports
       - store_test_results:
-          path: lib/build/test-results
+          path: core/build/test-results

@@ -1,0 +1,22 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion sdk.target
+
+    defaultConfig {
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
+        versionName versions.goldfinger
+    }
+}
+
+dependencies {
+    implementation project(":core")
+    implementation deps.appcompat
+    implementation deps.rxjava
+    testImplementation deps.junit
+    testImplementation deps.mockito
+}
+
+apply from: '../tasks.gradle'
+apply from: 'bintray.gradle'
