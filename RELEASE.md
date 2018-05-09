@@ -13,7 +13,7 @@ Be sure that [build.gradle](https://github.com/infinum/Android-Goldfinger/blob/m
 ### Run gradle task
 
 `./gradlew clean build javadocs assemble`
-`./gradlew :rx:bintrayUpload :core:bintrayUpload`
+`./gradlew bintrayUpload`
 
 ### Bintray publish
 

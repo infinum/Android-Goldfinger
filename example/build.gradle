@@ -15,4 +15,6 @@ dependencies {
     implementation deps.rxjava
     implementation project(':core')
     implementation project(':rx')
+//    implementation "co.infinum:goldfinger:${versions.goldfinger}"
+//    implementation "co.infinum:goldfinger-rx:${versions.goldfinger}"
 }
