@@ -23,7 +23,8 @@ task generateReadme {
     doFirst {
         def readmeFile = new File("${project.rootDir}/README.md")
         def content = readmeFile.text
-        content = content.replaceAll("'co\\.infinum:goldfinger(-rx)?:.+?'", "'co.infinum:goldfinger:${versions.goldfinger}'")
+        content = content.replaceAll("'co\\.infinum:goldfinger:.+?'", "'co.infinum:goldfinger:${versions.goldfinger}'")
+        content = content.replaceAll("'co\\.infinum:goldfinger-rx?:.+?'", "'co.infinum:goldfinger-rx:${versions.goldfinger}'")
         readmeFile.setText(content)
     }
 }
