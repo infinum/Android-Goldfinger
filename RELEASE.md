@@ -14,3 +14,7 @@ Be sure that [build.gradle](https://github.com/infinum/Android-Goldfinger/blob/m
 
 `./gradlew clean build javadocs assemble`
 `./gradlew bintrayUpload`
+
+### Bintray publish
+
+Manually go to [Bintray page](https://bintray.com/infinum/android), check that all 8 files are there and publish them if everything is OK.
