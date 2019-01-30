@@ -1,13 +1,13 @@
 package co.infinum.goldfinger;
 
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static junit.framework.Assert.assertEquals;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -16,11 +16,10 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CancellableAuthenticationCallbackTest {
 
-    @Mock private Goldfinger.Callback callback;
-    private CancellableAuthenticationCallback cancellableCallback;
-    @Mock private Clock clock;
-    @Mock private Crypto crypto;
-    @Mock private FingerprintManagerCompat.CryptoObject cryptoObject;
+    @Mock private GoldfingerCallback callback;
+    @Mock private BiometricPrompt.CryptoObject cryptoObject;
+    @Mock private CryptographyHandler cryptographyHandler;
+    private InternalCallback internalCallback;
 
     @Test
     public void cancel_canceled() {
@@ -149,8 +148,8 @@ public class CancellableAuthenticationCallbackTest {
         verify(callback).onSuccess("");
     }
 
-    private CancellableAuthenticationCallback newInstance(Mode mode) {
-        return new CancellableAuthenticationCallback(crypto, clock, mode, "", callback);
+    private InternalCallback newInstance(Mode mode) {
+        return new InternalCallback(cryptographyHandler, mode, new CryptographyData("", ""), callback);
     }
 }
 

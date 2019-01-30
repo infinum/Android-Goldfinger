@@ -2,36 +2,40 @@ package co.infinum.goldfinger;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricPrompt;
 
 class CryptoObjectInitRunnable implements Runnable {
 
     private final static Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private final AsyncCryptoFactory.Callback callback;
-    private final CryptoFactory cryptoFactory;
-    private final String keyName;
+    private final AsyncCryptoObjectFactory.Callback callback;
+    private final CryptoObjectFactory cryptoFactory;
+    @NonNull private final CryptographyData cryptographyData;
     private final Mode mode;
 
-    CryptoObjectInitRunnable(CryptoFactory cryptoFactory, String keyName, Mode mode, AsyncCryptoFactory.Callback callback) {
+    CryptoObjectInitRunnable(
+        @NonNull CryptoObjectFactory cryptoFactory,
+        @NonNull CryptographyData cryptographyData,
+        @NonNull Mode mode,
+        @NonNull AsyncCryptoObjectFactory.Callback callback
+    ) {
         this.cryptoFactory = cryptoFactory;
-        this.keyName = keyName;
+        this.cryptographyData = cryptographyData;
         this.mode = mode;
         this.callback = callback;
     }
 
     @Override
     public void run() {
-        final FingerprintManagerCompat.CryptoObject cryptoObject;
+        final BiometricPrompt.CryptoObject cryptoObject;
         switch (mode) {
-            case AUTHENTICATION:
-                cryptoObject = cryptoFactory.createAuthenticationCryptoObject(keyName);
-                break;
             case DECRYPTION:
-                cryptoObject = cryptoFactory.createDecryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createDecryptionCryptoObject(cryptographyData);
                 break;
             case ENCRYPTION:
-                cryptoObject = cryptoFactory.createEncryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createEncryptionCryptoObject(cryptographyData);
                 break;
             default:
                 cryptoObject = null;

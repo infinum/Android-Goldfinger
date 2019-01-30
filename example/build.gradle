@@ -12,6 +12,7 @@ android {
 
 dependencies {
     implementation deps.appcompat
+    implementation deps.biometric
     implementation deps.rxjava
     implementation project(':core')
     implementation project(':rx')

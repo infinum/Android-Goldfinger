@@ -1,154 +1,155 @@
 package co.infinum.goldfinger;
 
-import android.hardware.fingerprint.FingerprintManager;
+import androidx.biometric.BiometricPrompt;
 
 /**
  * Wraps all possible errors that can happen.
  * <p>
  * It's important to differentiate critical errors from non-critical errors.
- *
- * @see Error#isCritical()
  */
 public enum Error {
 
     /**
-     * The hardware is unavailable.
+     * @see BiometricPrompt#ERROR_HW_UNAVAILABLE
      */
-    UNAVAILABLE(true),
+    HARDWARE_UNAVAILABLE(false),
 
     /**
-     * Error state returned when the sensor was unable to process the current image.
+     * @see BiometricPrompt#ERROR_UNABLE_TO_PROCESS
      */
-    UNABLE_TO_PROCESS(true),
+    UNABLE_TO_PROCESS(false),
 
     /**
-     * Error state returned when the current request has been running too long.
+     * @see BiometricPrompt#ERROR_TIMEOUT
      */
-    TIMEOUT(true),
+    TIMEOUT(false),
 
     /**
-     * Error state returned for operations like enrollment; the operation cannot be completed because there's not
-     * enough storage remaining to complete the operation.
+     * @see BiometricPrompt#ERROR_NO_SPACE
      */
-    NOT_ENOUGH_SPACE(true),
+    NO_SPACE(false),
 
     /**
-     * The operation was canceled because the fingerprint sensor is unavailable.
+     * @see BiometricPrompt#ERROR_CANCELED
      */
-    CANCELED(true),
+    CANCELED(false),
 
     /**
-     * The operation was canceled because the API is locked out due to too many attempts.
+     * @see BiometricPrompt#ERROR_LOCKOUT
      */
-    LOCKOUT(true),
+    LOCKOUT(false),
 
     /**
-     * Fingerprint did not start due to initialization failure, probably because of
-     * {@link android.security.keystore.KeyPermanentlyInvalidatedException}
+     * @see BiometricPrompt#ERROR_VENDOR
      */
-    INITIALIZATION_FAILED(true),
+    VENDOR(false),
 
     /**
-     * Crypto failed to decrypt the value.
+     * @see BiometricPrompt#ERROR_LOCKOUT_PERMANENT
+     */
+    LOCKOUT_PERMANENT(false),
+
+    /**
+     * @see BiometricPrompt#ERROR_USER_CANCELED
+     */
+    USER_CANCELED(false),
+
+    /**
+     * @see BiometricPrompt#ERROR_NO_BIOMETRICS
+     */
+    NO_BIOMETRICS(false),
+
+    /**
+     * @see BiometricPrompt#ERROR_HW_NOT_PRESENT
+     */
+    HARDWARE_NOT_PRESENT(false),
+
+    /**
+     * This is never received in {@link GoldfingerCallback#onError(Error)}
+     * but automatically delegated to {@link GoldfingerCallback#onNegativeButtonClicked()}
+     * as it is not really an error.
+     *
+     * @see BiometricPrompt#ERROR_NEGATIVE_BUTTON
+     */
+    NEGATIVE_BUTTON(false),
+
+    /**
+     * Biometric is valid but it is not recognized.
+     */
+    AUTHENTICATION_FAILED(false),
+
+    /**
+     * Value decryption failed.
      */
     DECRYPTION_FAILED(true),
 
     /**
-     * Crypto failed to encrypt the value.
+     * Value encryption failed.
      */
     ENCRYPTION_FAILED(true),
 
     /**
-     * The image acquired was good.
+     * CryptoObject creation failed.
      */
-    GOOD(false),
+    CRYPTO_OBJECT_CREATE_FAILED(true),
 
     /**
-     * Only a partial fingerprint image was detected.
+     * Encryption and decryption calls must have valid {@link CryptographyData}.
+     * In case nothing needs to be encrypted/decrypted, use {@link Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)} method.
      */
-    PARTIAL(false),
-
-    /**
-     * The fingerprint image was too noisy to process due to a detected condition.
-     */
-    INSUFFICIENT(false),
-
-    /**
-     * The fingerprint image was too noisy due to suspected or detected dirt on the sensor.
-     */
-    DIRTY(false),
-
-    /**
-     * The fingerprint image was unreadable due to lack of motion.
-     */
-    TOO_SLOW(false),
-
-    /**
-     * The fingerprint image was incomplete due to quick motion.
-     */
-    TOO_FAST(false),
-
-    /**
-     * Fingerprint valid but not recognized.
-     */
-    FAILURE(false),
+    INVALID_PARAMS(false),
 
     /**
      * Unknown error happened.
      */
-    UNKNOWN(true);
+    UNKNOWN(false);
 
-    private final boolean isCritical;
+    private boolean invalidateFingerprint;
 
-    Error(boolean isCritical) {
-        this.isCritical = isCritical;
+    Error(boolean invalidateFingerprint) {
+        this.invalidateFingerprint = invalidateFingerprint;
     }
 
-    static Error fromFingerprintError(int id) {
+    static Error fromBiometricError(int id) {
         switch (id) {
-            case FingerprintManager.FINGERPRINT_ERROR_HW_UNAVAILABLE:
-                return UNAVAILABLE;
-            case FingerprintManager.FINGERPRINT_ERROR_UNABLE_TO_PROCESS:
+            case BiometricPrompt.ERROR_HW_UNAVAILABLE:
+                return HARDWARE_UNAVAILABLE;
+            case BiometricPrompt.ERROR_UNABLE_TO_PROCESS:
                 return UNABLE_TO_PROCESS;
-            case FingerprintManager.FINGERPRINT_ERROR_TIMEOUT:
+            case BiometricPrompt.ERROR_TIMEOUT:
                 return TIMEOUT;
-            case FingerprintManager.FINGERPRINT_ERROR_NO_SPACE:
-                return NOT_ENOUGH_SPACE;
-            case FingerprintManager.FINGERPRINT_ERROR_CANCELED:
+            case BiometricPrompt.ERROR_NO_SPACE:
+                return NO_SPACE;
+            case BiometricPrompt.ERROR_CANCELED:
                 return CANCELED;
-            case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT:
+            case BiometricPrompt.ERROR_LOCKOUT:
                 return LOCKOUT;
+            case BiometricPrompt.ERROR_VENDOR:
+                return VENDOR;
+            case BiometricPrompt.ERROR_LOCKOUT_PERMANENT:
+                return LOCKOUT_PERMANENT;
+            case BiometricPrompt.ERROR_USER_CANCELED:
+                return USER_CANCELED;
+            case BiometricPrompt.ERROR_NO_BIOMETRICS:
+                return NO_BIOMETRICS;
+            case BiometricPrompt.ERROR_HW_NOT_PRESENT:
+                return HARDWARE_NOT_PRESENT;
+            case BiometricPrompt.ERROR_NEGATIVE_BUTTON:
+                return NEGATIVE_BUTTON;
             default:
                 return UNKNOWN;
         }
     }
 
-    static Error fromFingerprintHelp(int id) {
-        switch (id) {
-            case FingerprintManager.FINGERPRINT_ACQUIRED_GOOD:
-                return GOOD;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_PARTIAL:
-                return PARTIAL;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_INSUFFICIENT:
-                return INSUFFICIENT;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_IMAGER_DIRTY:
-                return DIRTY;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_SLOW:
-                return TOO_SLOW;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_FAST:
-                return TOO_FAST;
-            default:
-                return FAILURE;
-        }
-    }
-
     /**
-     * If an error is critical, then Fingerprint authentication is not active anymore.
-     * <p>
-     * If an error is non-critical, then Fingerprint authentication did not succeed, but it
-     * is still active and user can retry.
+     * Some errors are more serious than others. When specific errors are
+     * received, it means that existing user's fingerprint can't and should
+     * not be used but he should add new fingerprint.
+     *
+     * @return boolean value to know whether or not you should invalidate user's
+     * existing fingerprint
      */
-    public boolean isCritical() {
-        return isCritical;
+    public boolean shouldInvalidateFingerprint() {
+        return invalidateFingerprint;
     }
 }

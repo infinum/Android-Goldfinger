@@ -3,7 +3,7 @@ package co.infinum.goldfinger;
 import javax.crypto.Cipher;
 
 enum Mode {
-    AUTHENTICATION(Cipher.ENCRYPT_MODE),
+    AUTHENTICATION(-1),
     DECRYPTION(Cipher.DECRYPT_MODE),
     ENCRYPTION(Cipher.ENCRYPT_MODE);
 

@@ -16,6 +16,7 @@ android {
 
 dependencies {
     implementation deps.appcompat
+    implementation deps.biometric
     testImplementation deps.junit
     testImplementation deps.mockito
 }

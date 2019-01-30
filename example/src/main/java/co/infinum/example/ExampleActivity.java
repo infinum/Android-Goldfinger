@@ -1,21 +1,24 @@
 package co.infinum.example;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 import co.infinum.goldfinger.Error;
 import co.infinum.goldfinger.Goldfinger;
+import co.infinum.goldfinger.GoldfingerCallback;
+import co.infinum.goldfinger.GoldfingerParams;
 
 public class ExampleActivity extends AppCompatActivity {
 
-    private static final String KEY_NAME = "Example";
+    private static final String EXAMPLE_KEY = "key";
 
     private View authenticateButton;
     private View decryptButton;
@@ -26,9 +29,10 @@ public class ExampleActivity extends AppCompatActivity {
     private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
         @Override
         void onTextChanged(String text) {
-            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasEnrolledFingerprint());
+            encryptButton.setEnabled(!text.isEmpty());
         }
     };
+    private BiometricPrompt.PromptInfo promptInfo;
     private EditText secretInputView;
     private TextView statusView;
 
@@ -43,9 +47,15 @@ public class ExampleActivity extends AppCompatActivity {
         secretInputView = findViewById(R.id.secretInputView);
         statusView = findViewById(R.id.statusView);
 
-        goldfinger = new Goldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
+        goldfinger = new Goldfinger.Builder(this).logEnabled(BuildConfig.DEBUG).build();
 
         secretInputView.addTextChangedListener(onTextChangedListener);
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Goldfinger")
+            .setSubtitle("Biometric example")
+            .setDescription("Quick example setup to demonstrate how Goldfinger works with BiometricDialog")
+            .setNegativeButtonText("Cancel")
+            .build();
         initListeners();
     }
 
@@ -53,13 +63,8 @@ public class ExampleActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        authenticateButton.setEnabled(goldfinger.hasEnrolledFingerprint());
-
-        if (goldfinger.hasFingerprintHardware()
-            && goldfinger.hasEnrolledFingerprint()) {
-            authenticateButton.setEnabled(true);
-        } else {
-            authenticateButton.setEnabled(false);
+        authenticateButton.setEnabled(goldfinger.hasFingerprintHardware());
+        if (!goldfinger.hasFingerprintHardware()) {
             statusView.setText(getString(R.string.fingerprint_not_available));
             statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
         }
@@ -72,7 +77,10 @@ public class ExampleActivity extends AppCompatActivity {
     }
 
     private void authenticateUserFingerprint() {
-        goldfinger.authenticate(new Goldfinger.Callback() {
+        GoldfingerParams params = new GoldfingerParams.Builder(this)
+            .promptInfo(promptInfo)
+            .build();
+        goldfinger.authenticate(params, new GoldfingerCallback() {
             @Override
             public void onError(Error error) {
                 onErrorResult(error);
@@ -86,7 +94,11 @@ public class ExampleActivity extends AppCompatActivity {
     }
 
     private void decryptEncryptedValue() {
-        goldfinger.decrypt(KEY_NAME, encryptedValue, new Goldfinger.Callback() {
+        GoldfingerParams params = new GoldfingerParams.Builder(this)
+            .cryptographyData(EXAMPLE_KEY, encryptedValue)
+            .promptInfo(promptInfo)
+            .build();
+        goldfinger.decrypt(params, new GoldfingerCallback() {
             @Override
             public void onError(Error error) {
                 onErrorResult(error);
@@ -100,7 +112,11 @@ public class ExampleActivity extends AppCompatActivity {
     }
 
     private void encryptSecretValue() {
-        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString(), new Goldfinger.Callback() {
+        GoldfingerParams params = new GoldfingerParams.Builder(this)
+            .promptInfo(promptInfo)
+            .cryptographyData(EXAMPLE_KEY, secretInputView.getText().toString())
+            .build();
+        goldfinger.encrypt(params, new GoldfingerCallback() {
             @Override
             public void onError(Error error) {
                 onErrorResult(error);
@@ -143,7 +159,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void onErrorResult(Error error) {
         onResult("onError", error.toString());
-        if (error.isCritical()) {
+        if (error.shouldInvalidateFingerprint()) {
             statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
         } else {
             statusView.setTextColor(ContextCompat.getColor(this, R.color.warning));

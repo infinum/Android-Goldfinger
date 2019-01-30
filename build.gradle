@@ -2,19 +2,19 @@ buildscript {
 
     ext.sdk = [
         min   : 16,
-        target: 27,
+        target: 28,
     ]
 
     ext.versions = [
-        goldfinger: '1.1.1',
-        google    : '27.1.1',
+        goldfinger: '2.0.0',
         junit     : '4.12',
         mockito   : '2.10.0',
         rxjava    : '2.1.13'
     ]
 
     ext.deps = [
-        appcompat: "com.android.support:appcompat-v7:${versions.google}",
+        biometric: 'androidx.biometric:biometric:1.0.0-alpha03',
+        appcompat: "androidx.appcompat:appcompat:1.0.0",
         junit    : "junit:junit:${versions.junit}",
         mockito  : "org.mockito:mockito-core:${versions.mockito}",
         rxjava   : "io.reactivex.rxjava2:rxjava:${versions.rxjava}"

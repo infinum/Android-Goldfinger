@@ -13,6 +13,7 @@ android {
 dependencies {
     implementation project(':core')
     implementation deps.appcompat
+    implementation deps.biometric
     implementation deps.rxjava
     testImplementation deps.junit
     testImplementation deps.mockito

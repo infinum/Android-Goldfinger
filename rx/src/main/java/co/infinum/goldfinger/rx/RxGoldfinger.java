@@ -2,10 +2,13 @@ package co.infinum.goldfinger.rx;
 
 import android.content.Context;
 
-import co.infinum.goldfinger.Crypto;
-import co.infinum.goldfinger.CryptoFactory;
+import androidx.annotation.NonNull;
+import co.infinum.goldfinger.CryptoObjectFactory;
+import co.infinum.goldfinger.CryptographyHandler;
 import co.infinum.goldfinger.Goldfinger;
-import io.reactivex.Observable;
+import co.infinum.goldfinger.GoldfingerCallback;
+import co.infinum.goldfinger.GoldfingerParams;
+import io.reactivex.Single;
 
 public interface RxGoldfinger {
 
@@ -15,54 +18,53 @@ public interface RxGoldfinger {
     boolean hasFingerprintHardware();
 
     /**
-     * @see Goldfinger#hasEnrolledFingerprint()
+     * @see Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)
      */
-    boolean hasEnrolledFingerprint();
+    @NonNull
+    Single<String> authenticate(@NonNull GoldfingerParams params);
 
     /**
-     * @see Goldfinger#authenticate(Goldfinger.Callback)
+     * @see Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)
      */
-    Observable<GoldfingerEvent> authenticate();
+    @NonNull
+    Single<String> decrypt(@NonNull GoldfingerParams params);
 
     /**
-     * @see Goldfinger#decrypt(String, String, Goldfinger.Callback)
+     * @see Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)
      */
-    Observable<GoldfingerEvent> decrypt(String keyName, String value);
-
-    /**
-     * @see Goldfinger#encrypt(String, String, Goldfinger.Callback)
-     */
-    Observable<GoldfingerEvent> encrypt(String keyName, String value);
+    @NonNull
+    Single<String> encrypt(@NonNull GoldfingerParams params);
 
     /**
      * @see Goldfinger#cancel()
      */
     void cancel();
 
+    @SuppressWarnings("unused")
     class Builder {
 
-        private Goldfinger.Builder baseBuilder;
+        private Goldfinger.Builder goldfingerBuilder;
 
         public Builder(Context context) {
-            this.baseBuilder = new Goldfinger.Builder(context);
+            this.goldfingerBuilder = new Goldfinger.Builder(context);
         }
 
         public RxGoldfinger build() {
-            return new RxGoldfingerImpl(baseBuilder.build());
+            return new RxGoldfingerImpl(goldfingerBuilder.build());
         }
 
-        public RxGoldfinger.Builder setCrypto(Crypto crypto) {
-            baseBuilder.setCrypto(crypto);
+        public RxGoldfinger.Builder cryptoObjectFactory(CryptoObjectFactory cryptoObjectFactory) {
+            goldfingerBuilder.cryptoObjectFactory(cryptoObjectFactory);
             return this;
         }
 
-        public RxGoldfinger.Builder setCryptoFactory(CryptoFactory cryptoFactory) {
-            baseBuilder.setCryptoFactory(cryptoFactory);
+        public RxGoldfinger.Builder cryptographyHandler(CryptographyHandler cryptographyHandler) {
+            goldfingerBuilder.cryptographyHandler(cryptographyHandler);
             return this;
         }
 
-        public RxGoldfinger.Builder setLogEnabled(boolean logEnabled) {
-            baseBuilder.setLogEnabled(logEnabled);
+        public RxGoldfinger.Builder logEnabled(boolean logEnabled) {
+            goldfingerBuilder.logEnabled(logEnabled);
             return this;
         }
     }

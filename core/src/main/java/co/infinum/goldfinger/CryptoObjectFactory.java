@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.util.Base64;
 
 import java.security.Key;
@@ -17,36 +14,34 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.biometric.BiometricPrompt;
+
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Interface used for {@link android.support.v4.hardware.fingerprint.FingerprintManagerCompat.CryptoObject}
- * creation. Has separate method for {@link Goldfinger#authenticate(Goldfinger.Callback)},
- * {@link Goldfinger#decrypt(String, String, Goldfinger.Callback)} and
- * {@link Goldfinger#encrypt(String, String, Goldfinger.Callback)}
+ * Interface used for {@link androidx.core.hardware.fingerprint.FingerprintManagerCompat.CryptoObject}
+ * creation. Has separate method for {@link Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)},
+ * {@link Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)} and
+ * {@link Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)}.
  */
-public interface CryptoFactory {
-
-    /**
-     * Create CryptoObject for authentication call. Return null if invalid.
-     */
-    @Nullable
-    FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(String keyName);
+public interface CryptoObjectFactory {
 
     /**
      * Create CryptoObject for encryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(String keyName);
+    BiometricPrompt.CryptoObject createEncryptionCryptoObject(CryptographyData cryptographyData);
 
     /**
      * Create CryptoObject for decryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName);
+    BiometricPrompt.CryptoObject createDecryptionCryptoObject(CryptographyData cryptographyData);
 
     @RequiresApi(Build.VERSION_CODES.M)
-    class Default implements CryptoFactory {
+    class Default implements CryptoObjectFactory {
 
         private static final String KEY_KEYSTORE = "AndroidKeyStore";
         private static final String KEY_SHARED_PREFS = "<Goldfinger IV>";
@@ -67,20 +62,14 @@ public interface CryptoFactory {
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(String keyName) {
-            return createCryptoObject(keyName, Mode.AUTHENTICATION);
+        public BiometricPrompt.CryptoObject createDecryptionCryptoObject(CryptographyData cryptographyData) {
+            return createCryptoObject(cryptographyData.getKeyName(), Mode.DECRYPTION);
         }
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName) {
-            return createCryptoObject(keyName, Mode.DECRYPTION);
-        }
-
-        @Nullable
-        @Override
-        public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(String keyName) {
-            return createCryptoObject(keyName, Mode.ENCRYPTION);
+        public BiometricPrompt.CryptoObject createEncryptionCryptoObject(CryptographyData cryptographyData) {
+            return createCryptoObject(cryptographyData.getKeyName(), Mode.ENCRYPTION);
         }
 
         private Cipher createCipher(String keyName, Mode mode, Key key) throws Exception {
@@ -101,7 +90,7 @@ public interface CryptoFactory {
             return cipher;
         }
 
-        private FingerprintManagerCompat.CryptoObject createCryptoObject(String keyName, Mode mode) {
+        private BiometricPrompt.CryptoObject createCryptoObject(String keyName, Mode mode) {
             if (keyStore == null || keyGenerator == null) {
                 return null;
             }
@@ -109,7 +98,7 @@ public interface CryptoFactory {
             try {
                 Key key = (mode == Mode.DECRYPTION) ? loadKey(keyName) : createKey(keyName);
                 Cipher cipher = createCipher(keyName, mode, key);
-                return new FingerprintManagerCompat.CryptoObject(cipher);
+                return new BiometricPrompt.CryptoObject(cipher);
             } catch (Exception e) {
                 log(e);
                 return null;
