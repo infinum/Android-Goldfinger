@@ -40,6 +40,11 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull GoldfingerParams params,
         @NonNull GoldfingerCallback callback
     ) {
+        if (areParamsInvalid(params, Mode.AUTHENTICATION)) {
+            callback.onError(Error.INVALID_PARAMS);
+            return;
+        }
+
         cancel();
         this.internalCallback = new InternalCallback(
             this.cryptographyHandler,
@@ -48,7 +53,7 @@ class MarshmallowGoldfinger implements Goldfinger {
             callback
         );
         biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
-        biometricPrompt.authenticate(params.getPromptInfo());
+        biometricPrompt.authenticate(params.buildPromptInfo());
     }
 
     @Override
@@ -86,10 +91,34 @@ class MarshmallowGoldfinger implements Goldfinger {
             && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
     }
 
-    private boolean isCryptographyDataInvalid(@Nullable CryptographyData cryptographyData) {
-        return cryptographyData == null
-            || cryptographyData.getKeyName().isEmpty()
-            || cryptographyData.getValue().isEmpty();
+    private boolean areParamsInvalid(@NonNull GoldfingerParams params, @NonNull Mode mode) {
+        boolean invalid = false;
+
+        if (params.getTitle().isEmpty()) {
+            invalid = true;
+            log("GoldfingerParams must contain non-empty = [title]");
+        }
+
+        if (params.getNegativeButtonText().isEmpty()) {
+            invalid = true;
+            log("GoldfingerParams must contain non-empty = [negativeButtonText]");
+        }
+
+        if (Mode.AUTHENTICATION != mode) {
+            CryptographyData cryptographyData = params.getCryptographyData();
+
+            if (cryptographyData.getKeyName().isEmpty()) {
+                invalid = true;
+                log("GoldfingerParams must contain non-empty = [CryptographyData#keyName]");
+            }
+
+            if (cryptographyData.getValue().isEmpty()) {
+                invalid = true;
+                log("GoldfingerParams must contain non-empty = [CryptographyData#value]");
+            }
+        }
+
+        return invalid;
     }
 
     private void startFingerprintAuthentication(
@@ -97,12 +126,13 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull final GoldfingerParams params,
         @NonNull final GoldfingerCallback callback
     ) {
-        cancel();
-        log("Creating CryptoObject");
-        if (isCryptographyDataInvalid(params.getCryptographyData())) {
+        if (areParamsInvalid(params, mode)) {
             callback.onError(Error.INVALID_PARAMS);
             return;
         }
+
+        cancel();
+        log("Creating CryptoObject");
         asyncCryptoFactoryCallback = new AsyncCryptoObjectFactory.Callback() {
             @Override
             void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject) {
@@ -127,6 +157,6 @@ class MarshmallowGoldfinger implements Goldfinger {
         log("Starting authentication [keyName=%s; value=%s]", cryptographyData.getKeyName(), cryptographyData.getValue());
         this.internalCallback = new InternalCallback(cryptographyHandler, mode, cryptographyData, callback);
         this.biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
-        this.biometricPrompt.authenticate(params.getPromptInfo(), cryptoObject);
+        this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
     }
 }

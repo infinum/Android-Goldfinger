@@ -94,8 +94,12 @@ public enum Error {
     CRYPTO_OBJECT_CREATE_FAILED(true),
 
     /**
+     * Params are invalid, logs contain detailed explanation what is missing.
+     * <p>
+     * All methods expect GoldfingerParams to contain title and negativeButtonText. BiometricsPrompt API
+     * throws exception if they are not provided.
+     * <p>
      * Encryption and decryption calls must have valid {@link CryptographyData}.
-     * In case nothing needs to be encrypted/decrypted, use {@link Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)} method.
      */
     INVALID_PARAMS(false),
 

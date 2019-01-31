@@ -9,7 +9,6 @@ import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import co.infinum.goldfinger.Error;
 import co.infinum.goldfinger.Goldfinger;
@@ -32,7 +31,6 @@ public class ExampleActivity extends AppCompatActivity {
             encryptButton.setEnabled(!text.isEmpty());
         }
     };
-    private BiometricPrompt.PromptInfo promptInfo;
     private EditText secretInputView;
     private TextView statusView;
 
@@ -50,12 +48,6 @@ public class ExampleActivity extends AppCompatActivity {
         goldfinger = new Goldfinger.Builder(this).logEnabled(BuildConfig.DEBUG).build();
 
         secretInputView.addTextChangedListener(onTextChangedListener);
-        promptInfo = new BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Goldfinger")
-            .setSubtitle("Biometric example")
-            .setDescription("Quick example setup to demonstrate how Goldfinger works with BiometricDialog")
-            .setNegativeButtonText("Cancel")
-            .build();
         initListeners();
     }
 
@@ -78,7 +70,10 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         GoldfingerParams params = new GoldfingerParams.Builder(this)
-            .promptInfo(promptInfo)
+            .title("Title")
+            .description("Description")
+            .negativeButtonText("Cancel")
+            .subtitle("Subtitle")
             .build();
         goldfinger.authenticate(params, new GoldfingerCallback() {
             @Override
@@ -96,7 +91,10 @@ public class ExampleActivity extends AppCompatActivity {
     private void decryptEncryptedValue() {
         GoldfingerParams params = new GoldfingerParams.Builder(this)
             .cryptographyData(EXAMPLE_KEY, encryptedValue)
-            .promptInfo(promptInfo)
+            .title("Title")
+            .description("Description")
+            .negativeButtonText("Cancel")
+            .subtitle("Subtitle")
             .build();
         goldfinger.decrypt(params, new GoldfingerCallback() {
             @Override
@@ -113,7 +111,10 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void encryptSecretValue() {
         GoldfingerParams params = new GoldfingerParams.Builder(this)
-            .promptInfo(promptInfo)
+            .title("Title")
+            .description("Description")
+            .negativeButtonText("Cancel")
+            .subtitle("Subtitle")
             .cryptographyData(EXAMPLE_KEY, secretInputView.getText().toString())
             .build();
         goldfinger.encrypt(params, new GoldfingerCallback() {

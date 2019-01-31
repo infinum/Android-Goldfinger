@@ -10,33 +10,69 @@ import androidx.fragment.app.FragmentActivity;
  *
  * @see Builder
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class GoldfingerParams {
 
     private final FragmentActivity activity;
     private final CryptographyData cryptographyData;
-    private final BiometricPrompt.PromptInfo promptInfo;
+    private final String description;
+    private final String negativeButtonText;
+    private final String subtitle;
+    private final String title;
 
     private GoldfingerParams(
-        FragmentActivity activity,
-        BiometricPrompt.PromptInfo promptInfo,
-        CryptographyData cryptographyData
+        @NonNull FragmentActivity activity,
+        @NonNull CryptographyData cryptographyData,
+        @NonNull String title,
+        @NonNull String description,
+        @NonNull String negativeButtonText,
+        @NonNull String subtitle
     ) {
         this.activity = activity;
-        this.promptInfo = promptInfo;
         this.cryptographyData = cryptographyData;
+        this.title = title;
+        this.description = description;
+        this.negativeButtonText = negativeButtonText;
+        this.subtitle = subtitle;
     }
 
+    @NonNull
     public FragmentActivity getActivity() {
         return activity;
     }
 
+    @NonNull
     public CryptographyData getCryptographyData() {
         return cryptographyData;
     }
 
-    public BiometricPrompt.PromptInfo getPromptInfo() {
-        return promptInfo;
+    @NonNull
+    public String getDescription() {
+        return description;
+    }
+
+    @NonNull
+    public String getNegativeButtonText() {
+        return negativeButtonText;
+    }
+
+    @NonNull
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    @NonNull
+    public String getTitle() {
+        return title;
+    }
+
+    BiometricPrompt.PromptInfo buildPromptInfo() {
+        return new BiometricPrompt.PromptInfo.Builder()
+            .setTitle(title)
+            .setSubtitle(subtitle)
+            .setDescription(description)
+            .setNegativeButtonText(negativeButtonText)
+            .build();
     }
 
     @SuppressWarnings("unused")
@@ -46,7 +82,6 @@ public class GoldfingerParams {
         private CryptographyData cryptographyData;
         private String description;
         private String negativeButtonText;
-        private BiometricPrompt.PromptInfo promptInfo;
         private String subtitle;
         private String title;
 
@@ -58,8 +93,11 @@ public class GoldfingerParams {
         public GoldfingerParams build() {
             return new GoldfingerParams(
                 activity,
-                promptInfo != null ? promptInfo : buildBiometricPromptInfo(),
-                cryptographyData
+                cryptographyData != null ? cryptographyData : new CryptographyData("", ""),
+                title != null ? title : "",
+                description != null ? description : "",
+                negativeButtonText != null ? negativeButtonText : "",
+                subtitle != null ? subtitle : ""
             );
         }
 
@@ -86,8 +124,6 @@ public class GoldfingerParams {
         }
 
         /**
-         * Optional.
-         *
          * @see BiometricPrompt.PromptInfo.Builder#setDescription(CharSequence)
          */
         @NonNull
@@ -97,8 +133,6 @@ public class GoldfingerParams {
         }
 
         /**
-         * Required, if no value is given, uses default value.
-         *
          * @see BiometricPrompt.PromptInfo.Builder#setNegativeButtonText(CharSequence)
          */
         @NonNull
@@ -108,20 +142,6 @@ public class GoldfingerParams {
         }
 
         /**
-         * Instead of calling single methods on {@link GoldfingerParams.Builder} you can
-         * immediately pass already built {@link BiometricPrompt.PromptInfo}. In this case,
-         * it will override {@link GoldfingerParams.Builder#title}, {@link GoldfingerParams.Builder#subtitle},
-         * {@link GoldfingerParams.Builder#description} and {@link GoldfingerParams.Builder#negativeButtonText}.
-         */
-        @NonNull
-        public Builder promptInfo(@Nullable BiometricPrompt.PromptInfo promptInfo) {
-            this.promptInfo = promptInfo;
-            return this;
-        }
-
-        /**
-         * Optional.
-         *
          * @see BiometricPrompt.PromptInfo.Builder#setSubtitle(CharSequence)
          */
         @NonNull
@@ -131,27 +151,12 @@ public class GoldfingerParams {
         }
 
         /**
-         * Required, if no value is given, uses default value.
-         *
          * @see BiometricPrompt.PromptInfo.Builder#setTitle(CharSequence)
          */
         @NonNull
         public Builder title(@NonNull String title) {
             this.title = title;
             return this;
-        }
-
-        private BiometricPrompt.PromptInfo buildBiometricPromptInfo() {
-            BiometricPrompt.PromptInfo.Builder builder = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(title != null ? title : "<TITLE>")
-                .setNegativeButtonText(negativeButtonText != null ? negativeButtonText : "<NEGATIVEBUTTONTEXT>");
-            if (subtitle != null) {
-                builder.setSubtitle(subtitle);
-            }
-            if (description != null) {
-                builder.setDescription(description);
-            }
-            return builder.build();
         }
     }
 }

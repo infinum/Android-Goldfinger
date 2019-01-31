@@ -10,9 +10,7 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import co.infinum.goldfinger.rx.GoldfingerEvent;
 import co.infinum.goldfinger.rx.RxGoldfinger;
-import io.reactivex.observers.DisposableObserver;
 
 public class RxExampleActivity extends AppCompatActivity {
 
@@ -27,7 +25,7 @@ public class RxExampleActivity extends AppCompatActivity {
     private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
         @Override
         void onTextChanged(String text) {
-            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasEnrolledFingerprint());
+            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasFingerprintHardware());
         }
     };
     private EditText secretInputView;
@@ -44,7 +42,7 @@ public class RxExampleActivity extends AppCompatActivity {
         secretInputView = findViewById(R.id.secretInputView);
         statusView = findViewById(R.id.statusView);
 
-        goldfinger = new RxGoldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
+        goldfinger = new RxGoldfinger.Builder(this).logEnabled(BuildConfig.DEBUG).build();
 
         secretInputView.addTextChangedListener(onTextChangedListener);
         initListeners();
@@ -54,13 +52,9 @@ public class RxExampleActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        authenticateButton.setEnabled(goldfinger.hasEnrolledFingerprint());
+        authenticateButton.setEnabled(goldfinger.hasFingerprintHardware());
 
-        if (goldfinger.hasFingerprintHardware()
-            && goldfinger.hasEnrolledFingerprint()) {
-            authenticateButton.setEnabled(true);
-        } else {
-            authenticateButton.setEnabled(false);
+        if (!goldfinger.hasFingerprintHardware()) {
             statusView.setText(getString(R.string.fingerprint_not_available));
             statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
         }
@@ -73,63 +67,63 @@ public class RxExampleActivity extends AppCompatActivity {
     }
 
     private void authenticateUserFingerprint() {
-        goldfinger.authenticate().subscribe(new DisposableObserver<GoldfingerEvent>() {
-
-            @Override
-            public void onComplete() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                onEvent(goldfingerEvent);
-            }
-        });
+//        goldfinger.authenticate().subscribe(new DisposableObserver<GoldfingerEvent>() {
+//
+//            @Override
+//            public void onComplete() {
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onNext(GoldfingerEvent goldfingerEvent) {
+//                onEvent(goldfingerEvent);
+//            }
+//        });
     }
 
     private void decryptEncryptedValue() {
-        goldfinger.decrypt(KEY_NAME, encryptedValue).subscribe(new DisposableObserver<GoldfingerEvent>() {
-            @Override
-            public void onComplete() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                onEvent(goldfingerEvent);
-            }
-        });
+//        goldfinger.decrypt(KEY_NAME, encryptedValue).subscribe(new DisposableObserver<GoldfingerEvent>() {
+//            @Override
+//            public void onComplete() {
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onNext(GoldfingerEvent goldfingerEvent) {
+//                onEvent(goldfingerEvent);
+//            }
+//        });
     }
 
     private void encryptSecretValue() {
-        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString()).subscribe(new DisposableObserver<GoldfingerEvent>() {
-
-            @Override
-            public void onComplete() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
-                    decryptButton.setEnabled(true);
-                    encryptedValue = ((GoldfingerEvent.OnSuccess) goldfingerEvent).value();
-                }
-                onEvent(goldfingerEvent);
-            }
-        });
+//        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString()).subscribe(new DisposableObserver<GoldfingerEvent>() {
+//
+//            @Override
+//            public void onComplete() {
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onNext(GoldfingerEvent goldfingerEvent) {
+//                if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
+//                    decryptButton.setEnabled(true);
+//                    encryptedValue = ((GoldfingerEvent.OnSuccess) goldfingerEvent).value();
+//                }
+//                onEvent(goldfingerEvent);
+//            }
+//        });
     }
 
     private void initListeners() {
@@ -158,31 +152,31 @@ public class RxExampleActivity extends AppCompatActivity {
         });
     }
 
-    private void onErrorResult(GoldfingerEvent.OnError event) {
-        onResult("onError", event.error().toString());
-//        if (event.error().isCritical()) {
-//            statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
-//        } else {
-//            statusView.setTextColor(ContextCompat.getColor(this, R.color.warning));
+//    private void onErrorResult(GoldfingerEvent.OnError event) {
+//        onResult("onError", event.error().toString());
+////        if (event.error().isCritical()) {
+////            statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
+////        } else {
+////            statusView.setTextColor(ContextCompat.getColor(this, R.color.warning));
+////        }
+//    }
+//
+//    private void onEvent(GoldfingerEvent goldfingerEvent) {
+//        if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
+//            onSuccessResult((GoldfingerEvent.OnSuccess) goldfingerEvent);
+//        } else if (goldfingerEvent instanceof GoldfingerEvent.OnError) {
+//            onErrorResult((GoldfingerEvent.OnError) goldfingerEvent);
 //        }
-    }
-
-    private void onEvent(GoldfingerEvent goldfingerEvent) {
-        if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
-            onSuccessResult((GoldfingerEvent.OnSuccess) goldfingerEvent);
-        } else if (goldfingerEvent instanceof GoldfingerEvent.OnError) {
-            onErrorResult((GoldfingerEvent.OnError) goldfingerEvent);
-        }
-    }
+//    }
 
     private void onResult(String methodName, String value) {
         statusView.setText(String.format(Locale.US, "%s - [%s]", methodName, value));
     }
 
-    private void onSuccessResult(GoldfingerEvent.OnSuccess event) {
-        onResult("onSuccess", event.value());
-        statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
-    }
+//    private void onSuccessResult(GoldfingerEvent.OnSuccess event) {
+//        onResult("onSuccess", event.value());
+//        statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
+//    }
 
     private void resetStatusText() {
         statusView.setTextColor(ContextCompat.getColor(this, R.color.textRegular));
