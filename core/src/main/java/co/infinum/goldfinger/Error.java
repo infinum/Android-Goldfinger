@@ -65,18 +65,9 @@ public enum Error {
     HARDWARE_NOT_PRESENT(false),
 
     /**
-     * This is never received in {@link GoldfingerCallback#onError(Error)}
-     * but automatically delegated to {@link GoldfingerCallback#onNegativeButtonClicked()}
-     * as it is not really an error.
-     *
      * @see BiometricPrompt#ERROR_NEGATIVE_BUTTON
      */
     NEGATIVE_BUTTON(false),
-
-    /**
-     * Biometric is valid but it is not recognized.
-     */
-    AUTHENTICATION_FAILED(false),
 
     /**
      * Value decryption failed.

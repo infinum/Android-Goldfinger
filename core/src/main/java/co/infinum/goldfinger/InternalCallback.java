@@ -30,11 +30,6 @@ class InternalCallback extends BiometricPrompt.AuthenticationCallback {
     }
 
     @Override
-    public void onAuthenticationFailed() {
-        onError(Error.AUTHENTICATION_FAILED);
-    }
-
-    @Override
     public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
         if (this.mode == Mode.AUTHENTICATION) {
             this.callback.onSuccess("");
