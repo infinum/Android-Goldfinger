@@ -6,7 +6,7 @@ buildscript {
     ]
 
     ext.versions = [
-        goldfinger: '1.1.1',
+        goldfinger: '1.1.2',
         google    : '27.1.1',
         junit     : '4.12',
         mockito   : '2.10.0',
