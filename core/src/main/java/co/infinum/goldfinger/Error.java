@@ -59,6 +59,11 @@ public enum Error {
     ENCRYPTION_FAILED(true),
 
     /**
+     * User canceled fingerprint reading.
+     */
+    USER_CANCEL(false),
+
+    /**
      * The image acquired was good.
      */
     GOOD(false),
@@ -117,7 +122,10 @@ public enum Error {
             case FingerprintManager.FINGERPRINT_ERROR_CANCELED:
                 return CANCELED;
             case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT:
+            case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT_PERMANENT:
                 return LOCKOUT;
+            case FingerprintManager.FINGERPRINT_ERROR_USER_CANCELED:
+                return USER_CANCEL;
             default:
                 return UNKNOWN;
         }
