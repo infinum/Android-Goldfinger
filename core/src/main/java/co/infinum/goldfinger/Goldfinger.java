@@ -4,9 +4,8 @@ import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.biometric.BiometricPrompt;
-import androidx.fragment.app.FragmentActivity;
 
 public interface Goldfinger {
 
@@ -52,7 +51,7 @@ public interface Goldfinger {
     /**
      * Become Bob the builder.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     class Builder {
 
         private final Context context;
@@ -98,5 +97,30 @@ public interface Goldfinger {
             AsyncCryptoObjectFactory asyncFactory = new AsyncCryptoObjectFactory(factory);
             return new MarshmallowGoldfinger(context, asyncFactory, handler);
         }
+    }
+
+    class Result {
+
+        @NonNull private final Reason reason;
+        @Nullable private final String value;
+
+        public Result(@NonNull Reason reason, @Nullable String value) {
+            this.reason = reason;
+            this.value = value;
+        }
+
+        @NonNull
+        public Reason reason() {
+            return reason;
+        }
+
+        @Nullable
+        public String value() {
+            return value;
+        }
+    }
+
+    enum Reason {
+        ENCRYPTION, DECRYPTION, AUTHENTICATION, FAIL
     }
 }

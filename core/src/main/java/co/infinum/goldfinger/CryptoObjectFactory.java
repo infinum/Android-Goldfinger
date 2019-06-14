@@ -63,13 +63,13 @@ public interface CryptoObjectFactory {
         @Nullable
         @Override
         public BiometricPrompt.CryptoObject createDecryptionCryptoObject(CryptographyData cryptographyData) {
-            return createCryptoObject(cryptographyData.getKeyName(), Mode.DECRYPTION);
+            return createCryptoObject(cryptographyData.keyName(), Mode.DECRYPTION);
         }
 
         @Nullable
         @Override
         public BiometricPrompt.CryptoObject createEncryptionCryptoObject(CryptographyData cryptographyData) {
-            return createCryptoObject(cryptographyData.getKeyName(), Mode.ENCRYPTION);
+            return createCryptoObject(cryptographyData.keyName(), Mode.ENCRYPTION);
         }
 
         private Cipher createCipher(String keyName, Mode mode, Key key) throws Exception {

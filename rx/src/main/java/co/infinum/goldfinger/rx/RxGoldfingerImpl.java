@@ -3,9 +3,9 @@ package co.infinum.goldfinger.rx;
 import androidx.annotation.NonNull;
 import co.infinum.goldfinger.Goldfinger;
 import co.infinum.goldfinger.GoldfingerParams;
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
 class RxGoldfingerImpl implements RxGoldfinger {
 
@@ -17,11 +17,11 @@ class RxGoldfingerImpl implements RxGoldfinger {
 
     @NonNull
     @Override
-    public Single<String> authenticate(@NonNull final GoldfingerParams params) {
-        return Single.create(new SingleOnSubscribe<String>() {
+    public Observable<Goldfinger.Result> authenticate(@NonNull final GoldfingerParams params) {
+        return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
-            public void subscribe(SingleEmitter<String> emitter) {
-                RxGoldfingerCallback callback = new RxGoldfingerCallback(emitter);
+            public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
+                RxGoldfingerCallback callback = new RxGoldfingerCallback(observableEmitter);
                 RxGoldfingerImpl.this.goldfinger.authenticate(params, callback);
             }
         });
@@ -34,11 +34,11 @@ class RxGoldfingerImpl implements RxGoldfinger {
 
     @NonNull
     @Override
-    public Single<String> decrypt(@NonNull final GoldfingerParams params) {
-        return Single.create(new SingleOnSubscribe<String>() {
+    public Observable<Goldfinger.Result> decrypt(@NonNull final GoldfingerParams params) {
+        return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
-            public void subscribe(SingleEmitter<String> emitter) {
-                RxGoldfingerCallback callback = new RxGoldfingerCallback(emitter);
+            public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
+                RxGoldfingerCallback callback = new RxGoldfingerCallback(observableEmitter);
                 RxGoldfingerImpl.this.goldfinger.decrypt(params, callback);
             }
         });
@@ -46,11 +46,11 @@ class RxGoldfingerImpl implements RxGoldfinger {
 
     @NonNull
     @Override
-    public Single<String> encrypt(@NonNull final GoldfingerParams params) {
-        return Single.create(new SingleOnSubscribe<String>() {
+    public Observable<Goldfinger.Result> encrypt(@NonNull final GoldfingerParams params) {
+        return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
-            public void subscribe(SingleEmitter<String> emitter) {
-                RxGoldfingerCallback callback = new RxGoldfingerCallback(emitter);
+            public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
+                RxGoldfingerCallback callback = new RxGoldfingerCallback(observableEmitter);
                 RxGoldfingerImpl.this.goldfinger.encrypt(params, callback);
             }
         });

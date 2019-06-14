@@ -22,12 +22,12 @@ public class CryptographyData {
     }
 
     @NonNull
-    public String getKeyName() {
+    public String keyName() {
         return keyName;
     }
 
     @NonNull
-    public String getValue() {
+    public String value() {
         return value;
     }
 }

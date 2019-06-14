@@ -8,7 +8,7 @@ import co.infinum.goldfinger.CryptographyHandler;
 import co.infinum.goldfinger.Goldfinger;
 import co.infinum.goldfinger.GoldfingerCallback;
 import co.infinum.goldfinger.GoldfingerParams;
-import io.reactivex.Single;
+import io.reactivex.Observable;
 
 public interface RxGoldfinger {
 
@@ -21,19 +21,19 @@ public interface RxGoldfinger {
      * @see Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)
      */
     @NonNull
-    Single<String> authenticate(@NonNull GoldfingerParams params);
+    Observable<Goldfinger.Result> authenticate(@NonNull GoldfingerParams params);
 
     /**
      * @see Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)
      */
     @NonNull
-    Single<String> decrypt(@NonNull GoldfingerParams params);
+    Observable<Goldfinger.Result> decrypt(@NonNull GoldfingerParams params);
 
     /**
      * @see Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)
      */
     @NonNull
-    Single<String> encrypt(@NonNull GoldfingerParams params);
+    Observable<Goldfinger.Result> encrypt(@NonNull GoldfingerParams params);
 
     /**
      * @see Goldfinger#cancel()

@@ -8,12 +8,12 @@ import androidx.biometric.BiometricPrompt;
 
 class CryptoObjectInitRunnable implements Runnable {
 
-    private final static Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final static Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
-    private final AsyncCryptoObjectFactory.Callback callback;
-    private final CryptoObjectFactory cryptoFactory;
+    @NonNull private final AsyncCryptoObjectFactory.Callback callback;
+    @NonNull private final CryptoObjectFactory cryptoFactory;
     @NonNull private final CryptographyData cryptographyData;
-    private final Mode mode;
+    @NonNull private final Mode mode;
 
     CryptoObjectInitRunnable(
         @NonNull CryptoObjectFactory cryptoFactory,
@@ -44,7 +44,7 @@ class CryptoObjectInitRunnable implements Runnable {
 
         if (!callback.canceled) {
             /* Return callback back to main thread as this is executed in the background */
-            mainHandler.post(new Runnable() {
+            MAIN_HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
                     callback.onCryptoObjectCreated(cryptoObject);

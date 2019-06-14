@@ -1,14 +1,15 @@
 package co.infinum.goldfinger.rx;
 
 import co.infinum.goldfinger.Error;
+import co.infinum.goldfinger.Goldfinger;
 import co.infinum.goldfinger.GoldfingerCallback;
-import io.reactivex.SingleEmitter;
+import io.reactivex.ObservableEmitter;
 
-class RxGoldfingerCallback implements GoldfingerCallback {
+class RxGoldfingerCallback extends GoldfingerCallback {
 
-    private final SingleEmitter<String> emitter;
+    private final ObservableEmitter<Goldfinger.Result> emitter;
 
-    RxGoldfingerCallback(SingleEmitter<String> emitter) {
+    RxGoldfingerCallback(ObservableEmitter<Goldfinger.Result> emitter) {
         this.emitter = emitter;
     }
 
@@ -20,9 +21,17 @@ class RxGoldfingerCallback implements GoldfingerCallback {
     }
 
     @Override
-    public void onSuccess(String value) {
+    public void onFail() {
         if (!emitter.isDisposed()) {
-            emitter.onSuccess(value);
+            emitter.onNext(new Goldfinger.Result(Goldfinger.Reason.FAIL, null));
+        }
+    }
+
+    @Override
+    public void onSuccess(Goldfinger.Result result) {
+        if (!emitter.isDisposed()) {
+            emitter.onNext(result);
+            emitter.onComplete();
         }
     }
 }

@@ -107,12 +107,12 @@ class MarshmallowGoldfinger implements Goldfinger {
         if (Mode.AUTHENTICATION != mode) {
             CryptographyData cryptographyData = params.getCryptographyData();
 
-            if (cryptographyData.getKeyName().isEmpty()) {
+            if (cryptographyData.keyName().isEmpty()) {
                 invalid = true;
                 log("GoldfingerParams must contain non-empty = [CryptographyData#keyName]");
             }
 
-            if (cryptographyData.getValue().isEmpty()) {
+            if (cryptographyData.value().isEmpty()) {
                 invalid = true;
                 log("GoldfingerParams must contain non-empty = [CryptographyData#value]");
             }
@@ -154,7 +154,7 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull GoldfingerCallback callback
     ) {
         CryptographyData cryptographyData = params.getCryptographyData();
-        log("Starting authentication [keyName=%s; value=%s]", cryptographyData.getKeyName(), cryptographyData.getValue());
+        log("Starting authentication [keyName=%s; value=%s]", cryptographyData.keyName(), cryptographyData.value());
         this.internalCallback = new InternalCallback(cryptographyHandler, mode, cryptographyData, callback);
         this.biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
         this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);

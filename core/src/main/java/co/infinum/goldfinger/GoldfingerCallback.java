@@ -1,20 +1,30 @@
 package co.infinum.goldfinger;
 
-public interface GoldfingerCallback {
+import androidx.biometric.BiometricPrompt;
+
+public abstract class GoldfingerCallback {
 
     /**
      * User successfully authenticated.
      *
-     * @param value This value can be one of:
-     *              1) Empty string - {@link Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)}
-     *              2) Encrypted string - {@link Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)}
-     *              3) Decrypted string - {@link Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)}
+     * @see Goldfinger.Result
+     * @see BiometricPrompt.AuthenticationCallback#onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult)
      */
-    void onSuccess(String value);
+    public abstract void onSuccess(Goldfinger.Result result);
 
     /**
+     * Unrecoverable error happened, fingerprint authentication is complete.
+     *
      * @see Error
+     * @see BiometricPrompt.AuthenticationCallback#onAuthenticationError(int, CharSequence)
      */
-    void onError(Error error);
+    public abstract void onError(Error error);
+
+    /**
+     * Recoverable error when user is not recognized.
+     *
+     * @see BiometricPrompt.AuthenticationCallback#onAuthenticationFailed()
+     */
+    public void onFail() {}
 }
 

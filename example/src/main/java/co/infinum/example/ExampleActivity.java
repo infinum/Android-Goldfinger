@@ -1,6 +1,7 @@
 package co.infinum.example;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +34,35 @@ public class ExampleActivity extends AppCompatActivity {
     };
     private EditText secretInputView;
     private TextView statusView;
+    private GoldfingerCallback callback = new GoldfingerCallback() {
+        @Override
+        public void onError(Error error) {
+            onErrorResult(error);
+        }
+
+        @Override
+        public void onFail() {
+            Log.d("Goldfinger", "onFail");
+        }
+
+        @Override
+        public void onSuccess(Goldfinger.Result result) {
+            switch (result.reason()) {
+                case ENCRYPTION:
+                    Log.d("Goldfinger", "Data encrypted.");
+                    encryptedValue = result.value();
+                    decryptButton.setEnabled(true);
+                    break;
+                case DECRYPTION:
+                    Log.d("Goldfinger", "Data decrypted.");
+                    break;
+                case AUTHENTICATION:
+                    Log.d("Goldfinger", "User authenticated");
+                    break;
+            }
+            onSuccessResult(result.value());
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,17 +105,7 @@ public class ExampleActivity extends AppCompatActivity {
             .negativeButtonText("Cancel")
             .subtitle("Subtitle")
             .build();
-        goldfinger.authenticate(params, new GoldfingerCallback() {
-            @Override
-            public void onError(Error error) {
-                onErrorResult(error);
-            }
-
-            @Override
-            public void onSuccess(String value) {
-                onSuccessResult(value);
-            }
-        });
+        goldfinger.authenticate(params, callback);
     }
 
     private void decryptEncryptedValue() {
@@ -96,17 +116,7 @@ public class ExampleActivity extends AppCompatActivity {
             .negativeButtonText("Cancel")
             .subtitle("Subtitle")
             .build();
-        goldfinger.decrypt(params, new GoldfingerCallback() {
-            @Override
-            public void onError(Error error) {
-                onErrorResult(error);
-            }
-
-            @Override
-            public void onSuccess(String value) {
-                onSuccessResult(value);
-            }
-        });
+        goldfinger.decrypt(params, callback);
     }
 
     private void encryptSecretValue() {
@@ -117,19 +127,7 @@ public class ExampleActivity extends AppCompatActivity {
             .subtitle("Subtitle")
             .cryptographyData(EXAMPLE_KEY, secretInputView.getText().toString())
             .build();
-        goldfinger.encrypt(params, new GoldfingerCallback() {
-            @Override
-            public void onError(Error error) {
-                onErrorResult(error);
-            }
-
-            @Override
-            public void onSuccess(String value) {
-                encryptedValue = value;
-                decryptButton.setEnabled(true);
-                onSuccessResult(value);
-            }
-        });
+        goldfinger.encrypt(params, callback);
     }
 
     private void initListeners() {

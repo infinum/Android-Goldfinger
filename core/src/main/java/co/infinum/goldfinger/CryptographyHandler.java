@@ -34,7 +34,7 @@ public interface CryptographyHandler {
         @Override
         public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData) {
             try {
-                byte[] decodedBytes = Base64.decode(cryptographyData.getValue(), Base64.DEFAULT);
+                byte[] decodedBytes = Base64.decode(cryptographyData.value(), Base64.DEFAULT);
                 return new String(cryptoObject.getCipher().doFinal(decodedBytes));
             } catch (Exception e) {
                 log(e);
@@ -46,7 +46,7 @@ public interface CryptographyHandler {
         @Override
         public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData) {
             try {
-                byte[] encryptedBytes = cryptoObject.getCipher().doFinal(cryptographyData.getValue().getBytes());
+                byte[] encryptedBytes = cryptoObject.getCipher().doFinal(cryptographyData.value().getBytes());
                 return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
             } catch (Exception e) {
                 log(e);

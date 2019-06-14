@@ -6,7 +6,7 @@ import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.FragmentActivity;
 
 /**
- * Data wrapper with Builder pattern for easier library usage.
+ * Data wrapper with Builder pattern for easier usage.
  *
  * @see Builder
  */
