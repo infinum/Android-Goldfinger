@@ -7,5 +7,5 @@
     <color name="error">#c21d1d</color>
     <color name="ok">#21a921</color>
     <color name="textRegular">#333</color>
-    <color name="warning">@color/primaryDark</color>
+    <color name="info">#258A60</color>
 </resources>

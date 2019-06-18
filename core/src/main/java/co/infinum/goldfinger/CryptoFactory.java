@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.util.Base64;
 
 import java.security.Key;
@@ -17,10 +14,15 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Interface used for {@link android.support.v4.hardware.fingerprint.FingerprintManagerCompat.CryptoObject}
+ * Interface used for {@link androidx.core.hardware.fingerprint.FingerprintManagerCompat.CryptoObject}
  * creation. Has separate method for {@link Goldfinger#authenticate(Goldfinger.Callback)},
  * {@link Goldfinger#decrypt(String, String, Goldfinger.Callback)} and
  * {@link Goldfinger#encrypt(String, String, Goldfinger.Callback)}
@@ -31,19 +33,19 @@ public interface CryptoFactory {
      * Create CryptoObject for authentication call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(String keyName);
+    FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName);
 
     /**
      * Create CryptoObject for encryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(String keyName);
+    FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName);
 
     /**
      * Create CryptoObject for decryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName);
+    FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName);
 
     @RequiresApi(Build.VERSION_CODES.M)
     class Default implements CryptoFactory {
@@ -55,7 +57,7 @@ public interface CryptoFactory {
         private KeyStore keyStore;
         private final SharedPreferences sharedPrefs;
 
-        Default(Context context) {
+        Default(@NonNull Context context) {
             this.sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE);
             try {
                 keyStore = KeyStore.getInstance(KEY_KEYSTORE);
@@ -67,23 +69,24 @@ public interface CryptoFactory {
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(String keyName) {
+        public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName) {
             return createCryptoObject(keyName, Mode.AUTHENTICATION);
         }
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName) {
+        public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {
             return createCryptoObject(keyName, Mode.DECRYPTION);
         }
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(String keyName) {
+        public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {
             return createCryptoObject(keyName, Mode.ENCRYPTION);
         }
 
-        private Cipher createCipher(String keyName, Mode mode, Key key) throws Exception {
+        @NonNull
+        private Cipher createCipher(@NonNull String keyName, @NonNull Mode mode, @Nullable Key key) throws Exception {
             String transformation = String.format(
                 "%s/%s/%s",
                 KeyProperties.KEY_ALGORITHM_AES,
@@ -101,7 +104,8 @@ public interface CryptoFactory {
             return cipher;
         }
 
-        private FingerprintManagerCompat.CryptoObject createCryptoObject(String keyName, Mode mode) {
+        @Nullable
+        private FingerprintManagerCompat.CryptoObject createCryptoObject(@NonNull String keyName, @NonNull Mode mode) {
             if (keyStore == null || keyGenerator == null) {
                 return null;
             }
@@ -116,7 +120,8 @@ public interface CryptoFactory {
             }
         }
 
-        private Key createKey(String keyName) throws Exception {
+        @Nullable
+        private Key createKey(@NonNull String keyName) throws Exception {
             KeyGenParameterSpec.Builder keyGenParamsBuilder =
                 new KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
@@ -130,16 +135,18 @@ public interface CryptoFactory {
             return loadKey(keyName);
         }
 
-        private byte[] loadIv(String keyName) {
+        @NonNull
+        private byte[] loadIv(@NonNull String keyName) {
             return Base64.decode(sharedPrefs.getString(keyName, ""), Base64.DEFAULT);
         }
 
-        private Key loadKey(String keyName) throws Exception {
+        @Nullable
+        private Key loadKey(@NonNull String keyName) throws Exception {
             keyStore.load(null);
             return keyStore.getKey(keyName, null);
         }
 
-        private void saveIv(String keyName, byte[] iv) {
+        private void saveIv(@NonNull String keyName, @Nullable byte[] iv) {
             sharedPrefs.edit().putString(keyName, Base64.encodeToString(iv, Base64.DEFAULT)).apply();
         }
     }

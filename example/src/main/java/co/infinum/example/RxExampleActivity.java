@@ -1,16 +1,14 @@
 package co.infinum.example;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.Locale;
-
-import co.infinum.goldfinger.rx.GoldfingerEvent;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import co.infinum.goldfinger.Goldfinger;
 import co.infinum.goldfinger.rx.RxGoldfinger;
 import io.reactivex.observers.DisposableObserver;
 
@@ -21,6 +19,7 @@ public class RxExampleActivity extends AppCompatActivity {
     private View authenticateButton;
     private View decryptButton;
     private View encryptButton;
+    private View cancelButton;
 
     private String encryptedValue;
     private RxGoldfinger goldfinger;
@@ -37,17 +36,9 @@ public class RxExampleActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_example);
-
-        encryptButton = findViewById(R.id.encryptButton);
-        decryptButton = findViewById(R.id.decryptButton);
-        authenticateButton = findViewById(R.id.authenticateButton);
-        secretInputView = findViewById(R.id.secretInputView);
-        statusView = findViewById(R.id.statusView);
-
-        goldfinger = new RxGoldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
-
-        secretInputView.addTextChangedListener(onTextChangedListener);
+        fetchViews();
         initListeners();
+        goldfinger = new RxGoldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
     }
 
     @Override
@@ -57,7 +48,8 @@ public class RxExampleActivity extends AppCompatActivity {
         authenticateButton.setEnabled(goldfinger.hasEnrolledFingerprint());
 
         if (goldfinger.hasFingerprintHardware()
-            && goldfinger.hasEnrolledFingerprint()) {
+            && goldfinger.hasEnrolledFingerprint()
+        ) {
             authenticateButton.setEnabled(true);
         } else {
             authenticateButton.setEnabled(false);
@@ -73,63 +65,78 @@ public class RxExampleActivity extends AppCompatActivity {
     }
 
     private void authenticateUserFingerprint() {
-        goldfinger.authenticate().subscribe(new DisposableObserver<GoldfingerEvent>() {
+        cancelButton.setEnabled(true);
+        goldfinger.authenticate().subscribe(new DisposableObserver<Goldfinger.Result>() {
 
             @Override
             public void onComplete() {
+                cancelButton.setEnabled(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                e.printStackTrace();
+                onGoldfingerError();
             }
 
             @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                onEvent(goldfingerEvent);
+            public void onNext(Goldfinger.Result result) {
+                onGoldfingerResult(result);
             }
         });
     }
 
     private void decryptEncryptedValue() {
-        goldfinger.decrypt(KEY_NAME, encryptedValue).subscribe(new DisposableObserver<GoldfingerEvent>() {
+        cancelButton.setEnabled(true);
+        goldfinger.decrypt(KEY_NAME, encryptedValue).subscribe(new DisposableObserver<Goldfinger.Result>() {
             @Override
             public void onComplete() {
+                cancelButton.setEnabled(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                e.printStackTrace();
+                onGoldfingerError();
             }
 
             @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                onEvent(goldfingerEvent);
+            public void onNext(Goldfinger.Result result) {
+                onGoldfingerResult(result);
             }
         });
     }
 
     private void encryptSecretValue() {
-        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString()).subscribe(new DisposableObserver<GoldfingerEvent>() {
+        cancelButton.setEnabled(true);
+        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString()).subscribe(new DisposableObserver<Goldfinger.Result>() {
 
             @Override
             public void onComplete() {
+                cancelButton.setEnabled(false);
             }
 
             @Override
             public void onError(Throwable e) {
-                e.printStackTrace();
+                onGoldfingerError();
             }
 
             @Override
-            public void onNext(GoldfingerEvent goldfingerEvent) {
-                if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
+            public void onNext(Goldfinger.Result result) {
+                onGoldfingerResult(result);
+                if (result.type() == Goldfinger.Type.SUCCESS) {
                     decryptButton.setEnabled(true);
-                    encryptedValue = ((GoldfingerEvent.OnSuccess) goldfingerEvent).value();
+                    encryptedValue = result.value();
                 }
-                onEvent(goldfingerEvent);
             }
         });
+    }
+
+    private void fetchViews() {
+        encryptButton = findViewById(R.id.encryptButton);
+        decryptButton = findViewById(R.id.decryptButton);
+        authenticateButton = findViewById(R.id.authenticateButton);
+        secretInputView = findViewById(R.id.secretInputView);
+        statusView = findViewById(R.id.statusView);
+        cancelButton = findViewById(R.id.cancelButton);
     }
 
     private void initListeners() {
@@ -156,32 +163,35 @@ public class RxExampleActivity extends AppCompatActivity {
                 authenticateUserFingerprint();
             }
         });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goldfinger.cancel();
+            }
+        });
+
+        secretInputView.addTextChangedListener(onTextChangedListener);
     }
 
-    private void onErrorResult(GoldfingerEvent.OnError event) {
-        onResult("onError", event.error().toString());
-        if (event.error().isCritical()) {
+    private void onGoldfingerError() {
+        cancelButton.setEnabled(false);
+        statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
+        statusView.setText(getString(R.string.error));
+    }
+
+    private void onGoldfingerResult(Goldfinger.Result result) {
+        statusView.setText(getString(R.string.status, result.type(), result.reason(), result.value(), result.message()));
+        Goldfinger.Type type = result.type();
+        if (type == Goldfinger.Type.SUCCESS) {
+            cancelButton.setEnabled(false);
+            statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
+        } else if (type == Goldfinger.Type.INFO) {
+            statusView.setTextColor(ContextCompat.getColor(this, R.color.info));
+        } else if (type == Goldfinger.Type.ERROR) {
+            cancelButton.setEnabled(false);
             statusView.setTextColor(ContextCompat.getColor(this, R.color.error));
-        } else {
-            statusView.setTextColor(ContextCompat.getColor(this, R.color.warning));
         }
-    }
-
-    private void onEvent(GoldfingerEvent goldfingerEvent) {
-        if (goldfingerEvent instanceof GoldfingerEvent.OnSuccess) {
-            onSuccessResult((GoldfingerEvent.OnSuccess) goldfingerEvent);
-        } else if (goldfingerEvent instanceof GoldfingerEvent.OnError) {
-            onErrorResult((GoldfingerEvent.OnError) goldfingerEvent);
-        }
-    }
-
-    private void onResult(String methodName, String value) {
-        statusView.setText(String.format(Locale.US, "%s - [%s]", methodName, value));
-    }
-
-    private void onSuccessResult(GoldfingerEvent.OnSuccess event) {
-        onResult("onSuccess", event.value());
-        statusView.setTextColor(ContextCompat.getColor(this, R.color.ok));
     }
 
     private void resetStatusText() {

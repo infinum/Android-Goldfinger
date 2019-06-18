@@ -1,8 +1,12 @@
 package co.infinum.goldfinger;
 
-import android.support.annotation.Nullable;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.util.Base64;
+
+import javax.crypto.Cipher;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
@@ -17,22 +21,28 @@ public interface Crypto {
      * Encrypt value with unlocked cryptoObject. Return null if encryption fails.
      */
     @Nullable
-    String encrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value);
+    String encrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value);
 
     /**
      * Decrypt value with unlocked cryptoObject. Return null if decryption fails.
      */
     @Nullable
-    String decrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value);
+    String decrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value);
 
     class Default implements Crypto {
 
         @Nullable
         @Override
-        public String decrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
+        public String decrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {
+            Cipher cipher = cryptoObject.getCipher();
+            if (cipher == null) {
+                log("decrypt Cipher = [NULL]");
+                return null;
+            }
+
             try {
                 byte[] decodedBytes = Base64.decode(value, Base64.DEFAULT);
-                return new String(cryptoObject.getCipher().doFinal(decodedBytes));
+                return new String(cipher.doFinal(decodedBytes));
             } catch (Exception e) {
                 log(e);
                 return null;
@@ -41,7 +51,13 @@ public interface Crypto {
 
         @Nullable
         @Override
-        public String encrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
+        public String encrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {
+            Cipher cipher = cryptoObject.getCipher();
+            if (cipher == null) {
+                log("encrypt Cipher = [NULL]");
+                return null;
+            }
+
             try {
                 byte[] encryptedBytes = cryptoObject.getCipher().doFinal(value.getBytes());
                 return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);

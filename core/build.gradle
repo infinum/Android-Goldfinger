@@ -15,9 +15,9 @@ android {
 }
 
 dependencies {
-    implementation deps.appcompat
-    testImplementation deps.junit
-    testImplementation deps.mockito
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "org.mockito:mockito-core:${versions.mockito}"
 }
 
 apply from: '../tasks.gradle'

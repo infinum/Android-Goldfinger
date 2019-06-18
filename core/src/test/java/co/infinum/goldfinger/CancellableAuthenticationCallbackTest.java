@@ -1,22 +1,39 @@
 package co.infinum.goldfinger;
 
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.hardware.fingerprint.FingerprintManager;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import androidx.annotation.NonNull;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CancellableAuthenticationCallbackTest {
 
-    @Mock private Goldfinger.Callback callback;
+    private Goldfinger.Result result;
+    private Exception exception;
+    private Goldfinger.Callback callback = new Goldfinger.Callback() {
+        @Override
+        public void onError(@NonNull Exception e) {
+            CancellableAuthenticationCallbackTest.this.exception = e;
+        }
+
+        @Override
+        public void onResult(@NonNull Goldfinger.Result result) {
+            CancellableAuthenticationCallbackTest.this.result = result;
+        }
+    };
     private CancellableAuthenticationCallback cancellableCallback;
     @Mock private Clock clock;
     @Mock private Crypto crypto;
@@ -26,46 +43,52 @@ public class CancellableAuthenticationCallbackTest {
     public void cancel_canceled() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.cancellationSignal.cancel();
-        cancellableCallback.cancel();
-        assertEquals(true, cancellableCallback.cancellationSignal.isCanceled());
+        assertTrue(cancellableCallback.cancellationSignal.isCanceled());
     }
 
     @Test
     public void cancel_delegated() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.cancel();
-        assertEquals(true, cancellableCallback.cancellationSignal.isCanceled());
+        assertTrue(cancellableCallback.cancellationSignal.isCanceled());
+    }
+
+    @Before
+    public void init() {
+        this.exception = null;
+        this.result = null;
     }
 
     @Test
     public void onAuthenticationError_cancelDelegated() {
-        when(clock.isBeforeNow(anyLong())).thenReturn(true);
         cancellableCallback = newInstance(Mode.ENCRYPTION);
-        cancellableCallback.onAuthenticationError(5, "");
-        verify(callback).onError(Error.CANCELED);
+        cancellableCallback.onAuthenticationError(-1, "");
+        assertEquals(Goldfinger.Type.ERROR, result.type());
     }
 
     @Test
     public void onAuthenticationError_cancelIgnored() {
         when(clock.isBeforeNow(anyLong())).thenReturn(false);
         cancellableCallback = newInstance(Mode.ENCRYPTION);
-        cancellableCallback.onAuthenticationError(5, "");
-        verify(callback, never()).onError(Error.CANCELED);
+        cancellableCallback.onAuthenticationError(FingerprintManager.FINGERPRINT_ERROR_CANCELED, "");
+        assertNull(result);
+        assertNull(exception);
     }
 
     @Test
     public void onAuthenticationError_canceled() {
         cancellableCallback = newInstance(Mode.ENCRYPTION);
         cancellableCallback.cancellationSignal.cancel();
-        cancellableCallback.onAuthenticationError(0, "");
-        verify(callback, never()).onError(Error.UNKNOWN);
+        cancellableCallback.onAuthenticationError(-1, "");
+        assertNull(result);
+        assertNull(exception);
     }
 
     @Test
     public void onAuthenticationError_delegated() {
         cancellableCallback = newInstance(Mode.ENCRYPTION);
-        cancellableCallback.onAuthenticationError(0, "");
-        verify(callback).onError(Error.UNKNOWN);
+        cancellableCallback.onAuthenticationError(-1, "");
+        assertEquals(Goldfinger.Type.ERROR, result.type());
     }
 
     @Test
@@ -73,36 +96,40 @@ public class CancellableAuthenticationCallbackTest {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationFailed();
-        verify(callback, never()).onError(Error.FAILURE);
+        assertNull(result);
+        assertNull(exception);
     }
 
     @Test
     public void onAuthenticationFailed_delegated() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.onAuthenticationFailed();
-        verify(callback).onError(Error.FAILURE);
+        assertEquals(Goldfinger.Type.INFO, result.type());
+        assertEquals(Goldfinger.Reason.AUTHENTICATION_FAIL, result.reason());
     }
 
     @Test
     public void onAuthenticationHelp_canceled() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.cancellationSignal.cancel();
-        cancellableCallback.onAuthenticationHelp(0, "");
-        verify(callback, never()).onError(Error.FAILURE);
+        cancellableCallback.onAuthenticationHelp(-1, "");
+        assertNull(result);
+        assertNull(exception);
     }
 
     @Test
     public void onAuthenticationHelp_delegated() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.onAuthenticationHelp(-1, "");
-        verify(callback).onError(Error.FAILURE);
+        assertEquals(Goldfinger.Type.INFO, result.type());
     }
 
     @Test
     public void onAuthenticationSucceeded_authenticated() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
-        verify(callback).onSuccess("");
+        assertEquals(Goldfinger.Type.SUCCESS, result.type());
+        assertEquals(Goldfinger.Reason.AUTHENTICATION_SUCCESS, result.reason());
     }
 
     @Test
@@ -110,7 +137,8 @@ public class CancellableAuthenticationCallbackTest {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
         cancellableCallback.cancellationSignal.cancel();
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
-        verify(callback, never()).onSuccess("");
+        assertNull(result);
+        assertNull(exception);
     }
 
     @Test
@@ -119,16 +147,18 @@ public class CancellableAuthenticationCallbackTest {
         when(crypto.decrypt(cryptoObject, "")).thenReturn(null);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).decrypt(cryptoObject, "");
-        verify(callback).onError(Error.DECRYPTION_FAILED);
+        assertTrue(exception instanceof DecryptionException);
     }
 
     @Test
     public void onAuthenticationSucceeded_decryptionOk() {
         cancellableCallback = newInstance(Mode.DECRYPTION);
-        when(crypto.decrypt(cryptoObject, "")).thenReturn("");
+        when(crypto.decrypt(cryptoObject, "")).thenReturn("test");
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).decrypt(cryptoObject, "");
-        verify(callback).onSuccess("");
+        assertEquals(Goldfinger.Type.SUCCESS, result.type());
+        assertEquals(Goldfinger.Reason.AUTHENTICATION_SUCCESS, result.reason());
+        assertEquals("test", result.value());
     }
 
     @Test
@@ -137,16 +167,18 @@ public class CancellableAuthenticationCallbackTest {
         when(crypto.encrypt(cryptoObject, "")).thenReturn(null);
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).encrypt(cryptoObject, "");
-        verify(callback).onError(Error.ENCRYPTION_FAILED);
+        assertTrue(exception instanceof EncryptionException);
     }
 
     @Test
     public void onAuthenticationSucceeded_encryptionOk() {
         cancellableCallback = newInstance(Mode.ENCRYPTION);
-        when(crypto.encrypt(cryptoObject, "")).thenReturn("");
+        when(crypto.encrypt(cryptoObject, "")).thenReturn("test");
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         verify(crypto).encrypt(cryptoObject, "");
-        verify(callback).onSuccess("");
+        assertEquals(Goldfinger.Type.SUCCESS, result.type());
+        assertEquals(Goldfinger.Reason.AUTHENTICATION_SUCCESS, result.reason());
+        assertEquals("test", result.value());
     }
 
     private CancellableAuthenticationCallback newInstance(Mode mode) {

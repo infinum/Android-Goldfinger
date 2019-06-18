@@ -1,11 +1,12 @@
 package co.infinum.goldfinger;
 
-import android.support.annotation.Nullable;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 class AsyncCryptoFactory {
 
@@ -13,12 +14,12 @@ class AsyncCryptoFactory {
     private final ExecutorService executor;
     private Future task;
 
-    AsyncCryptoFactory(CryptoFactory cryptoFactory) {
+    AsyncCryptoFactory(@NonNull CryptoFactory cryptoFactory) {
         this.cryptoFactory = cryptoFactory;
         this.executor = Executors.newSingleThreadExecutor();
     }
 
-    void createCryptoObject(String keyName, Mode mode, AsyncCryptoFactory.Callback callback) {
+    void createCryptoObject(@NonNull String keyName, @NonNull Mode mode, @NonNull AsyncCryptoFactory.Callback callback) {
         if (task != null && !task.isDone()) {
             task.cancel(true);
         }

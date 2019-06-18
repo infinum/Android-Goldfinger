@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
@@ -14,21 +16,22 @@ import static co.infinum.goldfinger.LogUtils.log;
 class MarshmallowGoldfinger implements Goldfinger {
 
     private static final String KEY_AUTH_MODE = "<Goldfinger authentication mode>";
-    private final AsyncCryptoFactory asyncCryptoFactory;
-    private AsyncCryptoFactory.Callback asyncCryptoFactoryCallback;
-    private CancellableAuthenticationCallback cancellableAuthenticationCallback;
-    private final Crypto crypto;
-    private final FingerprintManagerCompat fingerprintManagerCompat;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    MarshmallowGoldfinger(Context context, AsyncCryptoFactory asyncCryptoFactory, Crypto crypto) {
+    @NonNull private final AsyncCryptoFactory asyncCryptoFactory;
+    @NonNull private final Crypto crypto;
+    @NonNull private final FingerprintManagerCompat fingerprintManagerCompat;
+    @NonNull private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    @Nullable private AsyncCryptoFactory.Callback asyncCryptoFactoryCallback;
+    @Nullable private CancellableAuthenticationCallback cancellableAuthenticationCallback;
+
+    MarshmallowGoldfinger(@NonNull Context context, @NonNull AsyncCryptoFactory asyncCryptoFactory, @NonNull Crypto crypto) {
         this.asyncCryptoFactory = asyncCryptoFactory;
         this.crypto = crypto;
         this.fingerprintManagerCompat = FingerprintManagerCompat.from(context);
     }
 
     @Override
-    public void authenticate(Callback callback) {
+    public void authenticate(@NonNull Callback callback) {
         startFingerprintAuthentication(KEY_AUTH_MODE, "", Mode.AUTHENTICATION, callback);
     }
 
@@ -46,12 +49,12 @@ class MarshmallowGoldfinger implements Goldfinger {
     }
 
     @Override
-    public void decrypt(String keyName, String value, Callback callback) {
+    public void decrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
         startFingerprintAuthentication(keyName, value, Mode.DECRYPTION, callback);
     }
 
     @Override
-    public void encrypt(String keyName, String value, Callback callback) {
+    public void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
         startFingerprintAuthentication(keyName, value, Mode.ENCRYPTION, callback);
     }
 
@@ -65,12 +68,17 @@ class MarshmallowGoldfinger implements Goldfinger {
         return fingerprintManagerCompat.isHardwareDetected();
     }
 
-    private void notifyCryptoObjectInitError(Callback callback) {
+    private void notifyCryptoObjectInitError(@NonNull Callback callback) {
         log("Failed to create CryptoObject");
-        callback.onError(Error.INITIALIZATION_FAILED);
+        callback.onError(new InitializationException());
     }
 
-    private void startFingerprintAuthentication(final String keyName, final String value, final Mode mode, final Callback callback) {
+    private void startFingerprintAuthentication(
+        @NonNull final String keyName,
+        @NonNull final String value,
+        @NonNull final Mode mode,
+        @NonNull final Callback callback
+    ) {
         cancel();
 
         log("Creating CryptoObject");
@@ -87,11 +95,16 @@ class MarshmallowGoldfinger implements Goldfinger {
         asyncCryptoFactory.createCryptoObject(keyName, mode, asyncCryptoFactoryCallback);
     }
 
-    private void startNativeFingerprintAuthentication(@Nullable FingerprintManagerCompat.CryptoObject cryptoObject, String keyName,
-        String value, Mode mode, Callback callback) {
+    private void startNativeFingerprintAuthentication(
+        @Nullable FingerprintManagerCompat.CryptoObject cryptoObject,
+        @NonNull String keyName,
+        @NonNull String value,
+        @NonNull Mode mode,
+        @NonNull Callback callback
+    ) {
 
         log("Starting authentication [keyName=%s; value=%s]", keyName, value);
-        callback.onReady();
+        callback.onResult(new Goldfinger.Result(Type.INFO, Reason.AUTHENTICATION_START));
         cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, Clock.instance(), mode, value, callback);
         fingerprintManagerCompat.authenticate(
             cryptoObject,
