@@ -2,6 +2,10 @@
 
 <img src='./logo.svg' width='264'/>
 
+## Important
+
+This version is compatible with `androidx`. If you are not using `androidx`, you can use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.1.2).
+
 ## Quick guide
 
 #### Add dependency
@@ -130,7 +134,7 @@ new CryptoFactory() {
 
   @Nullable
   @Override
-  public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNullString keyName) {}
+  public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {}
 
   @Nullable
   @Override
