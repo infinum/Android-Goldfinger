@@ -12,10 +12,10 @@ android {
 
 dependencies {
     implementation project(':core')
-    implementation deps.appcompat
-    implementation deps.rxjava
-    testImplementation deps.junit
-    testImplementation deps.mockito
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    implementation "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "org.mockito:mockito-core:${versions.mockito}"
 }
 
 apply from: '../tasks.gradle'

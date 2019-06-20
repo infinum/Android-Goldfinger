@@ -6,16 +6,16 @@ package co.infinum.goldfinger;
  */
 class Clock {
 
-    private static Clock INSTANCE;
+    private static Clock instance;
 
     private Clock() {
     }
 
     static Clock instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Clock();
+        if (instance == null) {
+            instance = new Clock();
         }
-        return INSTANCE;
+        return instance;
     }
 
     long currentTimeMs() {

@@ -2,7 +2,7 @@ package co.infinum.goldfinger;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 class CryptoObjectInitRunnable implements Runnable {
 

@@ -1,13 +1,17 @@
-# Goldfinger [![JCenter](https://api.bintray.com/packages/infinum/android/goldfinger/images/download.svg)](https://bintray.com/infinum/android/goldfinger/_latestVersion) [![CircleCI Status](https://circleci.com/gh/infinum/Android-Goldfinger/tree/master.svg?style=shield&circle-token=141a7164e06f4e97602260e076110778f16a8d02)](https://bintray.com/infinum/android/goldfinger/_latestVersion)
+# Goldfinger [![JCenter](https://api.bintray.com/packages/infinum/android/goldfinger/images/download.svg)](https://bintray.com/infinum/android/goldfinger/_latestVersion) [![Build Status](https://app.bitrise.io/app/bc0cdf2da387a5c3/status.svg?token=eHOSr1ZB1HzNnKZfxYjxbA&branch=master)](https://bintray.com/infinum/android/goldfinger/_latestVersion)
 
 <img src='./logo.svg' width='264'/>
+
+## Important
+
+This version is compatible with `androidx`. If you are not using `androidx`, you can use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.1.2).
 
 ## Quick guide
 
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.1.2'
+implementation 'co.infinum:goldfinger:1.2.0'
 ```
 
 #### Initialize
@@ -28,15 +32,14 @@ if (goldfinger.hasEnrolledFingerprint()) {
 
 ```java
 goldfinger.authenticate(new Goldfinger.Callback() {
-
   @Override
-  public void onSuccess(String value) {
-    /* Authenticated */
+  public void onError(@NonNull Exception e) {
+    /* Critical error happened */
   }
 
   @Override
-  public void onError(Error error) {
-    /* Error, can be either critical or non-critical */
+  public void onResult(@NonNull Goldfinger.Result result) {
+    /* Result received */
   }
 });
 ```
@@ -50,8 +53,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.1.2'
-implementation 'co.infinum:goldfinger-rx:1.1.2'
+implementation 'co.infinum:goldfinger:1.2.0'
+implementation 'co.infinum:goldfinger-rx:1.2.0'
 ```
 
 #### Initialize
@@ -63,17 +66,21 @@ RxGoldfinger.Builder(context).build()
 #### Authenticate
 
 ```java
-goldfinger.authenticate().subscribe(new Observer<GoldfingerEvent>() {
-
-  ...
+goldfinger.authenticate().subscribe(new DisposableObserver<Goldfinger.Result>() {
 
   @Override
-  public void onNext(GoldfingerEvent event) {
-    if (event instanceof GoldfingerEvent.OnSuccess) {
-      /* Authenticated */
-    } else if (event instanceof GoldfingerEvent.OnError) {
-      /* Error, can be either critical or non-critical */
-    }
+  public void onComplete() {
+    /* Fingerprint authentication is finished */
+  }
+
+  @Override
+  public void onError(Throwable e) {
+    /* Critical error happened */
+  }
+
+  @Override
+  public void onNext(Goldfinger.Result result) {
+    /* Result received */
   }
 });
 ```
@@ -106,7 +113,7 @@ If you don’t like Default implementations, you can easily modify them using `G
 ```java
 Goldfinger.Builder(context)
   .setLogEnabled(true)
-  .setCryptoCreator(cryptoCreator)
+  .setCryptoFactory(cryptoFactory)
   .setCrypto(crypto)
   .build()
 ```
@@ -121,18 +128,17 @@ Creating a `CryptoObject` is a complicated process that has multiple steps. `Cry
 
 ```java
 new CryptoFactory() {
+  @Nullable
+  @Override
+  public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName) {}
 
-    @Nullable
-    @Override
-    public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(String keyName) {}
+  @Nullable
+  @Override
+  public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {}
 
-    @Nullable
-    @Override
-    public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(String keyName) {}
-
-    @Nullable
-    @Override
-    public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(String keyName) {}
+  @Nullable
+  @Override
+  public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {}
 };
 ```
 
@@ -146,14 +152,13 @@ Goldfinger automatically handles encryption and decryption operations via a `Cry
 
 ```java
 new Crypto() {
+  @Nullable
+  @Override
+  public String encrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {}
 
-    @Nullable
-    @Override
-    public String encrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {}
-
-    @Nullable
-    @Override
-    public String decrypt(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {}
+  @Nullable
+  @Override
+  public String decrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {}
 }
 ```
 

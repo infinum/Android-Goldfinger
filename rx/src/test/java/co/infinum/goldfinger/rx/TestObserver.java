@@ -1,8 +1,9 @@
 package co.infinum.goldfinger.rx;
 
+import co.infinum.goldfinger.Goldfinger;
 import io.reactivex.observers.DisposableObserver;
 
-public class TestObserver extends DisposableObserver<GoldfingerEvent> {
+public class TestObserver extends DisposableObserver<Goldfinger.Result> {
 
     @Override
     public void onComplete() {
@@ -13,6 +14,6 @@ public class TestObserver extends DisposableObserver<GoldfingerEvent> {
     }
 
     @Override
-    public void onNext(GoldfingerEvent goldfingerEvent) {
+    public void onNext(Goldfinger.Result goldfingerEvent) {
     }
 }

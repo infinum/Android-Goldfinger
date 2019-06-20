@@ -1,12 +1,14 @@
 package co.infinum.goldfinger;
 
+import androidx.annotation.NonNull;
+
 /**
  * Legacy implementation for pre-Marshmallow devices.
  */
 class LegacyGoldfinger implements Goldfinger {
 
     @Override
-    public void authenticate(Callback callback) {
+    public void authenticate(@NonNull Callback callback) {
     }
 
     @Override
@@ -14,11 +16,11 @@ class LegacyGoldfinger implements Goldfinger {
     }
 
     @Override
-    public void decrypt(String keyName, String value, Callback callback) {
+    public void decrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
     }
 
     @Override
-    public void encrypt(String keyName, String value, Callback callback) {
+    public void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
     }
 
     @Override
