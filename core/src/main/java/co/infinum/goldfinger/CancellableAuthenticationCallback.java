@@ -55,7 +55,7 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
             return;
         }
 
-        log("onAuthenticationFailed [%s]");
+        log("onAuthenticationFailed [%s]", Goldfinger.Reason.AUTHENTICATION_FAIL);
         callback.onResult(new Goldfinger.Result(
             Goldfinger.Type.INFO,
             Goldfinger.Reason.AUTHENTICATION_FAIL
