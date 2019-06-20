@@ -49,6 +49,7 @@ public interface Goldfinger {
      *
      * @param keyName unique key identifier, {@link java.security.Key} is stored to {@link java.security.KeyStore} under this value
      * @param value   String value which will be encrypted if user successfully authenticates
+     * @see Goldfinger.Callback
      */
     void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback);
 

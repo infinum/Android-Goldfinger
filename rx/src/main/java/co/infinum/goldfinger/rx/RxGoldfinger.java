@@ -23,16 +23,19 @@ public interface RxGoldfinger {
 
     /**
      * @see Goldfinger#authenticate(Goldfinger.Callback)
+     * @see Goldfinger.Result
      */
     Observable<Goldfinger.Result> authenticate();
 
     /**
      * @see Goldfinger#decrypt(String, String, Goldfinger.Callback)
+     * @see Goldfinger.Result
      */
     Observable<Goldfinger.Result> decrypt(String keyName, String value);
 
     /**
      * @see Goldfinger#encrypt(String, String, Goldfinger.Callback)
+     * @see Goldfinger.Result
      */
     Observable<Goldfinger.Result> encrypt(String keyName, String value);
 
