@@ -44,8 +44,6 @@ public class ExampleActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        authenticateButton.setEnabled(goldfinger.hasEnrolledFingerprint());
-
         if (goldfinger.hasFingerprintHardware()
             && goldfinger.hasEnrolledFingerprint()) {
             authenticateButton.setEnabled(true);

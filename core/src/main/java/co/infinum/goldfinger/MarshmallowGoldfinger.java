@@ -73,14 +73,30 @@ class MarshmallowGoldfinger implements Goldfinger {
         callback.onError(new InitializationException());
     }
 
+    private boolean preconditionsInvalid(Callback callback) {
+        if (!hasFingerprintHardware()) {
+            callback.onError(new MissingHardwareException());
+            return true;
+        }
+
+        if (!hasEnrolledFingerprint()) {
+            callback.onError(new NoEnrolledFingerprintsException());
+            return true;
+        }
+        return false;
+    }
+
     private void startFingerprintAuthentication(
         @NonNull final String keyName,
         @NonNull final String value,
         @NonNull final Mode mode,
         @NonNull final Callback callback
     ) {
-        cancel();
+        if (preconditionsInvalid(callback)) {
+            return;
+        }
 
+        cancel();
         log("Creating CryptoObject");
         asyncCryptoFactoryCallback = new AsyncCryptoFactory.Callback() {
             @Override
