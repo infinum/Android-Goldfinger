@@ -7,7 +7,7 @@ buildscript {
 
     ext.versions = [
         appcompat: '1.0.2',
-        goldfinger: '1.1.2',
+        goldfinger: '1.2.0',
         junit     : '4.12',
         mockito   : '2.10.0',
         rxjava    : '2.1.13'
