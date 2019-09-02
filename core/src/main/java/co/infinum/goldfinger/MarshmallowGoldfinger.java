@@ -12,6 +12,11 @@ import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
+/**
+ * Goldfinger implementation for Android Marshmallow and above
+ * For implementation on Android older version
+ * @see LegacyGoldfinger
+ */
 @RequiresApi(Build.VERSION_CODES.M)
 class MarshmallowGoldfinger implements Goldfinger {
 
@@ -68,6 +73,11 @@ class MarshmallowGoldfinger implements Goldfinger {
         return fingerprintManagerCompat.isHardwareDetected();
     }
 
+    /**
+     * Notify Goldfinger.Callback that the creation of CryptoObject is failed thus
+     * startNativeFingerAuthentication() method never been called.
+     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     */
     private void notifyCryptoObjectInitError(@NonNull Callback callback) {
         log("Failed to create CryptoObject");
         callback.onError(new InitializationException());
@@ -86,6 +96,16 @@ class MarshmallowGoldfinger implements Goldfinger {
         return false;
     }
 
+    /**
+     * Create CryptoObject using AsyncCryptoFactory and use it for
+     * startNativeFingerAuthentication() method
+     * @param keyName   unique key identifier, {@link java.security.Key} is stored to
+     *      *           {@link java.security.KeyStore} under this value
+     * @param value     String value which will be encrypted if user successfully authenticates.
+     *                  Value will be "" if Mode.AUTHENTICATION
+     * @param mode      Mode to differentiate Fingerprint authentication modes.{@link Mode}
+     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     */
     private void startFingerprintAuthentication(
         @NonNull final String keyName,
         @NonNull final String value,
@@ -111,6 +131,18 @@ class MarshmallowGoldfinger implements Goldfinger {
         asyncCryptoFactory.createCryptoObject(keyName, mode, asyncCryptoFactoryCallback);
     }
 
+    /**
+     * Request authentication of a crypto object.
+     * This call warms up the fingerprint hardware and starts scanning for a fingerprint.
+     * @param cryptoObject FingerprintManagerCompat.CryptoObject: object associated with the
+     *                     call or null if none required.
+     * @param keyName   unique key identifier, {@link java.security.Key} is stored to
+     *                  {@link java.security.KeyStore} under this value
+     * @param value     String value which will be encrypted if user successfully authenticates.
+     *                  Value will be "" if Mode.AUTHENTICATION
+     * @param mode      Mode to differentiate Fingerprint authentication modes.{@link Mode}
+     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     */
     private void startNativeFingerprintAuthentication(
         @Nullable FingerprintManagerCompat.CryptoObject cryptoObject,
         @NonNull String keyName,

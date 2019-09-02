@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
+/**
+ * Class to create CryptoObject asynchronously
+ */
 class AsyncCryptoFactory {
 
     private final CryptoFactory cryptoFactory;

@@ -6,6 +6,10 @@ import androidx.core.os.CancellationSignal;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
+/**
+ * The customize extension class of FingerprintManagerCompat.AuthenticationCallback
+ * which can be cancelled during process
+ */
 class CancellableAuthenticationCallback extends FingerprintManagerCompat.AuthenticationCallback {
 
     private static final long IGNORE_CANCEL_MS = 100;
@@ -95,12 +99,20 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
         }
     }
 
+    /**
+     * Cancel the authentication/encryption/decryption process
+     */
     void cancel() {
         if (!cancellationSignal.isCanceled()) {
             cancellationSignal.cancel();
         }
     }
 
+    /**
+     *  Decrypt value if Mode.DECRYPTION or encrypt value otherwise
+     * @param cryptoObject  FingerprintManagerCompat.CryptoObject: object associated with the call
+     * @param value
+     */
     private void cipherValue(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
         String cipheredValue = (mode == Mode.DECRYPTION) ? crypto.decrypt(cryptoObject, value) : crypto.encrypt(cryptoObject, value);
 
@@ -118,6 +130,11 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
         }
     }
 
+    /**
+     *
+     * @param reason    {@link Goldfinger.Reason}
+     * @return          true if error is not cancelled by user or timeout
+     */
     private boolean shouldReactToError(Goldfinger.Reason reason) {
         return !cancellationSignal.isCanceled()
             && (reason != Goldfinger.Reason.CANCELED || clock.isBeforeNow(initializationTimeMs + IGNORE_CANCEL_MS));
