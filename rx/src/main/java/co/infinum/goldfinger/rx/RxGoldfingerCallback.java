@@ -1,36 +1,38 @@
 package co.infinum.goldfinger.rx;
 
-import co.infinum.goldfinger.Error;
+import androidx.annotation.NonNull;
 import co.infinum.goldfinger.Goldfinger;
-import co.infinum.goldfinger.GoldfingerCallback;
 import io.reactivex.ObservableEmitter;
 
-class RxGoldfingerCallback extends GoldfingerCallback {
+class RxGoldfingerCallback implements Goldfinger.Callback {
 
-    private final ObservableEmitter<Goldfinger.Result> emitter;
+    @NonNull private final ObservableEmitter<Goldfinger.Result> emitter;
 
-    RxGoldfingerCallback(ObservableEmitter<Goldfinger.Result> emitter) {
+    RxGoldfingerCallback(@NonNull ObservableEmitter<Goldfinger.Result> emitter) {
         this.emitter = emitter;
     }
 
     @Override
-    public void onError(Error error) {
+    public void onError(@NonNull Exception e) {
         if (!emitter.isDisposed()) {
-            emitter.onError(new RxGoldfingerException(error));
+            emitter.onError(e);
         }
     }
 
     @Override
-    public void onFail() {
-        if (!emitter.isDisposed()) {
-            emitter.onNext(new Goldfinger.Result(Goldfinger.Reason.FAIL, null));
+    public void onResult(@NonNull Goldfinger.Result result) {
+        if (emitter.isDisposed()) {
+            return;
+        }
+
+        emitter.onNext(result);
+        if (result.type() == Goldfinger.Type.SUCCESS || result.type() == Goldfinger.Type.ERROR) {
+            emitter.onComplete();
         }
     }
 
-    @Override
-    public void onSuccess(Goldfinger.Result result) {
+    void cancel() {
         if (!emitter.isDisposed()) {
-            emitter.onNext(result);
             emitter.onComplete();
         }
     }

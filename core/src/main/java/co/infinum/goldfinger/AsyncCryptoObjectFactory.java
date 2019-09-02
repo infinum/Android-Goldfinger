@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.biometric.BiometricPrompt;
 
+/**
+ * Creates CryptoObject asynchronously.
+ */
 class AsyncCryptoObjectFactory {
 
     private final CryptoObjectFactory cryptoObjectFactory;
@@ -31,6 +34,9 @@ class AsyncCryptoObjectFactory {
         this.task = executor.submit(new CryptoObjectInitRunnable(cryptoObjectFactory, cryptographyData, mode, callback));
     }
 
+    /**
+     * Internal callback used to receive created {@link BiometricPrompt.CryptoObject}
+     */
     static abstract class Callback {
 
         abstract void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject);

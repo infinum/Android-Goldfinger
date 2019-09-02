@@ -4,8 +4,8 @@
     <color name="primaryDark">#e64a19</color>
     <color name="accent">#ff536dfe</color>
     <color name="accentDisabled">#70536dfe</color>
-    <color name="error">#c21d1d</color>
-    <color name="ok">#21a921</color>
+    <color name="error">#F44336</color>
+    <color name="ok">#4CAF50</color>
     <color name="textRegular">#333</color>
-    <color name="warning">@color/primaryDark</color>
+    <color name="info">#03A9F4</color>
 </resources>

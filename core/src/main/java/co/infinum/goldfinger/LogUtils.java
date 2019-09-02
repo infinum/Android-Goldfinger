@@ -4,22 +4,26 @@ import android.util.Log;
 
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+
+/**
+ * Logging utility functions. Logger can be turned on/off from {@link Goldfinger.Builder}.
+ */
 class LogUtils {
 
     private static final String TAG = "Goldfinger";
     private static boolean enabled = false;
 
     private LogUtils() {
-        /* Hide constructor */
     }
 
-    static void log(String message, Object... args) {
+    static void log(@NonNull String message, Object... args) {
         if (enabled) {
             Log.i(TAG, String.format(Locale.US, message, args));
         }
     }
 
-    static void log(Throwable t) {
+    static void log(@NonNull Throwable t) {
         if (enabled) {
             Log.e(TAG, t.toString());
         }

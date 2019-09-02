@@ -6,6 +6,10 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.biometric.BiometricPrompt;
 
+/**
+ * Custom runnable that creates CryptoObject.
+ * Used for async creation.
+ */
 class CryptoObjectInitRunnable implements Runnable {
 
     private final static Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());

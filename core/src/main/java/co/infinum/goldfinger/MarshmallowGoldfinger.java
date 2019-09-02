@@ -14,16 +14,20 @@ import androidx.biometric.BiometricPrompt;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
+/**
+ * Goldfinger implementation for Android Marshmallow and newer.
+ * Older versions use {@link LegacyGoldfinger}.
+ */
 @RequiresApi(Build.VERSION_CODES.M)
 class MarshmallowGoldfinger implements Goldfinger {
 
-    private final AsyncCryptoObjectFactory asyncCryptoFactory;
-    private AsyncCryptoObjectFactory.Callback asyncCryptoFactoryCallback;
-    private BiometricPrompt biometricPrompt;
-    private final Context context;
-    private final CryptographyHandler cryptographyHandler;
-    private final Executor executor = Executors.newSingleThreadExecutor();
-    private InternalCallback internalCallback;
+    @NonNull private final AsyncCryptoObjectFactory asyncCryptoFactory;
+    @Nullable private AsyncCryptoObjectFactory.Callback asyncCryptoFactoryCallback;
+    @Nullable private BiometricPrompt biometricPrompt;
+    @NonNull private final Context context;
+    @NonNull private final CryptographyHandler cryptographyHandler;
+    @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
+    @Nullable private AuthenticationCallback internalCallback;
 
     MarshmallowGoldfinger(
         @NonNull Context context,
@@ -31,22 +35,30 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull CryptographyHandler cryptographyHandler
     ) {
         this.context = context;
+
         this.asyncCryptoFactory = asyncCryptoFactory;
         this.cryptographyHandler = cryptographyHandler;
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void authenticate(
         @NonNull GoldfingerParams params,
-        @NonNull GoldfingerCallback callback
+        @NonNull Goldfinger.Callback callback
     ) {
+        if (internalCallback != null && internalCallback.isAuthenticationActive) {
+            return;
+        }
+
         if (areParamsInvalid(params, Mode.AUTHENTICATION)) {
-            callback.onError(Error.INVALID_PARAMS);
+            callback.onError(new InitializationException());
             return;
         }
 
         cancel();
-        this.internalCallback = new InternalCallback(
+        this.internalCallback = new AuthenticationCallback(
             this.cryptographyHandler,
             Mode.AUTHENTICATION,
             new CryptographyData("", ""),
@@ -56,6 +68,9 @@ class MarshmallowGoldfinger implements Goldfinger {
         biometricPrompt.authenticate(params.buildPromptInfo());
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void cancel() {
         if (biometricPrompt != null) {
@@ -69,22 +84,31 @@ class MarshmallowGoldfinger implements Goldfinger {
         }
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void decrypt(
         @NonNull GoldfingerParams params,
-        @NonNull GoldfingerCallback callback
+        @NonNull Goldfinger.Callback callback
     ) {
         startFingerprintAuthentication(Mode.DECRYPTION, params, callback);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void encrypt(
         @NonNull GoldfingerParams params,
-        @NonNull GoldfingerCallback callback
+        @NonNull Goldfinger.Callback callback
     ) {
         startFingerprintAuthentication(Mode.ENCRYPTION, params, callback);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public boolean hasFingerprintHardware() {
         return context.getPackageManager() != null
@@ -124,10 +148,14 @@ class MarshmallowGoldfinger implements Goldfinger {
     private void startFingerprintAuthentication(
         @NonNull final Mode mode,
         @NonNull final GoldfingerParams params,
-        @NonNull final GoldfingerCallback callback
+        @NonNull final Goldfinger.Callback callback
     ) {
+        if (internalCallback != null && internalCallback.isAuthenticationActive) {
+            return;
+        }
+
         if (areParamsInvalid(params, mode)) {
-            callback.onError(Error.INVALID_PARAMS);
+            callback.onError(new InitializationException());
             return;
         }
 
@@ -140,7 +168,7 @@ class MarshmallowGoldfinger implements Goldfinger {
                     startNativeFingerprintAuthentication(mode, cryptoObject, params, callback);
                 } else {
                     log("Failed to create CryptoObject");
-                    callback.onError(Error.CRYPTO_OBJECT_CREATE_FAILED);
+                    callback.onError(new InitializationException());
                 }
             }
         };
@@ -151,11 +179,12 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull Mode mode,
         @NonNull BiometricPrompt.CryptoObject cryptoObject,
         @NonNull GoldfingerParams params,
-        @NonNull GoldfingerCallback callback
+        @NonNull Goldfinger.Callback callback
     ) {
         CryptographyData cryptographyData = params.getCryptographyData();
         log("Starting authentication [keyName=%s; value=%s]", cryptographyData.keyName(), cryptographyData.value());
-        this.internalCallback = new InternalCallback(cryptographyHandler, mode, cryptographyData, callback);
+        callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
+        this.internalCallback = new AuthenticationCallback(cryptographyHandler, mode, cryptographyData, callback);
         this.biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
         this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
     }

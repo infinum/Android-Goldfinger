@@ -14,6 +14,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.biometric.BiometricPrompt;
@@ -50,7 +51,7 @@ public interface CryptoObjectFactory {
         private KeyStore keyStore;
         private final SharedPreferences sharedPrefs;
 
-        Default(Context context) {
+        Default(@NonNull Context context) {
             this.sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE);
             try {
                 keyStore = KeyStore.getInstance(KEY_KEYSTORE);
@@ -72,7 +73,8 @@ public interface CryptoObjectFactory {
             return createCryptoObject(cryptographyData.keyName(), Mode.ENCRYPTION);
         }
 
-        private Cipher createCipher(String keyName, Mode mode, Key key) throws Exception {
+        @NonNull
+        private Cipher createCipher(@NonNull String keyName, @NonNull Mode mode, @Nullable Key key) throws Exception {
             String transformation = String.format(
                 "%s/%s/%s",
                 KeyProperties.KEY_ALGORITHM_AES,
@@ -90,6 +92,7 @@ public interface CryptoObjectFactory {
             return cipher;
         }
 
+        @Nullable
         private BiometricPrompt.CryptoObject createCryptoObject(String keyName, Mode mode) {
             if (keyStore == null || keyGenerator == null) {
                 return null;
@@ -105,7 +108,8 @@ public interface CryptoObjectFactory {
             }
         }
 
-        private Key createKey(String keyName) throws Exception {
+        @Nullable
+        private Key createKey(@NonNull String keyName) throws Exception {
             KeyGenParameterSpec.Builder keyGenParamsBuilder =
                 new KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
@@ -119,16 +123,18 @@ public interface CryptoObjectFactory {
             return loadKey(keyName);
         }
 
-        private byte[] loadIv(String keyName) {
+        @NonNull
+        private byte[] loadIv(@NonNull String keyName) {
             return Base64.decode(sharedPrefs.getString(keyName, ""), Base64.DEFAULT);
         }
 
-        private Key loadKey(String keyName) throws Exception {
+        @Nullable
+        private Key loadKey(@NonNull String keyName) throws Exception {
             keyStore.load(null);
             return keyStore.getKey(keyName, null);
         }
 
-        private void saveIv(String keyName, byte[] iv) {
+        private void saveIv(@NonNull String keyName, @Nullable byte[] iv) {
             sharedPrefs.edit().putString(keyName, Base64.encodeToString(iv, Base64.DEFAULT)).apply();
         }
     }

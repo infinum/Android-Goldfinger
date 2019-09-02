@@ -6,18 +6,12 @@ buildscript {
     ]
 
     ext.versions = [
-        goldfinger: '2.0.0',
+        appcompat: '1.0.2',
+        biometric: '1.0.0-beta01',
+        goldfinger: '2.0.0-RC1',
         junit     : '4.12',
         mockito   : '2.10.0',
-        rxjava    : '2.1.13'
-    ]
-
-    ext.deps = [
-        biometric: 'androidx.biometric:biometric:1.0.0-alpha04',
-        appcompat: "androidx.appcompat:appcompat:1.0.2",
-        junit    : "junit:junit:${versions.junit}",
-        mockito  : "org.mockito:mockito-core:${versions.mockito}",
-        rxjava   : "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
+        rxjava    : '2.1.13',
     ]
 
     repositories {
@@ -26,8 +20,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
