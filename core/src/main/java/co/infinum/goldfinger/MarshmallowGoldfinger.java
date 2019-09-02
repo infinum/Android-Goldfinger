@@ -13,9 +13,8 @@ import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Goldfinger implementation for Android Marshmallow and above
- * For implementation on Android older version
- * @see LegacyGoldfinger
+ * Goldfinger implementation for Android Marshmallow and newer.
+ * Older versions use {@link LegacyGoldfinger}.
  */
 @RequiresApi(Build.VERSION_CODES.M)
 class MarshmallowGoldfinger implements Goldfinger {
@@ -35,11 +34,17 @@ class MarshmallowGoldfinger implements Goldfinger {
         this.fingerprintManagerCompat = FingerprintManagerCompat.from(context);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void authenticate(@NonNull Callback callback) {
         startFingerprintAuthentication(KEY_AUTH_MODE, "", Mode.AUTHENTICATION, callback);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void cancel() {
         if (cancellableAuthenticationCallback != null) {
@@ -53,36 +58,54 @@ class MarshmallowGoldfinger implements Goldfinger {
         }
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void decrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
         startFingerprintAuthentication(keyName, value, Mode.DECRYPTION, callback);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
         startFingerprintAuthentication(keyName, value, Mode.ENCRYPTION, callback);
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public boolean hasEnrolledFingerprint() {
         return fingerprintManagerCompat.hasEnrolledFingerprints();
     }
 
+    /**
+     * @see Goldfinger
+     */
     @Override
     public boolean hasFingerprintHardware() {
         return fingerprintManagerCompat.isHardwareDetected();
     }
 
     /**
-     * Notify Goldfinger.Callback that the creation of CryptoObject is failed thus
-     * startNativeFingerAuthentication() method never been called.
-     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     * Notify {@link Goldfinger.Callback} that CryptoObject failed to create.
      */
     private void notifyCryptoObjectInitError(@NonNull Callback callback) {
         log("Failed to create CryptoObject");
         callback.onError(new InitializationException());
     }
 
+    /**
+     * Check preconditions:
+     * 1) Device must have fingerprint hardware
+     * 2) Device must have at least 1 enrolled fingerprint.
+     * 3) Authentication is not active.
+     *
+     * @return true if preconditions are invalid, otherwise false.
+     */
     private boolean preconditionsInvalid(Callback callback) {
         if (!hasFingerprintHardware()) {
             callback.onError(new MissingHardwareException());
@@ -93,18 +116,16 @@ class MarshmallowGoldfinger implements Goldfinger {
             callback.onError(new NoEnrolledFingerprintsException());
             return true;
         }
-        return false;
+
+        return cancellableAuthenticationCallback != null && cancellableAuthenticationCallback.isAuthenticationActive;
     }
 
     /**
-     * Create CryptoObject using AsyncCryptoFactory and use it for
-     * startNativeFingerAuthentication() method
-     * @param keyName   unique key identifier, {@link java.security.Key} is stored to
-     *      *           {@link java.security.KeyStore} under this value
-     * @param value     String value which will be encrypted if user successfully authenticates.
-     *                  Value will be "" if Mode.AUTHENTICATION
-     * @param mode      Mode to differentiate Fingerprint authentication modes.{@link Mode}
-     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     * Starts fingerprint authentication if preconditions are valid.
+     *
+     * @see MarshmallowGoldfinger#authenticate(Callback)
+     * @see MarshmallowGoldfinger#encrypt(String, String, Callback)
+     * @see MarshmallowGoldfinger#encrypt(String, String, Callback)
      */
     private void startFingerprintAuthentication(
         @NonNull final String keyName,
@@ -116,7 +137,6 @@ class MarshmallowGoldfinger implements Goldfinger {
             return;
         }
 
-        cancel();
         log("Creating CryptoObject");
         asyncCryptoFactoryCallback = new AsyncCryptoFactory.Callback() {
             @Override
@@ -132,16 +152,9 @@ class MarshmallowGoldfinger implements Goldfinger {
     }
 
     /**
-     * Request authentication of a crypto object.
-     * This call warms up the fingerprint hardware and starts scanning for a fingerprint.
-     * @param cryptoObject FingerprintManagerCompat.CryptoObject: object associated with the
-     *                     call or null if none required.
-     * @param keyName   unique key identifier, {@link java.security.Key} is stored to
-     *                  {@link java.security.KeyStore} under this value
-     * @param value     String value which will be encrypted if user successfully authenticates.
-     *                  Value will be "" if Mode.AUTHENTICATION
-     * @param mode      Mode to differentiate Fingerprint authentication modes.{@link Mode}
-     * @param callback  {@link Goldfinger.Callback} an object to receive authentication events
+     * Start native authentication with successfully created CryptoObject.
+     *
+     * @see MarshmallowGoldfinger#startFingerprintAuthentication(String, String, Mode, Callback)
      */
     private void startNativeFingerprintAuthentication(
         @Nullable FingerprintManagerCompat.CryptoObject cryptoObject,
@@ -153,7 +166,7 @@ class MarshmallowGoldfinger implements Goldfinger {
 
         log("Starting authentication [keyName=%s; value=%s]", keyName, value);
         callback.onResult(new Goldfinger.Result(Type.INFO, Reason.AUTHENTICATION_START));
-        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, Clock.instance(), mode, value, callback);
+        cancellableAuthenticationCallback = new CancellableAuthenticationCallback(crypto, mode, value, callback);
         fingerprintManagerCompat.authenticate(
             cryptoObject,
             0,

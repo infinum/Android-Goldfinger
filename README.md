@@ -11,7 +11,7 @@ This version is compatible with `androidx`. If you are not using `androidx`, you
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.2.0'
+implementation 'co.infinum:goldfinger:1.2.1'
 ```
 
 #### Initialize
@@ -53,8 +53,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:1.2.0'
-implementation 'co.infinum:goldfinger-rx:1.2.0'
+implementation 'co.infinum:goldfinger:1.2.1'
+implementation 'co.infinum:goldfinger-rx:1.2.1'
 ```
 
 #### Initialize

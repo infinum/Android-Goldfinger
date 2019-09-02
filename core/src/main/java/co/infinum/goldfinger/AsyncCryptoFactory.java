@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 /**
- * Class to create CryptoObject asynchronously
+ * Creates CryptoObject asynchronously.
  */
 class AsyncCryptoFactory {
 
@@ -30,6 +30,9 @@ class AsyncCryptoFactory {
         this.task = executor.submit(new CryptoObjectInitRunnable(cryptoFactory, keyName, mode, callback));
     }
 
+    /**
+     * Internal callback used to receive created {@link FingerprintManagerCompat.CryptoObject}
+     */
     static abstract class Callback {
 
         abstract void onCryptoObjectCreated(@Nullable FingerprintManagerCompat.CryptoObject cryptoObject);

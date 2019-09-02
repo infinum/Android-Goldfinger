@@ -5,8 +5,10 @@ import android.util.Log;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RestrictTo;
 
+/**
+ * Logging utility functions. Logger can be turned on/off from {@link Goldfinger.Builder}.
+ */
 class LogUtils {
 
     private static final String TAG = "Goldfinger";
