@@ -25,7 +25,7 @@ public class ExampleActivity extends AppCompatActivity {
     private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
         @Override
         void onTextChanged(String text) {
-            encryptButton.setEnabled(!text.isEmpty());
+            encryptButton.setEnabled(!text.isEmpty() && goldfinger.canAuthenticate());
         }
     };
     private EditText secretInputView;

@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import co.infinum.goldfinger.Goldfinger;
-import co.infinum.goldfinger.GoldfingerParams;
 import co.infinum.goldfinger.rx.RxGoldfinger;
 import io.reactivex.observers.DisposableObserver;
 
@@ -27,7 +26,7 @@ public class RxExampleActivity extends AppCompatActivity {
     private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
         @Override
         void onTextChanged(String text) {
-            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasFingerprintHardware());
+            encryptButton.setEnabled(!text.isEmpty() && goldfinger.canAuthenticate());
         }
     };
     private EditText secretInputView;
@@ -46,9 +45,7 @@ public class RxExampleActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        authenticateButton.setEnabled(goldfinger.hasFingerprintHardware());
-
-        if (goldfinger.hasFingerprintHardware()) {
+        if (goldfinger.canAuthenticate()) {
             authenticateButton.setEnabled(true);
         } else {
             authenticateButton.setEnabled(false);
@@ -65,11 +62,7 @@ public class RxExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
-        GoldfingerParams params = new GoldfingerParams.Builder(this)
-            .description("Description")
-            .subtitle("Subtitle")
-            .build();
-        goldfinger.authenticate(params).subscribe(new DisposableObserver<Goldfinger.Result>() {
+        goldfinger.authenticate(baseParams().build()).subscribe(new DisposableObserver<Goldfinger.Result>() {
 
             @Override
             public void onComplete() {
@@ -86,61 +79,61 @@ public class RxExampleActivity extends AppCompatActivity {
                 onGoldfingerResult(result);
             }
         });
+    }
+
+    private Goldfinger.Params.Builder baseParams() {
+        return new Goldfinger.Params.Builder(this)
+            .description("Description")
+            .subtitle("Subtitle")
+            .title("Title")
+            .negativeButtonText("Cancel");
     }
 
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
-        GoldfingerParams params = new GoldfingerParams.Builder(this)
-            .description("Description")
-            .subtitle("Subtitle")
-            .cryptographyData(KEY_NAME, encryptedValue)
-            .build();
-        goldfinger.decrypt(params).subscribe(new DisposableObserver<Goldfinger.Result>() {
-            @Override
-            public void onComplete() {
-                cancelButton.setEnabled(false);
-            }
+        goldfinger.authenticate(baseParams().decrypt(KEY_NAME, encryptedValue).build())
+            .subscribe(new DisposableObserver<Goldfinger.Result>() {
+                @Override
+                public void onComplete() {
+                    cancelButton.setEnabled(false);
+                }
 
-            @Override
-            public void onError(Throwable e) {
-                onGoldfingerError();
-            }
+                @Override
+                public void onError(Throwable e) {
+                    onGoldfingerError();
+                }
 
-            @Override
-            public void onNext(Goldfinger.Result result) {
-                onGoldfingerResult(result);
-            }
-        });
+                @Override
+                public void onNext(Goldfinger.Result result) {
+                    onGoldfingerResult(result);
+                }
+            });
     }
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
-        GoldfingerParams params = new GoldfingerParams.Builder(this)
-            .description("Description")
-            .subtitle("Subtitle")
-            .cryptographyData(KEY_NAME, secretInputView.getText().toString())
-            .build();
-        goldfinger.encrypt(params).subscribe(new DisposableObserver<Goldfinger.Result>() {
+        goldfinger.authenticate(baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build())
+            .subscribe(new DisposableObserver<Goldfinger.Result>() {
 
-            @Override
-            public void onComplete() {
-                cancelButton.setEnabled(false);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                onGoldfingerError();
-            }
-
-            @Override
-            public void onNext(Goldfinger.Result result) {
-                onGoldfingerResult(result);
-                if (result.type() == Goldfinger.Type.SUCCESS) {
-                    decryptButton.setEnabled(true);
-                    encryptedValue = result.value();
+                @Override
+                public void onComplete() {
+                    cancelButton.setEnabled(false);
                 }
-            }
-        });
+
+                @Override
+                public void onError(Throwable e) {
+                    onGoldfingerError();
+                }
+
+                @Override
+                public void onNext(Goldfinger.Result result) {
+                    onGoldfingerResult(result);
+                    if (result.type() == Goldfinger.Type.SUCCESS) {
+                        decryptButton.setEnabled(true);
+                        encryptedValue = result.value();
+                    }
+                }
+            });
     }
 
     private void fetchViews() {
@@ -153,36 +146,22 @@ public class RxExampleActivity extends AppCompatActivity {
     }
 
     private void initListeners() {
-        encryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                encryptSecretValue();
-            }
+        encryptButton.setOnClickListener(v -> {
+            resetStatusText();
+            encryptSecretValue();
         });
 
-        decryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                decryptEncryptedValue();
-            }
+        decryptButton.setOnClickListener(v -> {
+            resetStatusText();
+            decryptEncryptedValue();
         });
 
-        authenticateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                authenticateUserFingerprint();
-            }
+        authenticateButton.setOnClickListener(v -> {
+            resetStatusText();
+            authenticateUserFingerprint();
         });
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goldfinger.cancel();
-            }
-        });
+        cancelButton.setOnClickListener(v -> goldfinger.cancel());
 
         secretInputView.addTextChangedListener(onTextChangedListener);
     }
