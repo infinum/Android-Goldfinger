@@ -30,17 +30,6 @@ public class ExampleActivity extends AppCompatActivity {
     };
     private EditText secretInputView;
     private TextView statusView;
-    private Goldfinger.Callback callback = new Goldfinger.Callback() {
-        @Override
-        public void onError(@NonNull Exception e) {
-            onGoldfingerError();
-        }
-
-        @Override
-        public void onResult(@NonNull Goldfinger.Result result) {
-            onGoldfingerResult(result);
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +62,17 @@ public class ExampleActivity extends AppCompatActivity {
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
         Goldfinger.Params params = baseParams().build();
-        goldfinger.authenticate(params, callback);
+        goldfinger.authenticate(params, new Goldfinger.Callback() {
+            @Override
+            public void onError(@NonNull Exception e) {
+                onGoldfingerError();
+            }
+
+            @Override
+            public void onResult(@NonNull Goldfinger.Result result) {
+                onGoldfingerResult(result);
+            }
+        });
     }
 
     private Goldfinger.Params.Builder baseParams() {
@@ -87,13 +86,35 @@ public class ExampleActivity extends AppCompatActivity {
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
         Goldfinger.Params params = baseParams().decrypt(KEY_NAME, encryptedValue).build();
-        goldfinger.authenticate(params, callback);
+        goldfinger.authenticate(params, new Goldfinger.Callback() {
+            @Override
+            public void onError(@NonNull Exception e) {
+                onGoldfingerError();
+            }
+
+            @Override
+            public void onResult(@NonNull Goldfinger.Result result) {
+                onGoldfingerResult(result);
+            }
+        });
     }
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
         Goldfinger.Params params = baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build();
-        goldfinger.authenticate(params, callback);
+        goldfinger.authenticate(params, new Goldfinger.Callback() {
+            @Override
+            public void onError(@NonNull Exception e) {
+                onGoldfingerError();
+            }
+
+            @Override
+            public void onResult(@NonNull Goldfinger.Result result) {
+                onGoldfingerResult(result);
+                encryptedValue = result.value();
+                decryptButton.setEnabled(true);
+            }
+        });
     }
 
     private void fetchViews() {
