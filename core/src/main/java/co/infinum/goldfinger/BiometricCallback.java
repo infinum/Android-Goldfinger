@@ -9,7 +9,8 @@ import androidx.biometric.BiometricPrompt;
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Extended default
+ * Extended default callback.
+ * Tracks if the authentication is still active and
  */
 class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
 
@@ -99,20 +100,17 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     /**
      * Cancel Goldfinger authentication.
      * <p>
-     * Native authentication will invoke {@link #onAuthenticationError(int, CharSequence)}
+     * Native authentication will invoke {@link #onAuthenticationError}
      * but the error will be ignored because the user knowingly canceled the authentication.
      */
     void cancel() {
-        if (isAuthenticationActive) {
-            isAuthenticationActive = false;
-        }
+        isAuthenticationActive = false;
     }
 
     /**
-     * Cipher the value with unlocked {@link FingerprintManagerCompat.CryptoObject}.
+     * Cipher the value with unlocked {@link BiometricPrompt.CryptoObject}.
      *
-     * @param cryptoObject unlocked {@link FingerprintManagerCompat.CryptoObject} that is ready to use
-     * @param value        String passed by the user that must be ciphered.
+     * @param cryptoObject unlocked {@link BiometricPrompt.CryptoObject} that is ready to use
      */
     private void cipherValue(BiometricPrompt.CryptoObject cryptoObject) {
         String cipheredValue;

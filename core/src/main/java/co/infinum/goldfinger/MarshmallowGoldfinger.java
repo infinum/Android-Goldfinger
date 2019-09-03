@@ -27,7 +27,7 @@ class MarshmallowGoldfinger implements Goldfinger {
     @NonNull private final Context context;
     @NonNull private final CryptographyHandler cryptographyHandler;
     @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
-    @Nullable private AuthenticationCallback internalCallback;
+    @Nullable private BiometricCallback biometricCallback;
 
     MarshmallowGoldfinger(
         @NonNull Context context,
@@ -45,8 +45,8 @@ class MarshmallowGoldfinger implements Goldfinger {
      */
     @Override
     public void authenticate(
-        @NonNull GoldfingerParams params,
-        @NonNull Goldfinger.Callback callback
+        @NonNull Params params,
+        @NonNull Callback callback
     ) {
         if (internalCallback != null && internalCallback.isAuthenticationActive) {
             return;

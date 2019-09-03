@@ -7,6 +7,9 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.biometric.BiometricPrompt;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 public interface Goldfinger {
 
@@ -25,26 +28,6 @@ public interface Goldfinger {
     void authenticate(@NonNull GoldfingerParams params, @NonNull Callback callback);
 
     /**
-     * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptographyHandler} implementation is used to automatically decrypt given value.
-     *
-     * @see GoldfingerParams
-     */
-    void decrypt(@NonNull GoldfingerParams params, @NonNull Callback callback);
-
-    /**
-     * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptographyHandler} implementation is used to automatically encrypt given value.
-     * <p>
-     * Use it when saving some data that should not be saved as plain text (e.g. password).
-     * To decrypt the value use {@link Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)}} method.
-     *
-     * @see GoldfingerParams
-     * @see GoldfingerCallback
-     */
-    void encrypt(@NonNull GoldfingerParams params, @NonNull Callback callback);
-
-    /**
      * Cancel current active Fingerprint authentication.
      */
     void cancel();
@@ -58,6 +41,9 @@ public interface Goldfinger {
         @NonNull private final Context context;
         @Nullable private CryptoObjectFactory cryptoObjectFactory;
         @Nullable private CryptographyHandler cryptographyHandler;
+        @NonNull private Mode mode = Mode.AUTHENTICATION;
+        @Nullable private String key;
+        @Nullable private String value;
 
         public Builder(@NonNull Context context) {
             this.context = context;
@@ -178,6 +164,170 @@ public interface Goldfinger {
          * Critical error happened and user fingerprint should be invalidated.
          */
         void onError(@NonNull Exception e);
+    }
+
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    class Params {
+
+        private final Object dialogOwner;
+        private final String description;
+        private final String negativeButtonText;
+        private final String subtitle;
+        private final String title;
+
+        private Params(
+            @NonNull Object dialogOwner,
+            @NonNull String title,
+            @NonNull String description,
+            @NonNull String negativeButtonText,
+            @NonNull String subtitle
+        ) {
+            this.dialogOwner = dialogOwner;
+            this.title = title;
+            this.description = description;
+            this.negativeButtonText = negativeButtonText;
+            this.subtitle = subtitle;
+        }
+
+        @NonNull
+        public String getDescription() {
+            return description;
+        }
+
+        @NonNull
+        public Object getDialogOwner() {
+            return dialogOwner;
+        }
+
+        @NonNull
+        public String getNegativeButtonText() {
+            return negativeButtonText;
+        }
+
+        @NonNull
+        public String getSubtitle() {
+            return subtitle;
+        }
+
+        @NonNull
+        public String getTitle() {
+            return title;
+        }
+
+        BiometricPrompt.PromptInfo buildPromptInfo() {
+            return new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(title)
+                .setConfirmationRequired()
+                .setDeviceCredentialAllowed()
+                .setSubtitle(subtitle)
+                .setDescription(description)
+                .setNegativeButtonText(negativeButtonText)
+                .build();
+        }
+
+        @SuppressWarnings("unused")
+        public static class Builder {
+
+            /* Dialog dialogOwner can be either Fragment or FragmentActivity */
+            private Object dialogOwner;
+            private Mode mode = Mode.AUTHENTICATION;
+            private String description;
+            private String negativeButtonText;
+            private String subtitle;
+            private String title;
+            private boolean confirmationRequired;
+
+            public Builder(@NonNull FragmentActivity activity) {
+                this.dialogOwner = activity;
+            }
+
+            public Builder(@NonNull Fragment fragment) {
+                this.dialogOwner = fragment;
+            }
+
+            @NonNull
+            public Params build() {
+                return new GoldfingerParams(
+                    activity,
+                    cryptographyData != null ? cryptographyData : new CryptographyData("", ""),
+                    title != null ? title : "",
+                    description != null ? description : "",
+                    negativeButtonText != null ? negativeButtonText : "",
+                    subtitle != null ? subtitle : ""
+                );
+            }
+
+            /**
+             * Required: For {@link Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)}
+             * and {@link Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)}
+             * <p>
+             * Ignored: For {@link Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)}
+             *
+             * @see CryptographyData
+             */
+            @NonNull
+            public Builder cryptographyData(@NonNull CryptographyData cryptographyData) {
+                this.cryptographyData = cryptographyData;
+                return this;
+            }
+
+            /**
+             * @see #cryptographyData(CryptographyData)
+             */
+            @NonNull
+            public Builder cryptographyData(@NonNull String keyName, @NonNull String value) {
+                return cryptographyData(new CryptographyData(keyName, value));
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDescription(CharSequence)
+             */
+            @NonNull
+            public Builder description(@Nullable String description) {
+                this.description = description;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setNegativeButtonText(CharSequence)
+             */
+            @NonNull
+            public Builder negativeButtonText(@NonNull String negativeButtonText) {
+                this.negativeButtonText = negativeButtonText;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setSubtitle(CharSequence)
+             */
+            @NonNull
+            public Builder subtitle(@Nullable String subtitle) {
+                this.subtitle = subtitle;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle(CharSequence)
+             */
+            @NonNull
+            public Builder title(@NonNull String title) {
+                this.title = title;
+                return this;
+            }
+
+
+            @NonNull
+            public Goldfinger.Builder encrypt(String key, String value) {
+                this.mode = Mode.ENCRYPTION;
+                return this;
+            }
+
+            @NonNull
+            public Goldfinger.Builder decrypt(String key, String value) {
+                this.mode = Mode.DECRYPTION;
+                return this;
+            }
+        }
     }
 
     enum Reason {
