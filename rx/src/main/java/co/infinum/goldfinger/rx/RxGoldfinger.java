@@ -7,33 +7,21 @@ import androidx.annotation.Nullable;
 import co.infinum.goldfinger.CryptoObjectFactory;
 import co.infinum.goldfinger.CryptographyHandler;
 import co.infinum.goldfinger.Goldfinger;
-import co.infinum.goldfinger.GoldfingerParams;
 import io.reactivex.Observable;
 
+@SuppressWarnings("unused")
 public interface RxGoldfinger {
 
     /**
-     * @see Goldfinger#hasFingerprintHardware()
+     * @see Goldfinger#canAuthenticate()
      */
-    boolean hasFingerprintHardware();
+    boolean canAuthenticate();
 
     /**
-     * @see Goldfinger#authenticate(GoldfingerParams, GoldfingerCallback)
+     * @see Goldfinger#authenticate
      */
     @NonNull
-    Observable<Goldfinger.Result> authenticate(@NonNull GoldfingerParams params);
-
-    /**
-     * @see Goldfinger#decrypt(String, String, Goldfinger.Callback)
-     * @see Goldfinger.Result
-     */
-    Observable<Goldfinger.Result> decrypt(@NonNull GoldfingerParams params);
-
-    /**
-     * @see Goldfinger#encrypt(String, String, Goldfinger.Callback)
-     * @see Goldfinger.Result
-     */
-    Observable<Goldfinger.Result> encrypt(@NonNull GoldfingerParams params);
+    Observable<Goldfinger.Result> authenticate(@NonNull Goldfinger.Params params);
 
     /**
      * @see Goldfinger#cancel()

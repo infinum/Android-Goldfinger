@@ -9,32 +9,35 @@ import androidx.biometric.BiometricPrompt;
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Interface implements crypto operations on given value when using
- * {@link Goldfinger#decrypt(GoldfingerParams, GoldfingerCallback)} or
- * {@link Goldfinger#encrypt(GoldfingerParams, GoldfingerCallback)} methods.
+ * Interface implements crypto operations on given value.
+ *
+ * @see Goldfinger.Params.Builder#encrypt
+ * @see Goldfinger.Params.Builder#decrypt
  */
 public interface CryptographyHandler {
 
     /**
-     * Encrypt value with unlocked cryptoObject. Return null if encryption fails.
+     * Encrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
+     * Return null if encryption fails.
      */
     @Nullable
-    String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData);
+    String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);
 
     /**
-     * Decrypt value with unlocked cryptoObject. Return null if decryption fails.
+     * Decrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
+     * Return null if decryption fails.
      */
     @Nullable
-    String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData);
+    String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);
 
     @SuppressWarnings("ConstantConditions")
     class Default implements CryptographyHandler {
 
         @Nullable
         @Override
-        public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData) {
+        public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {
             try {
-                byte[] decodedBytes = Base64.decode(cryptographyData.value(), Base64.DEFAULT);
+                byte[] decodedBytes = Base64.decode(value, Base64.DEFAULT);
                 return new String(cryptoObject.getCipher().doFinal(decodedBytes));
             } catch (Exception e) {
                 log(e);
@@ -44,9 +47,9 @@ public interface CryptographyHandler {
 
         @Nullable
         @Override
-        public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull CryptographyData cryptographyData) {
+        public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {
             try {
-                byte[] encryptedBytes = cryptoObject.getCipher().doFinal(cryptographyData.value().getBytes());
+                byte[] encryptedBytes = cryptoObject.getCipher().doFinal(value.getBytes());
                 return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
             } catch (Exception e) {
                 log(e);

@@ -3,7 +3,7 @@ package co.infinum.goldfinger;
 /**
  * Thrown when value encryption fails.
  *
- * @see AuthenticationCallback
+ * @see BiometricCallback#onAuthenticationSucceeded
  */
 class EncryptionException extends Exception {
 

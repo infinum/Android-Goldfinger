@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.biometric.BiometricPrompt;
 
 import static co.infinum.goldfinger.LogUtils.log;
@@ -12,46 +13,49 @@ import static co.infinum.goldfinger.LogUtils.log;
  * Extended default callback.
  * Tracks if the authentication is still active and
  */
+@SuppressWarnings({"ConstantConditions", "NullableProblems"})
 class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
+
+    @NonNull private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     boolean isAuthenticationActive = true;
 
     @NonNull private final Goldfinger.Callback callback;
     @NonNull private final CryptographyHandler cryptographyHandler;
     @NonNull private final Mode mode;
-    @NonNull private final CryptographyData cryptographyData;
-    @NonNull private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    @Nullable private final String value;
 
     BiometricCallback(
         @NonNull CryptographyHandler cryptographyHandler,
         @NonNull Mode mode,
-        @NonNull CryptographyData cryptographyData,
+        @Nullable String value,
         @NonNull Goldfinger.Callback callback
     ) {
         this.cryptographyHandler = cryptographyHandler;
         this.mode = mode;
-        this.cryptographyData = cryptographyData;
+        this.value = value;
         this.callback = callback;
     }
 
     @Override
-    public void onAuthenticationError(int errMsgId, @NonNull final CharSequence errString) {
-        final Goldfinger.Reason reason = EnumConverter.errorToReason(errMsgId);
+    public void onAuthenticationError(int errMsgId, final CharSequence errString) {
         if (!isAuthenticationActive) {
             return;
         }
 
         isAuthenticationActive = false;
-        mainHandler.post(new Runnable() {
+        final Goldfinger.Reason reason = EnumConverter.errorToReason(errMsgId);
+        log("onAuthenticationError [%s]", reason);
+        MAIN_HANDLER.post(new Runnable() {
             @Override
             public void run() {
-                log("onAuthenticationError [%s]", reason);
-                callback.onResult(new Goldfinger.Result(
+                Goldfinger.Result result = new Goldfinger.Result(
                     Goldfinger.Type.ERROR,
                     reason,
                     null,
-                    errString.toString()
-                ));
+                    errString != null ? errString.toString() : null
+                );
+                callback.onResult(result);
             }
         });
     }
@@ -62,14 +66,15 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
             return;
         }
 
-        mainHandler.post(new Runnable() {
+        log("onAuthenticationFailed [%s]", Goldfinger.Reason.AUTHENTICATION_FAIL);
+        MAIN_HANDLER.post(new Runnable() {
             @Override
             public void run() {
-                log("onAuthenticationFailed [%s]", Goldfinger.Reason.AUTHENTICATION_FAIL);
-                callback.onResult(new Goldfinger.Result(
+                Goldfinger.Result result = new Goldfinger.Result(
                     Goldfinger.Type.INFO,
                     Goldfinger.Reason.AUTHENTICATION_FAIL
-                ));
+                );
+                callback.onResult(result);
             }
         });
     }
@@ -81,15 +86,16 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
         }
 
         isAuthenticationActive = false;
-        mainHandler.post(new Runnable() {
+        log("onAuthenticationSucceeded");
+        MAIN_HANDLER.post(new Runnable() {
             @Override
             public void run() {
-                log("onAuthenticationSucceeded");
                 if (mode == Mode.AUTHENTICATION) {
-                    callback.onResult(new Goldfinger.Result(
+                    Goldfinger.Result goldfingerResult = new Goldfinger.Result(
                         Goldfinger.Type.SUCCESS,
                         Goldfinger.Reason.AUTHENTICATION_SUCCESS
-                    ));
+                    );
+                    callback.onResult(goldfingerResult);
                 } else {
                     cipherValue(result.getCryptoObject());
                 }
@@ -115,13 +121,13 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     private void cipherValue(BiometricPrompt.CryptoObject cryptoObject) {
         String cipheredValue;
         if (mode == Mode.DECRYPTION) {
-            cipheredValue = cryptographyHandler.decrypt(cryptoObject, cryptographyData);
+            cipheredValue = cryptographyHandler.decrypt(cryptoObject, value);
         } else {
-            cipheredValue = cryptographyHandler.encrypt(cryptoObject, cryptographyData);
+            cipheredValue = cryptographyHandler.encrypt(cryptoObject, value);
         }
 
         if (cipheredValue != null) {
-            log("Ciphered [%s] => [%s]", cryptographyData.value(), cipheredValue);
+            log("Ciphered [%s] => [%s]", value, cipheredValue);
             callback.onResult(new Goldfinger.Result(
                 Goldfinger.Type.SUCCESS,
                 Goldfinger.Reason.AUTHENTICATION_SUCCESS,

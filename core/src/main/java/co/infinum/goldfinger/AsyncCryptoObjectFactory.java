@@ -23,15 +23,15 @@ class AsyncCryptoObjectFactory {
     }
 
     void createCryptoObject(
-        @NonNull CryptographyData cryptographyData,
         @NonNull Mode mode,
+        @NonNull String key,
         @NonNull AsyncCryptoObjectFactory.Callback callback
     ) {
         if (task != null && !task.isDone()) {
             task.cancel(true);
         }
 
-        this.task = executor.submit(new CryptoObjectInitRunnable(cryptoObjectFactory, cryptographyData, mode, callback));
+        this.task = executor.submit(new CryptoObjectInitRunnable(cryptoObjectFactory, mode, key, callback));
     }
 
     /**

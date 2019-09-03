@@ -8,7 +8,7 @@ import androidx.biometric.BiometricPrompt;
 
 /**
  * Custom runnable that creates CryptoObject.
- * Used for async creation.
+ * Used for asynchronous creation.
  */
 class CryptoObjectInitRunnable implements Runnable {
 
@@ -16,18 +16,18 @@ class CryptoObjectInitRunnable implements Runnable {
 
     @NonNull private final AsyncCryptoObjectFactory.Callback callback;
     @NonNull private final CryptoObjectFactory cryptoFactory;
-    @NonNull private final CryptographyData cryptographyData;
     @NonNull private final Mode mode;
+    @NonNull private final String key;
 
     CryptoObjectInitRunnable(
         @NonNull CryptoObjectFactory cryptoFactory,
-        @NonNull CryptographyData cryptographyData,
         @NonNull Mode mode,
+        @NonNull String key,
         @NonNull AsyncCryptoObjectFactory.Callback callback
     ) {
         this.cryptoFactory = cryptoFactory;
-        this.cryptographyData = cryptographyData;
         this.mode = mode;
+        this.key = key;
         this.callback = callback;
     }
 
@@ -36,10 +36,10 @@ class CryptoObjectInitRunnable implements Runnable {
         final BiometricPrompt.CryptoObject cryptoObject;
         switch (mode) {
             case DECRYPTION:
-                cryptoObject = cryptoFactory.createDecryptionCryptoObject(cryptographyData);
+                cryptoObject = cryptoFactory.createDecryptionCryptoObject(key);
                 break;
             case ENCRYPTION:
-                cryptoObject = cryptoFactory.createEncryptionCryptoObject(cryptographyData);
+                cryptoObject = cryptoFactory.createEncryptionCryptoObject(key);
                 break;
             default:
                 cryptoObject = null;

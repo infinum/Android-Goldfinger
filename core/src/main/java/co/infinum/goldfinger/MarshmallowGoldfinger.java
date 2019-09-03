@@ -1,16 +1,19 @@
 package co.infinum.goldfinger;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Build;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
@@ -24,8 +27,8 @@ class MarshmallowGoldfinger implements Goldfinger {
     @NonNull private final AsyncCryptoObjectFactory asyncCryptoFactory;
     @Nullable private AsyncCryptoObjectFactory.Callback asyncCryptoFactoryCallback;
     @Nullable private BiometricPrompt biometricPrompt;
-    @NonNull private final Context context;
     @NonNull private final CryptographyHandler cryptographyHandler;
+    @NonNull private final BiometricManager biometricManager;
     @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
     @Nullable private BiometricCallback biometricCallback;
 
@@ -34,42 +37,44 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull AsyncCryptoObjectFactory asyncCryptoFactory,
         @NonNull CryptographyHandler cryptographyHandler
     ) {
-        this.context = context;
-
+        this.biometricManager = BiometricManager.from(context);
         this.asyncCryptoFactory = asyncCryptoFactory;
         this.cryptographyHandler = cryptographyHandler;
     }
 
     /**
-     * @see Goldfinger
+     * @see Goldfinger#authenticate
      */
     @Override
     public void authenticate(
         @NonNull Params params,
         @NonNull Callback callback
     ) {
-        if (internalCallback != null && internalCallback.isAuthenticationActive) {
+        if (biometricCallback != null && biometricCallback.isAuthenticationActive) {
+            log("Authentication is already active. Ignoring authenticate call.");
+            return;
+        }
+        List<String> errors = ValidateUtils.validateParams(params);
+        if (!errors.isEmpty()) {
+            callback.onError(new InvalidParametersException(errors));
             return;
         }
 
-        if (areParamsInvalid(params, Mode.AUTHENTICATION)) {
-            callback.onError(new InitializationException());
-            return;
+        if (params.mode() == Mode.AUTHENTICATION) {
+            log("Starting authentication");
+            startNativeFingerprintAuthentication(params, callback, null);
+        } else {
+            initializeCryptoObject(params, callback);
         }
+    }
 
-        cancel();
-        this.internalCallback = new AuthenticationCallback(
-            this.cryptographyHandler,
-            Mode.AUTHENTICATION,
-            new CryptographyData("", ""),
-            callback
-        );
-        biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
-        biometricPrompt.authenticate(params.buildPromptInfo());
+    @Override
+    public boolean canAuthenticate() {
+        return biometricManager.canAuthenticate() > 0;
     }
 
     /**
-     * @see Goldfinger
+     * @see Goldfinger#cancel
      */
     @Override
     public void cancel() {
@@ -78,114 +83,60 @@ class MarshmallowGoldfinger implements Goldfinger {
             biometricPrompt = null;
         }
 
+        if (biometricCallback != null) {
+            biometricCallback.cancel();
+            biometricCallback = null;
+        }
+
         if (asyncCryptoFactoryCallback != null) {
             asyncCryptoFactoryCallback.cancel();
             asyncCryptoFactoryCallback = null;
         }
     }
 
-    /**
-     * @see Goldfinger
-     */
-    @Override
-    public void decrypt(
-        @NonNull GoldfingerParams params,
-        @NonNull Goldfinger.Callback callback
+    @SuppressWarnings("ConstantConditions")
+    private void initializeCryptoObject(
+        @NonNull final Params params,
+        @NonNull final Callback callback
     ) {
-        startFingerprintAuthentication(Mode.DECRYPTION, params, callback);
-    }
-
-    /**
-     * @see Goldfinger
-     */
-    @Override
-    public void encrypt(
-        @NonNull GoldfingerParams params,
-        @NonNull Goldfinger.Callback callback
-    ) {
-        startFingerprintAuthentication(Mode.ENCRYPTION, params, callback);
-    }
-
-    /**
-     * @see Goldfinger
-     */
-    @Override
-    public boolean hasFingerprintHardware() {
-        return context.getPackageManager() != null
-            && context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
-    }
-
-    private boolean areParamsInvalid(@NonNull GoldfingerParams params, @NonNull Mode mode) {
-        boolean invalid = false;
-
-        if (params.getTitle().isEmpty()) {
-            invalid = true;
-            log("GoldfingerParams must contain non-empty = [title]");
-        }
-
-        if (params.getNegativeButtonText().isEmpty()) {
-            invalid = true;
-            log("GoldfingerParams must contain non-empty = [negativeButtonText]");
-        }
-
-        if (Mode.AUTHENTICATION != mode) {
-            CryptographyData cryptographyData = params.getCryptographyData();
-
-            if (cryptographyData.keyName().isEmpty()) {
-                invalid = true;
-                log("GoldfingerParams must contain non-empty = [CryptographyData#keyName]");
-            }
-
-            if (cryptographyData.value().isEmpty()) {
-                invalid = true;
-                log("GoldfingerParams must contain non-empty = [CryptographyData#value]");
-            }
-        }
-
-        return invalid;
-    }
-
-    private void startFingerprintAuthentication(
-        @NonNull final Mode mode,
-        @NonNull final GoldfingerParams params,
-        @NonNull final Goldfinger.Callback callback
-    ) {
-        if (internalCallback != null && internalCallback.isAuthenticationActive) {
-            return;
-        }
-
-        if (areParamsInvalid(params, mode)) {
-            callback.onError(new InitializationException());
-            return;
-        }
-
-        cancel();
         log("Creating CryptoObject");
         asyncCryptoFactoryCallback = new AsyncCryptoObjectFactory.Callback() {
             @Override
             void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject) {
                 if (cryptoObject != null) {
-                    startNativeFingerprintAuthentication(mode, cryptoObject, params, callback);
+                    startNativeFingerprintAuthentication(params, callback, cryptoObject);
                 } else {
                     log("Failed to create CryptoObject");
                     callback.onError(new InitializationException());
                 }
             }
         };
-        asyncCryptoFactory.createCryptoObject(params.getCryptographyData(), mode, asyncCryptoFactoryCallback);
+        asyncCryptoFactory.createCryptoObject(params.mode(), params.key(), asyncCryptoFactoryCallback);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void startNativeFingerprintAuthentication(
-        @NonNull Mode mode,
-        @NonNull BiometricPrompt.CryptoObject cryptoObject,
-        @NonNull GoldfingerParams params,
-        @NonNull Goldfinger.Callback callback
+        @NonNull Params params,
+        @NonNull Callback callback,
+        @Nullable BiometricPrompt.CryptoObject cryptoObject
     ) {
-        CryptographyData cryptographyData = params.getCryptographyData();
-        log("Starting authentication [keyName=%s; value=%s]", cryptographyData.keyName(), cryptographyData.value());
         callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
-        this.internalCallback = new AuthenticationCallback(cryptographyHandler, mode, cryptographyData, callback);
-        this.biometricPrompt = new BiometricPrompt(params.getActivity(), executor, internalCallback);
-        this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
+        this.biometricCallback = new BiometricCallback(cryptographyHandler, params.mode(), params.value(), callback);
+        if (params.dialogOwner() instanceof FragmentActivity) {
+            this.biometricPrompt = new BiometricPrompt((FragmentActivity) params.dialogOwner(), executor, biometricCallback);
+        }
+        if (params.dialogOwner() instanceof Fragment) {
+            this.biometricPrompt = new BiometricPrompt((Fragment) params.dialogOwner(), executor, biometricCallback);
+        }
+
+        if (cryptoObject != null) {
+            /* Encryption/Decryption call with initialized CryptoObject */
+            log("Starting authentication [keyName=%s; value=%s]", params.key(), params.value());
+            this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
+        } else {
+            /* Simple Authentication call */
+            log("Starting authentication");
+            this.biometricPrompt.authenticate(params.buildPromptInfo());
+        }
     }
 }

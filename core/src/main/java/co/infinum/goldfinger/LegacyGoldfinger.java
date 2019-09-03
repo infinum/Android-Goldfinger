@@ -8,23 +8,15 @@ import androidx.annotation.NonNull;
 class LegacyGoldfinger implements Goldfinger {
 
     @Override
-    public void authenticate(@NonNull GoldfingerParams params, @NonNull Callback callback) {
+    public void authenticate(@NonNull Params params, @NonNull Callback callback) {
+    }
+
+    @Override
+    public boolean canAuthenticate() {
+        return false;
     }
 
     @Override
     public void cancel() {
-    }
-
-    @Override
-    public void decrypt(@NonNull GoldfingerParams params, @NonNull Callback callback) {
-    }
-
-    @Override
-    public void encrypt(@NonNull GoldfingerParams params, @NonNull Callback callback) {
-    }
-
-    @Override
-    public boolean hasFingerprintHardware() {
-        return false;
     }
 }
