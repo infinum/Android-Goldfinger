@@ -6,22 +6,22 @@ import androidx.core.os.CancellationSignal;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
+/**
+ * Extended {@link FingerprintManagerCompat.AuthenticationCallback} because default implementation
+ * does not support cancel functionality.
+ */
 class CancellableAuthenticationCallback extends FingerprintManagerCompat.AuthenticationCallback {
 
-    private static final long IGNORE_CANCEL_MS = 100;
-
     @NonNull final CancellationSignal cancellationSignal;
+    boolean isAuthenticationActive = true;
 
     @NonNull private final Goldfinger.Callback callback;
-    @NonNull private final Clock clock;
     @NonNull private final Crypto crypto;
     @NonNull private final Mode mode;
     @NonNull private final String value;
-    private final long initializationTimeMs;
 
     CancellableAuthenticationCallback(
         @NonNull Crypto crypto,
-        @NonNull Clock clock,
         @NonNull Mode mode,
         @NonNull String value,
         @NonNull Goldfinger.Callback callback
@@ -30,28 +30,29 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
         this.mode = mode;
         this.value = value;
         this.callback = callback;
-        this.clock = clock;
-        this.initializationTimeMs = clock.currentTimeMs();
         this.cancellationSignal = new CancellationSignal();
     }
 
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
         Goldfinger.Reason reason = EnumConverter.errorToReason(errMsgId);
-        if (shouldReactToError(reason)) {
-            log("onAuthenticationError [%s]", reason);
-            callback.onResult(new Goldfinger.Result(
-                Goldfinger.Type.ERROR,
-                reason,
-                null,
-                errString != null ? errString.toString() : null
-            ));
+        if (!isAuthenticationActive) {
+            return;
         }
+
+        isAuthenticationActive = false;
+        log("onAuthenticationError [%s]", reason);
+        callback.onResult(new Goldfinger.Result(
+            Goldfinger.Type.ERROR,
+            reason,
+            null,
+            errString != null ? errString.toString() : null
+        ));
     }
 
     @Override
     public void onAuthenticationFailed() {
-        if (cancellationSignal.isCanceled()) {
+        if (!isAuthenticationActive) {
             return;
         }
 
@@ -64,7 +65,7 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
 
     @Override
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
-        if (cancellationSignal.isCanceled()) {
+        if (!isAuthenticationActive) {
             return;
         }
 
@@ -80,10 +81,11 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
 
     @Override
     public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
-        if (cancellationSignal.isCanceled()) {
+        if (!isAuthenticationActive) {
             return;
         }
 
+        isAuthenticationActive = false;
         log("onAuthenticationSucceeded");
         if (mode == Mode.AUTHENTICATION) {
             callback.onResult(new Goldfinger.Result(
@@ -95,12 +97,25 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
         }
     }
 
+    /**
+     * Cancel Goldfinger authentication.
+     *
+     * Native authentication will invoke {@link #onAuthenticationError(int, CharSequence)}
+     * but the error will be ignored because the user knowingly canceled the authentication.
+     */
     void cancel() {
-        if (!cancellationSignal.isCanceled()) {
+        if (isAuthenticationActive) {
+            isAuthenticationActive = false;
             cancellationSignal.cancel();
         }
     }
 
+    /**
+     * Cipher the value with unlocked {@link FingerprintManagerCompat.CryptoObject}.
+     *
+     * @param cryptoObject unlocked {@link FingerprintManagerCompat.CryptoObject} that is ready to use
+     * @param value        String passed by the user that must be ciphered.
+     */
     private void cipherValue(FingerprintManagerCompat.CryptoObject cryptoObject, String value) {
         String cipheredValue = (mode == Mode.DECRYPTION) ? crypto.decrypt(cryptoObject, value) : crypto.encrypt(cryptoObject, value);
 
@@ -116,10 +131,5 @@ class CancellableAuthenticationCallback extends FingerprintManagerCompat.Authent
             Exception e = (mode == Mode.DECRYPTION) ? new DecryptionException() : new EncryptionException();
             callback.onError(e);
         }
-    }
-
-    private boolean shouldReactToError(Goldfinger.Reason reason) {
-        return !cancellationSignal.isCanceled()
-            && (reason != Goldfinger.Reason.CANCELED || clock.isBeforeNow(initializationTimeMs + IGNORE_CANCEL_MS));
     }
 }

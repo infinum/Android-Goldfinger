@@ -4,6 +4,10 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
+/**
+ * Custom runnable that creates CryptoObject.
+ * Used for async creation.
+ */
 class CryptoObjectInitRunnable implements Runnable {
 
     private final static Handler mainHandler = new Handler(Looper.getMainLooper());

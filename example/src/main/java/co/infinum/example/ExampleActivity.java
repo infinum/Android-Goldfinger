@@ -144,6 +144,7 @@ public class ExampleActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cancelButton.setEnabled(false);
                 goldfinger.cancel();
             }
         });

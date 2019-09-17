@@ -35,7 +35,6 @@ public class CancellableAuthenticationCallbackTest {
         }
     };
     private CancellableAuthenticationCallback cancellableCallback;
-    @Mock private Clock clock;
     @Mock private Crypto crypto;
     @Mock private FingerprintManagerCompat.CryptoObject cryptoObject;
 
@@ -68,8 +67,8 @@ public class CancellableAuthenticationCallbackTest {
 
     @Test
     public void onAuthenticationError_cancelIgnored() {
-        when(clock.isBeforeNow(anyLong())).thenReturn(false);
         cancellableCallback = newInstance(Mode.ENCRYPTION);
+        cancellableCallback.cancel();
         cancellableCallback.onAuthenticationError(FingerprintManager.FINGERPRINT_ERROR_CANCELED, "");
         assertNull(result);
         assertNull(exception);
@@ -78,7 +77,7 @@ public class CancellableAuthenticationCallbackTest {
     @Test
     public void onAuthenticationError_canceled() {
         cancellableCallback = newInstance(Mode.ENCRYPTION);
-        cancellableCallback.cancellationSignal.cancel();
+        cancellableCallback.cancel();
         cancellableCallback.onAuthenticationError(-1, "");
         assertNull(result);
         assertNull(exception);
@@ -94,7 +93,7 @@ public class CancellableAuthenticationCallbackTest {
     @Test
     public void onAuthenticationFailed_canceled() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
-        cancellableCallback.cancellationSignal.cancel();
+        cancellableCallback.cancel();
         cancellableCallback.onAuthenticationFailed();
         assertNull(result);
         assertNull(exception);
@@ -111,7 +110,7 @@ public class CancellableAuthenticationCallbackTest {
     @Test
     public void onAuthenticationHelp_canceled() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
-        cancellableCallback.cancellationSignal.cancel();
+        cancellableCallback.cancel();
         cancellableCallback.onAuthenticationHelp(-1, "");
         assertNull(result);
         assertNull(exception);
@@ -135,7 +134,7 @@ public class CancellableAuthenticationCallbackTest {
     @Test
     public void onAuthenticationSucceeded_canceled() {
         cancellableCallback = newInstance(Mode.AUTHENTICATION);
-        cancellableCallback.cancellationSignal.cancel();
+        cancellableCallback.cancel();
         cancellableCallback.onAuthenticationSucceeded(new FingerprintManagerCompat.AuthenticationResult(cryptoObject));
         assertNull(result);
         assertNull(exception);
@@ -182,7 +181,7 @@ public class CancellableAuthenticationCallbackTest {
     }
 
     private CancellableAuthenticationCallback newInstance(Mode mode) {
-        return new CancellableAuthenticationCallback(crypto, clock, mode, "", callback);
+        return new CancellableAuthenticationCallback(crypto, mode, "", callback);
     }
 }
 

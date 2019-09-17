@@ -1,5 +1,8 @@
 package co.infinum.goldfinger;
 
+/**
+ * Thrown if the user has no enrolled fingerprints.
+ */
 class NoEnrolledFingerprintsException extends Exception {
 
     NoEnrolledFingerprintsException() {
