@@ -31,6 +31,7 @@ class MarshmallowGoldfinger implements Goldfinger {
     @NonNull private final BiometricManager biometricManager;
     @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
     @Nullable private BiometricCallback biometricCallback;
+    private boolean creatingCryptoObject = false;
 
     MarshmallowGoldfinger(
         @NonNull Context context,
@@ -50,13 +51,7 @@ class MarshmallowGoldfinger implements Goldfinger {
         @NonNull Params params,
         @NonNull Callback callback
     ) {
-        if (biometricCallback != null && biometricCallback.isAuthenticationActive) {
-            log("Authentication is already active. Ignoring authenticate call.");
-            return;
-        }
-        List<String> errors = ValidateUtils.validateParams(params);
-        if (!errors.isEmpty()) {
-            callback.onError(new InvalidParametersException(errors));
+        if (preconditionsInvalid(params, callback)) {
             return;
         }
 
@@ -70,7 +65,7 @@ class MarshmallowGoldfinger implements Goldfinger {
 
     @Override
     public boolean canAuthenticate() {
-        return biometricManager.canAuthenticate() > 0;
+        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
     }
 
     /**
@@ -94,6 +89,16 @@ class MarshmallowGoldfinger implements Goldfinger {
         }
     }
 
+    @Override
+    public boolean hasEnrolledFingerprints() {
+        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED;
+    }
+
+    @Override
+    public boolean hasFingerprintHardware() {
+        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
+    }
+
     @SuppressWarnings("ConstantConditions")
     private void initializeCryptoObject(
         @NonNull final Params params,
@@ -103,15 +108,42 @@ class MarshmallowGoldfinger implements Goldfinger {
         asyncCryptoFactoryCallback = new AsyncCryptoObjectFactory.Callback() {
             @Override
             void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject) {
+                creatingCryptoObject = false;
                 if (cryptoObject != null) {
                     startNativeFingerprintAuthentication(params, callback, cryptoObject);
                 } else {
                     log("Failed to create CryptoObject");
-                    callback.onError(new InitializationException());
+                    callback.onError(new CryptoObjectInitException());
                 }
             }
         };
+        creatingCryptoObject = true;
         asyncCryptoFactory.createCryptoObject(params.mode(), params.key(), asyncCryptoFactoryCallback);
+    }
+
+    private boolean preconditionsInvalid(Params params, Callback callback) {
+        if ((biometricCallback != null && biometricCallback.isAuthenticationActive) || creatingCryptoObject) {
+            log("Authentication is already active. Ignoring authenticate call.");
+            return true;
+        }
+
+        if (!hasFingerprintHardware()) {
+            callback.onError(new MissingHardwareException());
+            return true;
+        }
+
+        if (!hasEnrolledFingerprints()) {
+            callback.onError(new NoEnrolledFingerprintsException());
+            return true;
+        }
+
+        List<String> errors = ValidateUtils.validateParams(params);
+        if (!errors.isEmpty()) {
+            callback.onError(new InvalidParametersException(errors));
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("ConstantConditions")

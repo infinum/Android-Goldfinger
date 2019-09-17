@@ -19,4 +19,14 @@ class LegacyGoldfinger implements Goldfinger {
     @Override
     public void cancel() {
     }
+
+    @Override
+    public boolean hasEnrolledFingerprints() {
+        return false;
+    }
+
+    @Override
+    public boolean hasFingerprintHardware() {
+        return false;
+    }
 }

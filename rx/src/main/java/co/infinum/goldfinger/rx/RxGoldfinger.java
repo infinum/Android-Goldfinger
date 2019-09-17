@@ -18,6 +18,16 @@ public interface RxGoldfinger {
     boolean canAuthenticate();
 
     /**
+     * @see Goldfinger#hasFingerprintHardware()
+     */
+    boolean hasFingerprintHardware();
+
+    /**
+     * @see Goldfinger#hasEnrolledFingerprints()
+     */
+    boolean hasEnrolledFingerprints();
+
+    /**
      * @see Goldfinger#authenticate
      */
     @NonNull
@@ -28,6 +38,9 @@ public interface RxGoldfinger {
      */
     void cancel();
 
+    /**
+     * @see Goldfinger.Builder
+     */
     @SuppressWarnings("unused")
     class Builder {
 

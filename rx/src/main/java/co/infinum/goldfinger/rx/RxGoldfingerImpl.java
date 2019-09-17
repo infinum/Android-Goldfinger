@@ -40,4 +40,14 @@ class RxGoldfingerImpl implements RxGoldfinger {
         }
         goldfinger.cancel();
     }
+
+    @Override
+    public boolean hasEnrolledFingerprints() {
+        return goldfinger.hasEnrolledFingerprints();
+    }
+
+    @Override
+    public boolean hasFingerprintHardware() {
+        return goldfinger.hasFingerprintHardware();
+    }
 }

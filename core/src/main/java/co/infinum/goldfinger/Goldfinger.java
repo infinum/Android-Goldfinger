@@ -17,6 +17,14 @@ public interface Goldfinger {
     /**
      * @see BiometricManager#canAuthenticate()
      */
+    boolean hasFingerprintHardware();
+
+
+    boolean hasEnrolledFingerprints();
+
+    /**
+     * @see BiometricManager#canAuthenticate()
+     */
     boolean canAuthenticate();
 
     /**
