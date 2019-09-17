@@ -16,10 +16,13 @@ import androidx.fragment.app.FragmentActivity;
 public interface Goldfinger {
 
     /**
-     * @see BiometricManager#canAuthenticate()
+     * Returns true if user has fingerprint hardware, false otherwise.
      */
     boolean hasFingerprintHardware();
 
+    /**
+     * Returns true if user has enrolled fingerprint, false otherwise.
+     */
     boolean hasEnrolledFingerprint();
 
     /**
