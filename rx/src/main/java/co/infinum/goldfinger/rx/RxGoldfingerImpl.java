@@ -42,8 +42,8 @@ class RxGoldfingerImpl implements RxGoldfinger {
     }
 
     @Override
-    public boolean hasEnrolledFingerprints() {
-        return goldfinger.hasEnrolledFingerprints();
+    public boolean hasEnrolledFingerprint() {
+        return goldfinger.hasEnrolledFingerprint();
     }
 
     @Override

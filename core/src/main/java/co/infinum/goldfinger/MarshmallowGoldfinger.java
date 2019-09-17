@@ -90,7 +90,7 @@ class MarshmallowGoldfinger implements Goldfinger {
     }
 
     @Override
-    public boolean hasEnrolledFingerprints() {
+    public boolean hasEnrolledFingerprint() {
         return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED;
     }
 
@@ -132,8 +132,8 @@ class MarshmallowGoldfinger implements Goldfinger {
             return true;
         }
 
-        if (!hasEnrolledFingerprints()) {
-            callback.onError(new NoEnrolledFingerprintsException());
+        if (!hasEnrolledFingerprint()) {
+            callback.onError(new NoEnrolledFingerprintException());
             return true;
         }
 

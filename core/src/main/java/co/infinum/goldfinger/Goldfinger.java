@@ -20,7 +20,7 @@ public interface Goldfinger {
      */
     boolean hasFingerprintHardware();
 
-    boolean hasEnrolledFingerprints();
+    boolean hasEnrolledFingerprint();
 
     /**
      * @see BiometricManager#canAuthenticate()

@@ -23,9 +23,9 @@ public interface RxGoldfinger {
     boolean hasFingerprintHardware();
 
     /**
-     * @see Goldfinger#hasEnrolledFingerprints()
+     * @see Goldfinger#hasEnrolledFingerprint()
      */
-    boolean hasEnrolledFingerprints();
+    boolean hasEnrolledFingerprint();
 
     /**
      * @see Goldfinger#authenticate
