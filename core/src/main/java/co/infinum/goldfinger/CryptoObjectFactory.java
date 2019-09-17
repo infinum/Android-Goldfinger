@@ -34,13 +34,13 @@ public interface CryptoObjectFactory {
      * Create CryptoObject for encryption call. Return null if invalid.
      */
     @Nullable
-    BiometricPrompt.CryptoObject createEncryptionCryptoObject(String key);
+    BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String key);
 
     /**
      * Create CryptoObject for decryption call. Return null if invalid.
      */
     @Nullable
-    BiometricPrompt.CryptoObject createDecryptionCryptoObject(String key);
+    BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String key);
 
     @RequiresApi(Build.VERSION_CODES.M)
     class Default implements CryptoObjectFactory {
@@ -64,13 +64,13 @@ public interface CryptoObjectFactory {
 
         @Nullable
         @Override
-        public BiometricPrompt.CryptoObject createDecryptionCryptoObject(String key) {
+        public BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String key) {
             return createCryptoObject(key, Mode.DECRYPTION);
         }
 
         @Nullable
         @Override
-        public BiometricPrompt.CryptoObject createEncryptionCryptoObject(String key) {
+        public BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String key) {
             return createCryptoObject(key, Mode.ENCRYPTION);
         }
 

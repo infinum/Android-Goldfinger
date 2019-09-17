@@ -4,7 +4,7 @@
 
 ## Important
 
-This version is compatible with `androidx`. If you are not using `androidx`, you can use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.1.2).
+This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.1.2). 
 
 ## Quick guide
 
@@ -23,24 +23,34 @@ Goldfinger.Builder(context).build()
 #### Check prerequisites
 
 ```java
-if (goldfinger.hasEnrolledFingerprint()) {
+if (goldfinger.canAuthenticate()) {
   /* Authenticate */
 }
+```
+
+#### Build params
+
+```java
+Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+  .title("Title")
+  .negativeButtonText("Cancel")
+  .description("Description")
+  .subtitle("Subtitle");
 ```
 
 #### Authenticate
 
 ```java
-goldfinger.authenticate(new Goldfinger.Callback() {
-  @Override
-  public void onError(@NonNull Exception e) {
-    /* Critical error happened */
-  }
+goldfinger.authenticate(params, new Goldfinger.Callback() {
+    @Override
+    public void onError(@NonNull Exception e) {
+        /* Critical error happened */
+    }
 
-  @Override
-  public void onResult(@NonNull Goldfinger.Result result) {
-    /* Result received */
-  }
+    @Override
+    public void onResult(@NonNull Goldfinger.Result result) {
+        /* Result received */
+    }
 });
 ```
 
@@ -66,7 +76,7 @@ RxGoldfinger.Builder(context).build()
 #### Authenticate
 
 ```java
-goldfinger.authenticate().subscribe(new DisposableObserver<Goldfinger.Result>() {
+goldfinger.authenticate(params).subscribe(new DisposableObserver<Goldfinger.Result>() {
 
   @Override
   public void onComplete() {
@@ -95,6 +105,7 @@ To use the Android Fingerprint API you must:
 - Create a `Cipher` with a created or loaded `SecretKey`
 - Create a `CryptoObject` with a created `Cipher`
 - Start Fingerprint authentication with a created `CryptoObject`
+- Create `BiometricPrompt.PromptInfo` object
 - Handle possible exceptions at every step due to complexity of the Android Fingerprint API
 
 The `CryptoObject` is **locked** when created and it is **unlocked** when the user successfully authenticates. Once it is unlocked, you can use it to cipher data.
@@ -113,8 +124,8 @@ If you don’t like Default implementations, you can easily modify them using `G
 ```java
 Goldfinger.Builder(context)
   .setLogEnabled(true)
-  .setCryptoFactory(cryptoFactory)
-  .setCrypto(crypto)
+  .setCryptoObjectFactory(factory)
+  .setCryptographyHandler(cryptographyHandler)
   .build()
 ```
 
@@ -122,53 +133,49 @@ Goldfinger.Builder(context)
 
 Logging is **off** by default. You can enable it by calling `Goldfinger.Builder(context).setLogEnabled(true)`.
 
-#### `CryptoFactory`
+#### `CryptoObjectFactory`
 
-Creating a `CryptoObject` is a complicated process that has multiple steps. `CryptoFactory` allows you to modify `CryptoObject` creation and adjust it to your needs.
+Creating a `CryptoObject` is a complicated process that has multiple steps. `CryptoObjectFactory` allows you to modify `CryptoObject` creation and adjust it to your needs.
 
 ```java
-new CryptoFactory() {
+new CryptoObjectFactory() {
   @Nullable
   @Override
-  public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName) {}
+  public BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {}
 
   @Nullable
   @Override
-  public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {}
-
-  @Nullable
-  @Override
-  public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {}
+  public BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {}
 };
 ```
 
 All methods should return a `CryptoObject` instance or a `null` value if an error happens during object creation.
 
-You can find the default implementation [here](./core/src/main/java/co/infinum/goldfinger/CryptoFactory.java).
+You can find the default implementation [here](./core/src/main/java/co/infinum/goldfinger/CryptoObjectFactory.java).
 
-#### Crypto
+#### CryptographyHandler
 
-Goldfinger automatically handles encryption and decryption operations via a `Crypto` implementation which you can implement yourself in case you want a custom cipher.
+Goldfinger automatically handles encryption and decryption operations via a `CryptographyHandler` implementation which you can implement yourself in case you want a custom cipher.
 
 ```java
-new Crypto() {
+new CryptographyHandler() {
   @Nullable
   @Override
-  public String encrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {}
+  public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {}
 
   @Nullable
   @Override
-  public String decrypt(@NonNull FingerprintManagerCompat.CryptoObject cryptoObject, @NonNull String value) {}
+  public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {}
 }
 ```
 
-`Crypto` methods receive an unlocked `CryptoObject` that ciphers data and a `String` value as data you should cipher. The return value should be ciphered data or `null` if an error happens.
+`CryptographyHandler` methods receive an unlocked `CryptoObject` and a `String` value. The return value should be ciphered `value` or `null` if an error happens.
 
-The default `Crypto` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/Crypto.java).
+The default `CryptoGraphyHandler` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/CryptographyHandler.java).
 
 ## Known issues
 
-- Android Oreo doesn't throw `KeyPermanentlyInvalidatedException` - [Link](https://issuetracker.google.com/issues/65578763)
+- Android Oreo does not throw `KeyPermanentlyInvalidatedException` - [Link](https://issuetracker.google.com/issues/65578763)
 
 ## Contributing
 

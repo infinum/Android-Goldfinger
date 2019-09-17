@@ -79,6 +79,20 @@ public class ValidateUtilsTest {
     }
 
     @Test
+    public void decrypt_invalid_emptyKey() {
+        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+            .title(TITLE)
+            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
+            .description(DESCRIPTION)
+            .subtitle(SUBTITLE)
+            .deviceCredentialsAllowed(true)
+            .confirmationRequired(true)
+            .decrypt("", VALUE)
+            .build();
+        assertEquals(1, ValidateUtils.validateParams(params).size());
+    }
+
+    @Test
     public void decrypt_invalid_emptyValue() {
         Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
             .title(TITLE)
@@ -104,6 +118,20 @@ public class ValidateUtilsTest {
             .decrypt(KEY, VALUE)
             .build();
         assertTrue(ValidateUtils.validateParams(params).isEmpty());
+    }
+
+    @Test
+    public void encrypt_invalid_emptyKey() {
+        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+            .title(TITLE)
+            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
+            .description(DESCRIPTION)
+            .subtitle(SUBTITLE)
+            .deviceCredentialsAllowed(true)
+            .confirmationRequired(true)
+            .encrypt("", VALUE)
+            .build();
+        assertEquals(1, ValidateUtils.validateParams(params).size());
     }
 
     @Test
