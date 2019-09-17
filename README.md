@@ -4,7 +4,7 @@
 
 ## Important
 
-This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.1.2). 
+This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.2.1). 
 
 ## Quick guide
 
@@ -35,7 +35,8 @@ Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
   .title("Title")
   .negativeButtonText("Cancel")
   .description("Description")
-  .subtitle("Subtitle");
+  .subtitle("Subtitle")
+  .build();
 ```
 
 #### Authenticate
@@ -52,6 +53,21 @@ goldfinger.authenticate(params, new Goldfinger.Callback() {
         /* Result received */
     }
 });
+```
+
+#### Encryption or decryption
+
+If you need to encrypt or decrypt your data, build `Goldfinger.Params` with correct function and pass it to `authenticate` function.
+
+```java
+Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+  .title("Title")
+  .negativeButtonText("Cancel")
+  .encrypt("Key", "password")
+  .build();
+
+// We now encrypt data when user authenticates his fingerprint
+goldfinger.authenticate(params, callback);
 ```
 
 You can see all Goldfinger methods [here](./core/src/main/java/co/infinum/goldfinger/Goldfinger.java).
