@@ -6,6 +6,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.Fragment;
@@ -18,7 +19,6 @@ public interface Goldfinger {
      * @see BiometricManager#canAuthenticate()
      */
     boolean hasFingerprintHardware();
-
 
     boolean hasEnrolledFingerprints();
 
@@ -267,6 +267,15 @@ public interface Goldfinger {
             }
 
             /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDescription
+             */
+            @NonNull
+            public Builder description(@StringRes int resId) {
+                this.description = getString(resId);
+                return this;
+            }
+
+            /**
              * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
              */
             @NonNull
@@ -293,11 +302,29 @@ public interface Goldfinger {
             }
 
             /**
+             * @see BiometricPrompt.PromptInfo.Builder#setNegativeButtonText
+             */
+            @NonNull
+            public Builder negativeButtonText(@StringRes int resId) {
+                this.negativeButtonText = getString(resId);
+                return this;
+            }
+
+            /**
              * @see BiometricPrompt.PromptInfo.Builder#setSubtitle
              */
             @NonNull
             public Builder subtitle(@Nullable String subtitle) {
                 this.subtitle = subtitle;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setSubtitle
+             */
+            @NonNull
+            public Builder subtitle(@StringRes int resId) {
+                this.subtitle = getString(resId);
                 return this;
             }
 
@@ -308,6 +335,28 @@ public interface Goldfinger {
             public Builder title(@NonNull String title) {
                 this.title = title;
                 return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             */
+            @NonNull
+            public Builder title(@StringRes int resId) {
+                this.title = getString(resId);
+                return this;
+            }
+
+            @Nullable
+            private String getString(@StringRes int resId) {
+                if (dialogOwner instanceof Fragment) {
+                    return ((Fragment) dialogOwner).getString(resId);
+                }
+
+                if (dialogOwner instanceof FragmentActivity) {
+                    return ((FragmentActivity) dialogOwner).getString(resId);
+                }
+
+                return null;
             }
         }
     }
