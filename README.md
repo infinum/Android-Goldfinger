@@ -6,17 +6,6 @@
 
 This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.2.1).
 
-This version **requires** you to use Java 8.
-
-```gradle
-android {
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-}
-``` 
-
 ## Quick guide
 
 #### Add dependency
