@@ -38,7 +38,7 @@ public class RxExampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_example);
         fetchViews();
         initListeners();
-        goldfinger = new RxGoldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
+        goldfinger = new RxGoldfinger.Builder(this).logEnabled(BuildConfig.DEBUG).build();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class RxExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
-        goldfinger.authenticate(baseParams().build()).subscribe(new DisposableObserver<Goldfinger.Result>() {
+        goldfinger.authenticate(buildPromptParams()).subscribe(new DisposableObserver<Goldfinger.Result>() {
 
             @Override
             public void onComplete() {
@@ -81,17 +81,18 @@ public class RxExampleActivity extends AppCompatActivity {
         });
     }
 
-    private Goldfinger.PromptParams.Builder baseParams() {
+    private Goldfinger.PromptParams buildPromptParams() {
         return new Goldfinger.PromptParams.Builder(this)
             .description("Description")
             .subtitle("Subtitle")
             .title("Title")
-            .negativeButtonText("Cancel");
+            .negativeButtonText("Cancel")
+            .build();
     }
 
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
-        goldfinger.authenticate(baseParams().decrypt(KEY_NAME, encryptedValue).build())
+        goldfinger.decrypt(buildPromptParams(), KEY_NAME, encryptedValue)
             .subscribe(new DisposableObserver<Goldfinger.Result>() {
                 @Override
                 public void onComplete() {
@@ -112,7 +113,7 @@ public class RxExampleActivity extends AppCompatActivity {
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
-        goldfinger.authenticate(baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build())
+        goldfinger.encrypt(buildPromptParams(), KEY_NAME, secretInputView.getText().toString())
             .subscribe(new DisposableObserver<Goldfinger.Result>() {
 
                 @Override

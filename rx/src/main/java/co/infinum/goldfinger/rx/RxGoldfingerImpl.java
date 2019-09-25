@@ -18,12 +18,12 @@ class RxGoldfingerImpl implements RxGoldfinger {
 
     @NonNull
     @Override
-    public Observable<Goldfinger.Result> authenticate(@NonNull final Goldfinger.PromptParams goldfingerParams) {
+    public Observable<Goldfinger.Result> authenticate(@NonNull final Goldfinger.PromptParams params) {
         return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
             public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
                 callback = new RxGoldfingerCallback(observableEmitter);
-                goldfinger.authenticate(goldfingerParams, callback);
+                goldfinger.authenticate(params, callback);
             }
         });
     }
@@ -39,6 +39,36 @@ class RxGoldfingerImpl implements RxGoldfinger {
             callback.cancel();
         }
         goldfinger.cancel();
+    }
+
+    @Override
+    public Observable<Goldfinger.Result> decrypt(
+        @NonNull final Goldfinger.PromptParams params,
+        @NonNull final String key,
+        @NonNull final String value
+    ) {
+        return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
+            @Override
+            public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
+                callback = new RxGoldfingerCallback(observableEmitter);
+                goldfinger.decrypt(params, key, value, callback);
+            }
+        });
+    }
+
+    @Override
+    public Observable<Goldfinger.Result> encrypt(
+        @NonNull final Goldfinger.PromptParams params,
+        @NonNull final String key,
+        @NonNull final String value
+    ) {
+        return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
+            @Override
+            public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
+                callback = new RxGoldfingerCallback(observableEmitter);
+                goldfinger.encrypt(params, key, value, callback);
+            }
+        });
     }
 
     @Override

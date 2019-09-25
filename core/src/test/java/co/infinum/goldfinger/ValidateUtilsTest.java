@@ -32,7 +32,7 @@ public class ValidateUtilsTest {
             .deviceCredentialsAllowed(true)
             .confirmationRequired(true)
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ValidateUtilsTest {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ValidateUtilsTest {
             .deviceCredentialsAllowed(true)
             .confirmationRequired(true)
             .build();
-        assertTrue(ValidateUtils.validateParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class ValidateUtilsTest {
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .build();
-        assertTrue(ValidateUtils.validateParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .encrypt(KEY, VALUE)
             .build();
-        assertTrue(ValidateUtils.validateParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .decrypt("", VALUE)
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .decrypt(KEY, "")
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .decrypt(KEY, VALUE)
             .build();
-        assertTrue(ValidateUtils.validateParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .encrypt("", VALUE)
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .encrypt(KEY, "")
             .build();
-        assertEquals(1, ValidateUtils.validateParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
     }
 
     @Test
@@ -159,6 +159,6 @@ public class ValidateUtilsTest {
             .confirmationRequired(true)
             .encrypt(KEY, VALUE)
             .build();
-        assertTrue(ValidateUtils.validateParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
     }
 }

@@ -4,7 +4,18 @@
 
 ## Important
 
-This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.2.1). 
+This version is compatible with `androidx.biometric`. If you do not want to use `androidx.biometric`, feel free to use [older version of Goldfinger](https://github.com/infinum/Android-Goldfinger/tree/v1.2.1).
+
+This version **requires** you to use Java 8.
+
+```gradle
+android {
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+``` 
 
 ## Quick guide
 
@@ -31,7 +42,7 @@ if (goldfinger.canAuthenticate()) {
 #### Build params
 
 ```java
-Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
   .title("Title")
   .negativeButtonText("Cancel")
   .description("Description")
@@ -55,20 +66,9 @@ goldfinger.authenticate(params, new Goldfinger.Callback() {
 });
 ```
 
-#### Encryption or decryption
+#### Goldfinger.PromptParams
 
-If you need to encrypt or decrypt your data, build `Goldfinger.Params` with correct function and pass it to `authenticate` function.
-
-```java
-Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
-  .title("Title")
-  .negativeButtonText("Cancel")
-  .encrypt("Key", "password")
-  .build();
-
-// We now encrypt data when user authenticates his fingerprint
-goldfinger.authenticate(params, callback);
-```
+PromptParams are directly linked to [BiometricPrompt.PromptInfo](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder.html) so be sure to read which parameters are required.
 
 You can see all Goldfinger methods [here](./core/src/main/java/co/infinum/goldfinger/Goldfinger.java).
 
@@ -139,15 +139,15 @@ If you don’t like Default implementations, you can easily modify them using `G
 
 ```java
 Goldfinger.Builder(context)
-  .setLogEnabled(true)
-  .setCryptoObjectFactory(factory)
-  .setCryptographyHandler(cryptographyHandler)
+  .logEnabled(true)
+  .cryptoObjectFactory(factory)
+  .cryptographyHandler(cryptographyHandler)
   .build()
 ```
 
 #### Logging
 
-Logging is **off** by default. You can enable it by calling `Goldfinger.Builder(context).setLogEnabled(true)`.
+Logging is **off** by default. You can enable it by calling `Goldfinger.Builder(context).logEnabled(true)`.
 
 #### `CryptoObjectFactory`
 
@@ -187,7 +187,7 @@ new CryptographyHandler() {
 
 `CryptographyHandler` methods receive an unlocked `CryptoObject` and a `String` value. The return value should be ciphered `value` or `null` if an error happens.
 
-The default `CryptoGraphyHandler` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/CryptographyHandler.java).
+The default `CryptographyHandler` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/CryptographyHandler.java).
 
 ## Known issues
 

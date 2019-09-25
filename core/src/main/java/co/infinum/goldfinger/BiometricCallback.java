@@ -11,7 +11,8 @@ import static co.infinum.goldfinger.LogUtils.log;
 
 /**
  * Extended default callback.
- * Tracks if the authentication is still active and
+ * Tracks if the authentication is still active and handles multiple
+ * edge cases that are not expected by the user.
  */
 @SuppressWarnings({"ConstantConditions", "NullableProblems"})
 class BiometricCallback extends BiometricPrompt.AuthenticationCallback {

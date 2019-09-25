@@ -21,6 +21,14 @@ class LegacyGoldfinger implements Goldfinger {
     }
 
     @Override
+    public void decrypt(@NonNull PromptParams params, @NonNull String key, @NonNull String value, @NonNull Callback callback) {
+    }
+
+    @Override
+    public void encrypt(@NonNull PromptParams params, @NonNull String key, @NonNull String value, @NonNull Callback callback) {
+    }
+
+    @Override
     public boolean hasEnrolledFingerprint() {
         return false;
     }

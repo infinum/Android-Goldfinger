@@ -13,17 +13,17 @@ import io.reactivex.Observable;
 public interface RxGoldfinger {
 
     /**
-     * @see Goldfinger#canAuthenticate()
+     * @see Goldfinger#canAuthenticate
      */
     boolean canAuthenticate();
 
     /**
-     * @see Goldfinger#hasFingerprintHardware()
+     * @see Goldfinger#hasFingerprintHardware
      */
     boolean hasFingerprintHardware();
 
     /**
-     * @see Goldfinger#hasEnrolledFingerprint()
+     * @see Goldfinger#hasEnrolledFingerprint
      */
     boolean hasEnrolledFingerprint();
 
@@ -34,7 +34,17 @@ public interface RxGoldfinger {
     Observable<Goldfinger.Result> authenticate(@NonNull Goldfinger.PromptParams params);
 
     /**
-     * @see Goldfinger#cancel()
+     * @see Goldfinger#encrypt
+     */
+    Observable<Goldfinger.Result> encrypt(@NonNull Goldfinger.PromptParams params, @NonNull String key, @NonNull String value);
+
+    /**
+     * @see Goldfinger#decrypt
+     */
+    Observable<Goldfinger.Result> decrypt(@NonNull Goldfinger.PromptParams params, @NonNull String key, @NonNull String value);
+
+    /**
+     * @see Goldfinger#cancel
      */
     void cancel();
 
@@ -68,7 +78,7 @@ public interface RxGoldfinger {
         }
 
         @NonNull
-        public RxGoldfinger.Builder setLogEnabled(boolean logEnabled) {
+        public RxGoldfinger.Builder logEnabled(boolean logEnabled) {
             goldfingerBuilder.logEnabled(logEnabled);
             return this;
         }

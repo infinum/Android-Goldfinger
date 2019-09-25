@@ -23,7 +23,7 @@ import static co.infinum.goldfinger.LogUtils.log;
 
 /**
  * Interface used for {@link BiometricPrompt.CryptoObject} creation.
- * Only used for encryption and decryption.
+ * Only used for encryption and decryption operations.
  *
  * @see Goldfinger.PromptParams.Builder#encrypt
  * @see Goldfinger.PromptParams.Builder#decrypt

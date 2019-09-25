@@ -11,21 +11,27 @@ import static co.infinum.goldfinger.LogUtils.log;
 /**
  * Interface implements crypto operations on given value.
  *
- * @see Goldfinger.PromptParams.Builder#encrypt
- * @see Goldfinger.PromptParams.Builder#decrypt
+ * @see Goldfinger#encrypt
+ * @see Goldfinger#decrypt
  */
 public interface CryptographyHandler {
 
     /**
      * Encrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
-     * Return null if encryption fails.
+     *
+     * @param cryptoObject unlocked {@link BiometricPrompt.CryptoObject} can be used for encryption
+     * @param value        plain text value that should be encrypted
+     * @return encrypted value or null if encryption fails
      */
     @Nullable
     String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);
 
     /**
-     * Decrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
-     * Return null if decryption fails.
+     * Encrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
+     *
+     * @param cryptoObject unlocked {@link BiometricPrompt.CryptoObject} can be used for decryption
+     * @param value        previously encrypted value that should be decrypted
+     * @return decrypted value or null if encryption fails
      */
     @Nullable
     String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);

@@ -61,8 +61,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
-        Goldfinger.PromptParams params = baseParams().build();
-        goldfinger.authenticate(params, new Goldfinger.Callback() {
+        goldfinger.authenticate(buildPromptParams(), new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();
@@ -75,18 +74,18 @@ public class ExampleActivity extends AppCompatActivity {
         });
     }
 
-    private Goldfinger.PromptParams.Builder baseParams() {
+    private Goldfinger.PromptParams buildPromptParams() {
         return new Goldfinger.PromptParams.Builder(this)
             .description("Description")
             .subtitle("Subtitle")
             .title("Title")
-            .negativeButtonText("Cancel");
+            .negativeButtonText("Cancel")
+            .build();
     }
 
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
-        Goldfinger.PromptParams params = baseParams().decrypt(KEY_NAME, encryptedValue).build();
-        goldfinger.authenticate(params, new Goldfinger.Callback() {
+        goldfinger.decrypt(buildPromptParams(), KEY_NAME, encryptedValue, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();
@@ -101,8 +100,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
-        Goldfinger.PromptParams params = baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build();
-        goldfinger.authenticate(params, new Goldfinger.Callback() {
+        goldfinger.encrypt(buildPromptParams(), KEY_NAME, secretInputView.getText().toString(), new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();

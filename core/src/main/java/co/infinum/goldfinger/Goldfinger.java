@@ -40,6 +40,44 @@ public interface Goldfinger {
     void authenticate(@NonNull PromptParams params, @NonNull Callback callback);
 
     /**
+     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * {@link CryptographyHandler} implementation is used to automatically encrypt given value.
+     * <p>
+     * Use it when saving some data that should not be saved as plain text (e.g. password).
+     * To decrypt the value use {@link Goldfinger#decrypt} method.
+     * <p>
+     * Example - Allow auto-login via Fingerprint.
+     *
+     * @param params   parameters used to build {@link BiometricPrompt} instance
+     * @param key      unique key identifier, used to store cipher IV internally
+     * @param value    String value which will be encrypted if user successfully authenticates
+     * @param callback callback
+     * @see Goldfinger.Callback
+     */
+    void encrypt(
+        @NonNull PromptParams params,
+        @NonNull String key,
+        @NonNull String value,
+        @NonNull Callback callback
+    );
+
+    /**
+     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * {@link CryptographyHandler} implementation is used to automatically decrypt given value.
+     * <p>
+     * Should be used together with {@link Goldfinger#encrypt} to decrypt saved data.
+     *
+     * @param key   unique key identifier, used to load Cipher IV internally
+     * @param value String value which will be decrypted if user successfully authenticates
+     */
+    void decrypt(
+        @NonNull PromptParams params,
+        @NonNull String key,
+        @NonNull String value,
+        @NonNull Callback callback
+    );
+
+    /**
      * Cancel current active Fingerprint authentication.
      */
     void cancel();
@@ -98,7 +136,6 @@ public interface Goldfinger {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     class PromptParams {
 
         @NonNull private final Object dialogOwner;
@@ -108,9 +145,6 @@ public interface Goldfinger {
         @Nullable private final String title;
         private final boolean confirmationRequired;
         private final boolean deviceCredentialsAllowed;
-        @NonNull private final Mode mode;
-        @Nullable private final String key;
-        @Nullable private final String value;
 
         private PromptParams(
             @NonNull Object dialogOwner,
@@ -119,10 +153,7 @@ public interface Goldfinger {
             @Nullable String negativeButtonText,
             @Nullable String subtitle,
             boolean confirmationRequired,
-            boolean deviceCredentialsAllowed,
-            @NonNull Mode mode,
-            @Nullable String key,
-            @Nullable String value
+            boolean deviceCredentialsAllowed
         ) {
             this.dialogOwner = dialogOwner;
             this.title = title;
@@ -131,9 +162,6 @@ public interface Goldfinger {
             this.subtitle = subtitle;
             this.confirmationRequired = confirmationRequired;
             this.deviceCredentialsAllowed = deviceCredentialsAllowed;
-            this.mode = mode;
-            this.key = key;
-            this.value = value;
         }
 
         public boolean confirmationRequired() {
@@ -152,16 +180,6 @@ public interface Goldfinger {
         @NonNull
         public Object dialogOwner() {
             return dialogOwner;
-        }
-
-        @Nullable
-        public String key() {
-            return key;
-        }
-
-        @NonNull
-        public Mode mode() {
-            return mode;
         }
 
         @Nullable
@@ -200,11 +218,6 @@ public interface Goldfinger {
             return builder.build();
         }
 
-        @Nullable
-        String value() {
-            return value;
-        }
-
         public static class Builder {
 
             /* Dialog dialogOwner can be either Fragment or FragmentActivity */
@@ -216,8 +229,6 @@ public interface Goldfinger {
             @Nullable private String title;
             private boolean confirmationRequired;
             private boolean deviceCredentialsAllowed;
-            @Nullable private String key;
-            @Nullable private String value;
 
             public Builder(@NonNull FragmentActivity activity) {
                 this.dialogOwner = activity;
@@ -236,10 +247,7 @@ public interface Goldfinger {
                     negativeButtonText,
                     subtitle,
                     confirmationRequired,
-                    deviceCredentialsAllowed,
-                    mode,
-                    key,
-                    value
+                    deviceCredentialsAllowed
                 );
             }
 
@@ -249,14 +257,6 @@ public interface Goldfinger {
             @NonNull
             public Builder confirmationRequired(boolean confirmationRequired) {
                 this.confirmationRequired = confirmationRequired;
-                return this;
-            }
-
-            @NonNull
-            public Builder decrypt(@NonNull String key, @NonNull String value) {
-                this.mode = Mode.DECRYPTION;
-                this.key = key;
-                this.value = value;
                 return this;
             }
 
@@ -284,14 +284,6 @@ public interface Goldfinger {
             @NonNull
             public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
                 this.deviceCredentialsAllowed = deviceCredentialsAllowed;
-                return this;
-            }
-
-            @NonNull
-            public Builder encrypt(@NonNull String key, @NonNull String value) {
-                this.mode = Mode.ENCRYPTION;
-                this.key = key;
-                this.value = value;
                 return this;
             }
 
@@ -384,7 +376,7 @@ public interface Goldfinger {
          * Authentication value. If standard {@link Goldfinger#authenticate} method is used,
          * returned value is null.
          * <p>
-         * IFF {@link PromptParams.Builder#encrypt} or {@link PromptParams.Builder#decrypt}
+         * IFF {@link Goldfinger#encrypt} or {@link Goldfinger#decrypt}
          * is used, the value contains encrypted or decrypted String.
          * <p>
          * In all other cases, the value is null.
@@ -429,6 +421,9 @@ public interface Goldfinger {
         }
     }
 
+    /**
+     * Callback used to receive Goldfinger results.
+     */
     interface Callback {
 
         /**
@@ -436,16 +431,24 @@ public interface Goldfinger {
          * fingerprint authentication as not all fingerprint results complete
          * the authentication.
          *
+         * Result callback invoked for every fingerprint result (success, error or info).
+         * It can be invoked multiple times during single fingerprint authentication.
+         *
+         * @param result contains fingerprint result information
+         *
          * @see Goldfinger.Result
          */
         void onResult(@NonNull Goldfinger.Result result);
 
         /**
-         * Critical error happened and user fingerprint should be invalidated.
+         * Critical error happened and fingerprint authentication is stopped.
          */
         void onError(@NonNull Exception e);
     }
 
+    /**
+     * Describes in detail why {@link Callback#onResult} is dispatched.
+     */
     enum Reason {
         /**
          * @see BiometricPrompt#ERROR_HW_UNAVAILABLE
@@ -534,6 +537,9 @@ public interface Goldfinger {
         UNKNOWN
     }
 
+    /**
+     * Describes the type of the result received in {@link Callback#onResult}
+     */
     enum Type {
 
         /**
