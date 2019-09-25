@@ -61,7 +61,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
-        Goldfinger.Params params = baseParams().build();
+        Goldfinger.PromptParams params = baseParams().build();
         goldfinger.authenticate(params, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
@@ -75,8 +75,8 @@ public class ExampleActivity extends AppCompatActivity {
         });
     }
 
-    private Goldfinger.Params.Builder baseParams() {
-        return new Goldfinger.Params.Builder(this)
+    private Goldfinger.PromptParams.Builder baseParams() {
+        return new Goldfinger.PromptParams.Builder(this)
             .description("Description")
             .subtitle("Subtitle")
             .title("Title")
@@ -85,7 +85,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
-        Goldfinger.Params params = baseParams().decrypt(KEY_NAME, encryptedValue).build();
+        Goldfinger.PromptParams params = baseParams().decrypt(KEY_NAME, encryptedValue).build();
         goldfinger.authenticate(params, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
@@ -101,7 +101,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
-        Goldfinger.Params params = baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build();
+        Goldfinger.PromptParams params = baseParams().encrypt(KEY_NAME, secretInputView.getText().toString()).build();
         goldfinger.authenticate(params, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {

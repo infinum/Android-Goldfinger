@@ -48,7 +48,7 @@ class MarshmallowGoldfinger implements Goldfinger {
      */
     @Override
     public void authenticate(
-        @NonNull Params params,
+        @NonNull PromptParams params,
         @NonNull Callback callback
     ) {
         if (preconditionsInvalid(params, callback)) {
@@ -101,7 +101,7 @@ class MarshmallowGoldfinger implements Goldfinger {
 
     @SuppressWarnings("ConstantConditions")
     private void initializeCryptoObject(
-        @NonNull final Params params,
+        @NonNull final PromptParams params,
         @NonNull final Callback callback
     ) {
         log("Creating CryptoObject");
@@ -121,7 +121,7 @@ class MarshmallowGoldfinger implements Goldfinger {
         asyncCryptoFactory.createCryptoObject(params.mode(), params.key(), asyncCryptoFactoryCallback);
     }
 
-    private boolean preconditionsInvalid(Params params, Callback callback) {
+    private boolean preconditionsInvalid(PromptParams params, Callback callback) {
         if ((biometricCallback != null && biometricCallback.isAuthenticationActive) || creatingCryptoObject) {
             log("Authentication is already active. Ignoring authenticate call.");
             return true;
@@ -148,7 +148,7 @@ class MarshmallowGoldfinger implements Goldfinger {
 
     @SuppressWarnings("ConstantConditions")
     private void startNativeFingerprintAuthentication(
-        @NonNull Params params,
+        @NonNull PromptParams params,
         @NonNull Callback callback,
         @Nullable BiometricPrompt.CryptoObject cryptoObject
     ) {

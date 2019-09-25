@@ -35,9 +35,9 @@ public interface Goldfinger {
      * <p>
      * Example - Process payment after successful fingerprint authentication.
      *
-     * @see Params
+     * @see PromptParams
      */
-    void authenticate(@NonNull Params params, @NonNull Callback callback);
+    void authenticate(@NonNull PromptParams params, @NonNull Callback callback);
 
     /**
      * Cancel current active Fingerprint authentication.
@@ -99,7 +99,7 @@ public interface Goldfinger {
     }
 
     @SuppressWarnings("WeakerAccess")
-    class Params {
+    class PromptParams {
 
         @NonNull private final Object dialogOwner;
         @Nullable private final String description;
@@ -112,7 +112,7 @@ public interface Goldfinger {
         @Nullable private final String key;
         @Nullable private final String value;
 
-        private Params(
+        private PromptParams(
             @NonNull Object dialogOwner,
             @Nullable String title,
             @Nullable String description,
@@ -228,8 +228,8 @@ public interface Goldfinger {
             }
 
             @NonNull
-            public Params build() {
-                return new Params(
+            public PromptParams build() {
+                return new PromptParams(
                     dialogOwner,
                     title,
                     description,
@@ -384,7 +384,7 @@ public interface Goldfinger {
          * Authentication value. If standard {@link Goldfinger#authenticate} method is used,
          * returned value is null.
          * <p>
-         * IFF {@link Params.Builder#encrypt} or {@link Params.Builder#decrypt}
+         * IFF {@link PromptParams.Builder#encrypt} or {@link PromptParams.Builder#decrypt}
          * is used, the value contains encrypted or decrypted String.
          * <p>
          * In all other cases, the value is null.
@@ -538,8 +538,8 @@ public interface Goldfinger {
 
         /**
          * Fingerprint authentication is successfully finished. {@link Goldfinger.Result}
-         * will contain value in case of {@link Params.Builder#decrypt} or
-         * {@link Params.Builder#encrypt} invocation.
+         * will contain value in case of {@link PromptParams.Builder#decrypt} or
+         * {@link PromptParams.Builder#encrypt} invocation.
          */
         SUCCESS,
 

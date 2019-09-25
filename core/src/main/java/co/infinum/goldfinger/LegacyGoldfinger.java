@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 class LegacyGoldfinger implements Goldfinger {
 
     @Override
-    public void authenticate(@NonNull Params params, @NonNull Callback callback) {
+    public void authenticate(@NonNull PromptParams params, @NonNull Callback callback) {
     }
 
     @Override

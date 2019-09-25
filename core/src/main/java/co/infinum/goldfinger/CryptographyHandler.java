@@ -11,8 +11,8 @@ import static co.infinum.goldfinger.LogUtils.log;
 /**
  * Interface implements crypto operations on given value.
  *
- * @see Goldfinger.Params.Builder#encrypt
- * @see Goldfinger.Params.Builder#decrypt
+ * @see Goldfinger.PromptParams.Builder#encrypt
+ * @see Goldfinger.PromptParams.Builder#decrypt
  */
 public interface CryptographyHandler {
 

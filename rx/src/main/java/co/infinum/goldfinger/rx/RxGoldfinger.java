@@ -31,7 +31,7 @@ public interface RxGoldfinger {
      * @see Goldfinger#authenticate
      */
     @NonNull
-    Observable<Goldfinger.Result> authenticate(@NonNull Goldfinger.Params params);
+    Observable<Goldfinger.Result> authenticate(@NonNull Goldfinger.PromptParams params);
 
     /**
      * @see Goldfinger#cancel()

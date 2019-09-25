@@ -25,7 +25,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_invalid_emptyTitle() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
             .subtitle(SUBTITLE)
@@ -37,7 +37,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_invalid_negativeTextRequired() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .build();
         assertEquals(1, ValidateUtils.validateParams(params).size());
@@ -45,7 +45,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_valid() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -58,7 +58,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_valid_missingOptionalParams() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .build();
@@ -67,7 +67,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_valid_negativeTextIgnoredIfDeviceCredentialsTrue() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .description(DESCRIPTION)
             .subtitle(SUBTITLE)
@@ -80,7 +80,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void decrypt_invalid_emptyKey() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -94,7 +94,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void decrypt_invalid_emptyValue() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -108,7 +108,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void decrypt_valid() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -122,7 +122,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void encrypt_invalid_emptyKey() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -136,7 +136,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void encrypt_invalid_emptyValue() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
@@ -150,7 +150,7 @@ public class ValidateUtilsTest {
 
     @Test
     public void encrypt_valid() {
-        Goldfinger.Params params = new Goldfinger.Params.Builder(activity)
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)

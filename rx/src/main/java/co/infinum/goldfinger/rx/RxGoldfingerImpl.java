@@ -18,7 +18,7 @@ class RxGoldfingerImpl implements RxGoldfinger {
 
     @NonNull
     @Override
-    public Observable<Goldfinger.Result> authenticate(@NonNull final Goldfinger.Params goldfingerParams) {
+    public Observable<Goldfinger.Result> authenticate(@NonNull final Goldfinger.PromptParams goldfingerParams) {
         return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
             public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {

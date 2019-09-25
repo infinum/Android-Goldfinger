@@ -16,7 +16,7 @@ class ValidateUtils {
      * Return list of errors. If no errors detected, list will be empty.
      */
     @NonNull
-    static List<String> validateParams(Goldfinger.Params params) {
+    static List<String> validateParams(Goldfinger.PromptParams params) {
         List<String> errors = new ArrayList<>();
 
         if (!(params.dialogOwner() instanceof Fragment) && !(params.dialogOwner() instanceof FragmentActivity)) {

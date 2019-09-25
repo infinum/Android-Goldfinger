@@ -25,14 +25,14 @@ public class RxGoldfingerImplTest {
 
     @Test
     public void authenticate_delegatedOnSubscribe() {
-        Goldfinger.Params params = params();
+        Goldfinger.PromptParams params = params();
         rxGoldfinger.authenticate(params).subscribe(observer);
         verify(goldfinger).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
 
     @Test
     public void authenticate_notDelegated() {
-        Goldfinger.Params params = params();
+        Goldfinger.PromptParams params = params();
         rxGoldfinger.authenticate(params);
         verify(goldfinger, never()).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
@@ -45,41 +45,41 @@ public class RxGoldfingerImplTest {
 
     @Test
     public void decrypt_delegatedOnSubscribe() {
-        Goldfinger.Params params = decryptParams();
+        Goldfinger.PromptParams params = decryptParams();
         rxGoldfinger.authenticate(params).subscribe(observer);
         verify(goldfinger).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
 
     @Test
     public void decrypt_notDelegated() {
-        Goldfinger.Params params = decryptParams();
+        Goldfinger.PromptParams params = decryptParams();
         rxGoldfinger.authenticate(params);
         verify(goldfinger, never()).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
 
     @Test
     public void encrypt_delegatedOnSubscribe() {
-        Goldfinger.Params params = encryptParams();
+        Goldfinger.PromptParams params = encryptParams();
         rxGoldfinger.authenticate(params).subscribe(observer);
         verify(goldfinger).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
 
     @Test
     public void encrypt_notDelegated() {
-        Goldfinger.Params params = encryptParams();
+        Goldfinger.PromptParams params = encryptParams();
         rxGoldfinger.authenticate(params);
         verify(goldfinger, never()).authenticate(eq(params), any(Goldfinger.Callback.class));
     }
 
-    private Goldfinger.Params decryptParams() {
-        return new Goldfinger.Params.Builder(activity).title("Title").negativeButtonText("Text").decrypt("key", "value").build();
+    private Goldfinger.PromptParams decryptParams() {
+        return new Goldfinger.PromptParams.Builder(activity).title("Title").negativeButtonText("Text").decrypt("key", "value").build();
     }
 
-    private Goldfinger.Params encryptParams() {
-        return new Goldfinger.Params.Builder(activity).title("Title").negativeButtonText("Text").encrypt("key", "value").build();
+    private Goldfinger.PromptParams encryptParams() {
+        return new Goldfinger.PromptParams.Builder(activity).title("Title").negativeButtonText("Text").encrypt("key", "value").build();
     }
 
-    private Goldfinger.Params params() {
-        return new Goldfinger.Params.Builder(activity).title("Title").negativeButtonText("Text").build();
+    private Goldfinger.PromptParams params() {
+        return new Goldfinger.PromptParams.Builder(activity).title("Title").negativeButtonText("Text").build();
     }
 }

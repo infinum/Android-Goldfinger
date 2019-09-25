@@ -81,8 +81,8 @@ public class RxExampleActivity extends AppCompatActivity {
         });
     }
 
-    private Goldfinger.Params.Builder baseParams() {
-        return new Goldfinger.Params.Builder(this)
+    private Goldfinger.PromptParams.Builder baseParams() {
+        return new Goldfinger.PromptParams.Builder(this)
             .description("Description")
             .subtitle("Subtitle")
             .title("Title")
