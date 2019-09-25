@@ -22,7 +22,7 @@ android {
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0-RC1'
+implementation 'co.infinum:goldfinger:2.0.0-RC2'
 ```
 
 #### Initialize
@@ -79,8 +79,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0-RC1'
-implementation 'co.infinum:goldfinger-rx:2.0.0-RC1'
+implementation 'co.infinum:goldfinger:2.0.0-RC2'
+implementation 'co.infinum:goldfinger-rx:2.0.0-RC2'
 ```
 
 #### Initialize
