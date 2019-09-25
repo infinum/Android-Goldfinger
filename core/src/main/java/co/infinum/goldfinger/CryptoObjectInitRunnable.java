@@ -2,40 +2,44 @@ package co.infinum.goldfinger;
 
 import android.os.Handler;
 import android.os.Looper;
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricPrompt;
 
 /**
  * Custom runnable that creates CryptoObject.
- * Used for async creation.
+ * Used for asynchronous creation.
  */
 class CryptoObjectInitRunnable implements Runnable {
 
-    private final static Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final static Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
-    private final AsyncCryptoFactory.Callback callback;
-    private final CryptoFactory cryptoFactory;
-    private final String keyName;
-    private final Mode mode;
+    @NonNull private final AsyncCryptoObjectFactory.Callback callback;
+    @NonNull private final CryptoObjectFactory cryptoFactory;
+    @NonNull private final Mode mode;
+    @NonNull private final String key;
 
-    CryptoObjectInitRunnable(CryptoFactory cryptoFactory, String keyName, Mode mode, AsyncCryptoFactory.Callback callback) {
+    CryptoObjectInitRunnable(
+        @NonNull CryptoObjectFactory cryptoFactory,
+        @NonNull Mode mode,
+        @NonNull String key,
+        @NonNull AsyncCryptoObjectFactory.Callback callback
+    ) {
         this.cryptoFactory = cryptoFactory;
-        this.keyName = keyName;
         this.mode = mode;
+        this.key = key;
         this.callback = callback;
     }
 
     @Override
     public void run() {
-        final FingerprintManagerCompat.CryptoObject cryptoObject;
+        final BiometricPrompt.CryptoObject cryptoObject;
         switch (mode) {
-            case AUTHENTICATION:
-                cryptoObject = cryptoFactory.createAuthenticationCryptoObject(keyName);
-                break;
             case DECRYPTION:
-                cryptoObject = cryptoFactory.createDecryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createDecryptionCryptoObject(key);
                 break;
             case ENCRYPTION:
-                cryptoObject = cryptoFactory.createEncryptionCryptoObject(keyName);
+                cryptoObject = cryptoFactory.createEncryptionCryptoObject(key);
                 break;
             default:
                 cryptoObject = null;
@@ -44,7 +48,7 @@ class CryptoObjectInitRunnable implements Runnable {
 
         if (!callback.canceled) {
             /* Return callback back to main thread as this is executed in the background */
-            mainHandler.post(new Runnable() {
+            MAIN_HANDLER.post(new Runnable() {
                 @Override
                 public void run() {
                     callback.onCryptoObjectCreated(cryptoObject);

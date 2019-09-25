@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
  * Contains cipherMode parameter that is used on Goldfinger initialization.
  */
 enum Mode {
-    AUTHENTICATION(Cipher.ENCRYPT_MODE),
+    AUTHENTICATION(69),
     DECRYPTION(Cipher.DECRYPT_MODE),
     ENCRYPTION(Cipher.ENCRYPT_MODE);
 

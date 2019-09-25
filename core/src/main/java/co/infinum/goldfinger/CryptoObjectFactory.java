@@ -17,38 +17,33 @@ import javax.crypto.spec.IvParameterSpec;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.biometric.BiometricPrompt;
 
 import static co.infinum.goldfinger.LogUtils.log;
 
 /**
- * Interface used for {@link androidx.core.hardware.fingerprint.FingerprintManagerCompat.CryptoObject}
- * creation. Has separate method for {@link Goldfinger#authenticate(Goldfinger.Callback)},
- * {@link Goldfinger#decrypt(String, String, Goldfinger.Callback)} and
- * {@link Goldfinger#encrypt(String, String, Goldfinger.Callback)}
+ * Interface used for {@link BiometricPrompt.CryptoObject} creation.
+ * Only used for encryption and decryption operations.
+ *
+ * @see Goldfinger.PromptParams.Builder#encrypt
+ * @see Goldfinger.PromptParams.Builder#decrypt
  */
-public interface CryptoFactory {
-
-    /**
-     * Create CryptoObject for authentication call. Return null if invalid.
-     */
-    @Nullable
-    FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName);
+public interface CryptoObjectFactory {
 
     /**
      * Create CryptoObject for encryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName);
+    BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String key);
 
     /**
      * Create CryptoObject for decryption call. Return null if invalid.
      */
     @Nullable
-    FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName);
+    BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String key);
 
     @RequiresApi(Build.VERSION_CODES.M)
-    class Default implements CryptoFactory {
+    class Default implements CryptoObjectFactory {
 
         private static final String KEY_KEYSTORE = "AndroidKeyStore";
         private static final String KEY_SHARED_PREFS = "<Goldfinger IV>";
@@ -69,24 +64,23 @@ public interface CryptoFactory {
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createAuthenticationCryptoObject(@NonNull String keyName) {
-            return createCryptoObject(keyName, Mode.AUTHENTICATION);
+        public BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String key) {
+            return createCryptoObject(key, Mode.DECRYPTION);
         }
 
         @Nullable
         @Override
-        public FingerprintManagerCompat.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {
-            return createCryptoObject(keyName, Mode.DECRYPTION);
+        public BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String key) {
+            return createCryptoObject(key, Mode.ENCRYPTION);
         }
 
-        @Nullable
-        @Override
-        public FingerprintManagerCompat.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {
-            return createCryptoObject(keyName, Mode.ENCRYPTION);
-        }
-
+        /**
+         * Create {@link Cipher} for encryption or decryption.
+         * If encryption is used, it also creates new IV and saves it to Shared preferences.
+         * If decryption is used, it loads existing IV from Shared preferences.
+         */
         @NonNull
-        private Cipher createCipher(@NonNull String keyName, @NonNull Mode mode, @Nullable Key key) throws Exception {
+        private Cipher createCipher(@NonNull String key, @NonNull Mode mode, @Nullable Key secureKey) throws Exception {
             String transformation = String.format(
                 "%s/%s/%s",
                 KeyProperties.KEY_ALGORITHM_AES,
@@ -95,35 +89,42 @@ public interface CryptoFactory {
             );
             Cipher cipher = Cipher.getInstance(transformation);
             if (mode == Mode.DECRYPTION) {
-                byte[] iv = loadIv(keyName);
-                cipher.init(mode.cipherMode(), key, new IvParameterSpec(iv));
+                byte[] iv = loadIv(key);
+                cipher.init(mode.cipherMode(), secureKey, new IvParameterSpec(iv));
             } else {
-                cipher.init(mode.cipherMode(), key);
-                saveIv(keyName, cipher.getIV());
+                cipher.init(mode.cipherMode(), secureKey);
+                saveIv(key, cipher.getIV());
             }
             return cipher;
         }
 
+        /**
+         * Create new {@link BiometricPrompt.CryptoObject} for encryption or decryption.
+         * Handle all cases gracefully and return null if anything bad happens.
+         */
         @Nullable
-        private FingerprintManagerCompat.CryptoObject createCryptoObject(@NonNull String keyName, @NonNull Mode mode) {
+        private BiometricPrompt.CryptoObject createCryptoObject(String key, Mode mode) {
             if (keyStore == null || keyGenerator == null) {
                 return null;
             }
 
             try {
-                Key key = (mode == Mode.DECRYPTION) ? loadKey(keyName) : createKey(keyName);
-                Cipher cipher = createCipher(keyName, mode, key);
-                return new FingerprintManagerCompat.CryptoObject(cipher);
+                Key secureKey = (mode == Mode.DECRYPTION) ? loadKey(key) : createKey(key);
+                Cipher cipher = createCipher(key, mode, secureKey);
+                return new BiometricPrompt.CryptoObject(cipher);
             } catch (Exception e) {
                 log(e);
                 return null;
             }
         }
 
+        /**
+         * Generate new {@link Key} for encryption purposes.
+         */
         @Nullable
-        private Key createKey(@NonNull String keyName) throws Exception {
+        private Key createKey(@NonNull String key) throws Exception {
             KeyGenParameterSpec.Builder keyGenParamsBuilder =
-                new KeyGenParameterSpec.Builder(keyName, KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+                new KeyGenParameterSpec.Builder(key, KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
                     .setUserAuthenticationRequired(true);
@@ -132,22 +133,31 @@ public interface CryptoFactory {
             }
             keyGenerator.init(keyGenParamsBuilder.build());
             keyGenerator.generateKey();
-            return loadKey(keyName);
+            return loadKey(key);
         }
 
+        /**
+         * Load IV from Shared preferences. Decode from Base64.
+         */
         @NonNull
-        private byte[] loadIv(@NonNull String keyName) {
-            return Base64.decode(sharedPrefs.getString(keyName, ""), Base64.DEFAULT);
+        private byte[] loadIv(@NonNull String key) {
+            return Base64.decode(sharedPrefs.getString(key, ""), Base64.DEFAULT);
         }
 
+        /**
+         * Load {@link Key} from {@link KeyStore}.
+         */
         @Nullable
-        private Key loadKey(@NonNull String keyName) throws Exception {
+        private Key loadKey(@NonNull String key) throws Exception {
             keyStore.load(null);
-            return keyStore.getKey(keyName, null);
+            return keyStore.getKey(key, null);
         }
 
-        private void saveIv(@NonNull String keyName, @Nullable byte[] iv) {
-            sharedPrefs.edit().putString(keyName, Base64.encodeToString(iv, Base64.DEFAULT)).apply();
+        /**
+         * Save IV to Shared preferences. Before saving encode it to Base64.
+         */
+        private void saveIv(@NonNull String key, @Nullable byte[] iv) {
+            sharedPrefs.edit().putString(key, Base64.encodeToString(iv, Base64.DEFAULT)).apply();
         }
     }
 }
