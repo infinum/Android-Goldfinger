@@ -67,98 +67,36 @@ public class ValidateUtilsTest {
 
     @Test
     public void auth_valid_negativeTextIgnoredIfDeviceCredentialsTrue() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .encrypt(KEY, VALUE)
-            .build();
-        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
+        assertTrue(ValidateUtils.validateCipherParams(Mode.ENCRYPTION, KEY, VALUE).isEmpty());
     }
 
     @Test
     public void decrypt_invalid_emptyKey() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .decrypt("", VALUE)
-            .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validateCipherParams(Mode.DECRYPTION, "", VALUE).size());
     }
 
     @Test
     public void decrypt_invalid_emptyValue() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .decrypt(KEY, "")
-            .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validateCipherParams(Mode.DECRYPTION, KEY, "").size());
     }
 
     @Test
     public void decrypt_valid() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .decrypt(KEY, VALUE)
-            .build();
-        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
+        assertTrue(ValidateUtils.validateCipherParams(Mode.DECRYPTION, KEY, VALUE).isEmpty());
     }
 
     @Test
     public void encrypt_invalid_emptyKey() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .encrypt("", VALUE)
-            .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validateCipherParams(Mode.ENCRYPTION, "", VALUE).size());
     }
 
     @Test
     public void encrypt_invalid_emptyValue() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .encrypt(KEY, "")
-            .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validateCipherParams(Mode.ENCRYPTION, KEY, "").size());
     }
 
     @Test
     public void encrypt_valid() {
-        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
-            .description(DESCRIPTION)
-            .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
-            .confirmationRequired(true)
-            .encrypt(KEY, VALUE)
-            .build();
-        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
+        assertTrue(ValidateUtils.validateCipherParams(Mode.ENCRYPTION, KEY, VALUE).isEmpty());
     }
 }
