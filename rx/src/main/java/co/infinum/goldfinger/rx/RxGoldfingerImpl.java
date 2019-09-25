@@ -16,15 +16,21 @@ class RxGoldfingerImpl implements RxGoldfinger {
         this.goldfinger = goldfinger;
     }
 
+    @NonNull
     @Override
-    public Observable<Goldfinger.Result> authenticate() {
+    public Observable<Goldfinger.Result> authenticate(@NonNull final Goldfinger.PromptParams params) {
         return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
             public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
                 callback = new RxGoldfingerCallback(observableEmitter);
-                goldfinger.authenticate(callback);
+                goldfinger.authenticate(params, callback);
             }
         });
+    }
+
+    @Override
+    public boolean canAuthenticate() {
+        return goldfinger.canAuthenticate();
     }
 
     @Override
@@ -36,23 +42,31 @@ class RxGoldfingerImpl implements RxGoldfinger {
     }
 
     @Override
-    public Observable<Goldfinger.Result> decrypt(final String keyName, final String value) {
+    public Observable<Goldfinger.Result> decrypt(
+        @NonNull final Goldfinger.PromptParams params,
+        @NonNull final String key,
+        @NonNull final String value
+    ) {
         return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
             public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
                 callback = new RxGoldfingerCallback(observableEmitter);
-                goldfinger.decrypt(keyName, value, callback);
+                goldfinger.decrypt(params, key, value, callback);
             }
         });
     }
 
     @Override
-    public Observable<Goldfinger.Result> encrypt(final String keyName, final String value) {
+    public Observable<Goldfinger.Result> encrypt(
+        @NonNull final Goldfinger.PromptParams params,
+        @NonNull final String key,
+        @NonNull final String value
+    ) {
         return Observable.create(new ObservableOnSubscribe<Goldfinger.Result>() {
             @Override
             public void subscribe(ObservableEmitter<Goldfinger.Result> observableEmitter) {
                 callback = new RxGoldfingerCallback(observableEmitter);
-                goldfinger.encrypt(keyName, value, callback);
+                goldfinger.encrypt(params, key, value, callback);
             }
         });
     }

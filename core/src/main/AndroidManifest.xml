@@ -2,6 +2,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="co.infinum.goldfinger">
 
-    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
 </manifest>

@@ -8,9 +8,15 @@ android {
         minSdkVersion sdk.min
         targetSdkVersion sdk.target
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
+    implementation "androidx.biometric:biometric:${versions.biometric}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
     implementation project(':core')

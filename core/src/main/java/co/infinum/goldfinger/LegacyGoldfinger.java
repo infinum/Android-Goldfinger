@@ -8,7 +8,12 @@ import androidx.annotation.NonNull;
 class LegacyGoldfinger implements Goldfinger {
 
     @Override
-    public void authenticate(@NonNull Callback callback) {
+    public void authenticate(@NonNull PromptParams params, @NonNull Callback callback) {
+    }
+
+    @Override
+    public boolean canAuthenticate() {
+        return false;
     }
 
     @Override
@@ -16,11 +21,11 @@ class LegacyGoldfinger implements Goldfinger {
     }
 
     @Override
-    public void decrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
+    public void decrypt(@NonNull PromptParams params, @NonNull String key, @NonNull String value, @NonNull Callback callback) {
     }
 
     @Override
-    public void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback) {
+    public void encrypt(@NonNull PromptParams params, @NonNull String key, @NonNull String value, @NonNull Callback callback) {
     }
 
     @Override

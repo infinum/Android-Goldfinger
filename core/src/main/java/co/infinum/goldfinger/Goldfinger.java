@@ -1,57 +1,81 @@
 package co.infinum.goldfinger;
 
 import android.content.Context;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.StringRes;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
+@SuppressWarnings("unused")
 public interface Goldfinger {
 
     /**
-     * Returns true if device has fingerprint hardware, false otherwise.
+     * Returns true if user has fingerprint hardware, false otherwise.
      */
     boolean hasFingerprintHardware();
 
     /**
-     * Returns true if user has fingerprint in device settings, false otherwise.
+     * Returns true if user has enrolled fingerprint, false otherwise.
      */
     boolean hasEnrolledFingerprint();
+
+    /**
+     * @see BiometricManager#canAuthenticate()
+     */
+    boolean canAuthenticate();
 
     /**
      * Authenticate user via Fingerprint.
      * <p>
      * Example - Process payment after successful fingerprint authentication.
-     */
-    void authenticate(@NonNull Callback callback);
-
-    /**
-     * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link Crypto} implementation is used to automatically decrypt given value.
-     * <p>
-     * Should be used together with {@link Goldfinger#encrypt(String, String, Callback)} to decrypt saved data.
      *
-     * @param keyName unique key identifier, {@link java.security.Key} saved under this value is loaded from {@link java.security.KeyStore}
-     * @param value   String value which will be decrypted if user successfully authenticates
+     * @see PromptParams
      */
-    void decrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback);
+    void authenticate(@NonNull PromptParams params, @NonNull Callback callback);
 
     /**
      * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link Crypto} implementation is used to automatically encrypt given value.
+     * {@link CryptographyHandler} implementation is used to automatically encrypt given value.
      * <p>
      * Use it when saving some data that should not be saved as plain text (e.g. password).
-     * To decrypt the value use {@link Goldfinger#decrypt(String, String, Callback)} method.
+     * To decrypt the value use {@link Goldfinger#decrypt} method.
      * <p>
      * Example - Allow auto-login via Fingerprint.
      *
-     * @param keyName unique key identifier, {@link java.security.Key} is stored to {@link java.security.KeyStore} under this value
-     * @param value   String value which will be encrypted if user successfully authenticates
+     * @param params   parameters used to build {@link BiometricPrompt} instance
+     * @param key      unique key identifier, used to store cipher IV internally
+     * @param value    String value which will be encrypted if user successfully authenticates
+     * @param callback callback
      * @see Goldfinger.Callback
      */
-    void encrypt(@NonNull String keyName, @NonNull String value, @NonNull Callback callback);
+    void encrypt(
+        @NonNull PromptParams params,
+        @NonNull String key,
+        @NonNull String value,
+        @NonNull Callback callback
+    );
+
+    /**
+     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * {@link CryptographyHandler} implementation is used to automatically decrypt given value.
+     * <p>
+     * Should be used together with {@link Goldfinger#encrypt} to decrypt saved data.
+     *
+     * @param key   unique key identifier, used to load Cipher IV internally
+     * @param value String value which will be decrypted if user successfully authenticates
+     */
+    void decrypt(
+        @NonNull PromptParams params,
+        @NonNull String key,
+        @NonNull String value,
+        @NonNull Callback callback
+    );
 
     /**
      * Cancel current active Fingerprint authentication.
@@ -61,11 +85,15 @@ public interface Goldfinger {
     /**
      * Become Bob the builder.
      */
+    @SuppressWarnings("UnusedReturnValue")
     class Builder {
 
         @NonNull private final Context context;
-        @Nullable private Crypto crypto;
-        @Nullable private CryptoFactory cryptoFactory;
+        @Nullable private CryptoObjectFactory cryptoObjectFactory;
+        @Nullable private CryptographyHandler cryptographyHandler;
+        @NonNull private Mode mode = Mode.AUTHENTICATION;
+        @Nullable private String key;
+        @Nullable private String value;
 
         public Builder(@NonNull Context context) {
             this.context = context;
@@ -81,19 +109,19 @@ public interface Goldfinger {
         }
 
         @NonNull
-        public Builder setCrypto(@Nullable Crypto crypto) {
-            this.crypto = crypto;
+        public Builder cryptoObjectFactory(@Nullable CryptoObjectFactory cryptoObjectFactory) {
+            this.cryptoObjectFactory = cryptoObjectFactory;
             return this;
         }
 
         @NonNull
-        public Builder setCryptoFactory(@Nullable CryptoFactory cryptoFactory) {
-            this.cryptoFactory = cryptoFactory;
+        public Builder cryptographyHandler(@Nullable CryptographyHandler cryptographyHandler) {
+            this.cryptographyHandler = cryptographyHandler;
             return this;
         }
 
         @NonNull
-        public Builder setLogEnabled(boolean logEnabled) {
+        public Builder logEnabled(boolean logEnabled) {
             LogUtils.setEnabled(logEnabled);
             return this;
         }
@@ -101,11 +129,230 @@ public interface Goldfinger {
         @NonNull
         @RequiresApi(Build.VERSION_CODES.M)
         private Goldfinger buildMarshmallowInstance() {
-            Crypto finalCrypto = crypto != null ? crypto : new Crypto.Default();
-            CryptoFactory finalCryptoFactory =
-                cryptoFactory != null ? cryptoFactory : new CryptoFactory.Default(context);
-            AsyncCryptoFactory asyncCryptoFactory = new AsyncCryptoFactory(finalCryptoFactory);
-            return new MarshmallowGoldfinger(context, asyncCryptoFactory, finalCrypto);
+            CryptographyHandler handler = cryptographyHandler != null ? cryptographyHandler : new CryptographyHandler.Default();
+            CryptoObjectFactory factory = cryptoObjectFactory != null ? cryptoObjectFactory : new CryptoObjectFactory.Default(context);
+            AsyncCryptoObjectFactory asyncFactory = new AsyncCryptoObjectFactory(factory);
+            return new MarshmallowGoldfinger(context, asyncFactory, handler);
+        }
+    }
+
+    class PromptParams {
+
+        @NonNull private final Object dialogOwner;
+        @Nullable private final String description;
+        @Nullable private final String negativeButtonText;
+        @Nullable private final String subtitle;
+        @Nullable private final String title;
+        private final boolean confirmationRequired;
+        private final boolean deviceCredentialsAllowed;
+
+        private PromptParams(
+            @NonNull Object dialogOwner,
+            @Nullable String title,
+            @Nullable String description,
+            @Nullable String negativeButtonText,
+            @Nullable String subtitle,
+            boolean confirmationRequired,
+            boolean deviceCredentialsAllowed
+        ) {
+            this.dialogOwner = dialogOwner;
+            this.title = title;
+            this.description = description;
+            this.negativeButtonText = negativeButtonText;
+            this.subtitle = subtitle;
+            this.confirmationRequired = confirmationRequired;
+            this.deviceCredentialsAllowed = deviceCredentialsAllowed;
+        }
+
+        public boolean confirmationRequired() {
+            return confirmationRequired;
+        }
+
+        @Nullable
+        public String description() {
+            return description;
+        }
+
+        public boolean deviceCredentialsAllowed() {
+            return deviceCredentialsAllowed;
+        }
+
+        @NonNull
+        public Object dialogOwner() {
+            return dialogOwner;
+        }
+
+        @Nullable
+        public String negativeButtonText() {
+            return negativeButtonText;
+        }
+
+        @Nullable
+        public String subtitle() {
+            return subtitle;
+        }
+
+        @Nullable
+        public String title() {
+            return title;
+        }
+
+        /**
+         * Create new {@link BiometricPrompt.PromptInfo} instance. Parameter
+         * validation is done earlier in the code so we can trust the data at
+         * this step.
+         */
+        @SuppressWarnings("ConstantConditions")
+        @NonNull
+        BiometricPrompt.PromptInfo buildPromptInfo() {
+            BiometricPrompt.PromptInfo.Builder builder = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(title)
+                .setSubtitle(subtitle)
+                .setDescription(description)
+                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
+                .setConfirmationRequired(confirmationRequired);
+
+            if (!deviceCredentialsAllowed) {
+                builder.setNegativeButtonText(negativeButtonText);
+            }
+            return builder.build();
+        }
+
+        public static class Builder {
+
+            /* Dialog dialogOwner can be either Fragment or FragmentActivity */
+            @NonNull private Object dialogOwner;
+            @NonNull private Mode mode = Mode.AUTHENTICATION;
+            @Nullable private String description;
+            @Nullable private String negativeButtonText;
+            @Nullable private String subtitle;
+            @Nullable private String title;
+            private boolean confirmationRequired;
+            private boolean deviceCredentialsAllowed;
+
+            public Builder(@NonNull FragmentActivity activity) {
+                this.dialogOwner = activity;
+            }
+
+            public Builder(@NonNull Fragment fragment) {
+                this.dialogOwner = fragment;
+            }
+
+            @NonNull
+            public PromptParams build() {
+                return new PromptParams(
+                    dialogOwner,
+                    title,
+                    description,
+                    negativeButtonText,
+                    subtitle,
+                    confirmationRequired,
+                    deviceCredentialsAllowed
+                );
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setConfirmationRequired
+             */
+            @NonNull
+            public Builder confirmationRequired(boolean confirmationRequired) {
+                this.confirmationRequired = confirmationRequired;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDescription
+             */
+            @NonNull
+            public Builder description(@Nullable String description) {
+                this.description = description;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDescription
+             */
+            @NonNull
+            public Builder description(@StringRes int resId) {
+                this.description = getString(resId);
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
+             */
+            @NonNull
+            public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
+                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setNegativeButtonText
+             */
+            @NonNull
+            public Builder negativeButtonText(@NonNull String negativeButtonText) {
+                this.negativeButtonText = negativeButtonText;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setNegativeButtonText
+             */
+            @NonNull
+            public Builder negativeButtonText(@StringRes int resId) {
+                this.negativeButtonText = getString(resId);
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setSubtitle
+             */
+            @NonNull
+            public Builder subtitle(@Nullable String subtitle) {
+                this.subtitle = subtitle;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setSubtitle
+             */
+            @NonNull
+            public Builder subtitle(@StringRes int resId) {
+                this.subtitle = getString(resId);
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             */
+            @NonNull
+            public Builder title(@NonNull String title) {
+                this.title = title;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             */
+            @NonNull
+            public Builder title(@StringRes int resId) {
+                this.title = getString(resId);
+                return this;
+            }
+
+            @Nullable
+            private String getString(@StringRes int resId) {
+                if (dialogOwner instanceof Fragment) {
+                    return ((Fragment) dialogOwner).getString(resId);
+                }
+
+                if (dialogOwner instanceof FragmentActivity) {
+                    return ((FragmentActivity) dialogOwner).getString(resId);
+                }
+
+                return null;
+            }
         }
     }
 
@@ -126,16 +373,18 @@ public interface Goldfinger {
         @NonNull private final Goldfinger.Reason reason;
 
         /**
-         * Authentication value. If {@link Goldfinger#authenticate(Callback)} method is used,
-         * returned value is null, otherwise returned value contains encrypted or decrypted
-         * String, IFF type is {@link Type#SUCCESS}
+         * Authentication value. If standard {@link Goldfinger#authenticate} method is used,
+         * returned value is null.
+         * <p>
+         * IFF {@link Goldfinger#encrypt} or {@link Goldfinger#decrypt}
+         * is used, the value contains encrypted or decrypted String.
          * <p>
          * In all other cases, the value is null.
          */
         @Nullable private final String value;
 
         /**
-         * System message returned by {@link androidx.core.hardware.fingerprint.FingerprintManagerCompat.AuthenticationCallback}.
+         * System message returned by {@link BiometricPrompt.AuthenticationCallback}.
          * A human-readable error string that can be shown in UI.
          */
         @Nullable private final String message;
@@ -172,6 +421,9 @@ public interface Goldfinger {
         }
     }
 
+    /**
+     * Callback used to receive Goldfinger results.
+     */
     interface Callback {
 
         /**
@@ -179,107 +431,103 @@ public interface Goldfinger {
          * fingerprint authentication as not all fingerprint results complete
          * the authentication.
          *
+         * Result callback invoked for every fingerprint result (success, error or info).
+         * It can be invoked multiple times during single fingerprint authentication.
+         *
+         * @param result contains fingerprint result information
+         *
          * @see Goldfinger.Result
          */
         void onResult(@NonNull Goldfinger.Result result);
 
         /**
-         * Critical error happened and user fingerprint should be invalidated.
+         * Critical error happened and fingerprint authentication is stopped.
          */
         void onError(@NonNull Exception e);
     }
 
+    /**
+     * Describes in detail why {@link Callback#onResult} is dispatched.
+     */
     enum Reason {
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_HW_UNAVAILABLE
+         * @see BiometricPrompt#ERROR_HW_UNAVAILABLE
          */
         HARDWARE_UNAVAILABLE,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_UNABLE_TO_PROCESS
+         * @see BiometricPrompt#ERROR_UNABLE_TO_PROCESS
          */
         UNABLE_TO_PROCESS,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_TIMEOUT
+         * @see BiometricPrompt#ERROR_TIMEOUT
          */
         TIMEOUT,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_NO_SPACE
+         * @see BiometricPrompt#ERROR_NO_SPACE
          */
         NO_SPACE,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_CANCELED
+         * @see BiometricPrompt#ERROR_CANCELED
          */
         CANCELED,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_LOCKOUT
+         * @see BiometricPrompt#ERROR_LOCKOUT
          */
         LOCKOUT,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_VENDOR
+         * @see BiometricPrompt#ERROR_VENDOR
          */
         VENDOR,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_LOCKOUT_PERMANENT
+         * @see BiometricPrompt#ERROR_LOCKOUT_PERMANENT
          */
         LOCKOUT_PERMANENT,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ERROR_USER_CANCELED
+         * @see BiometricPrompt#ERROR_USER_CANCELED
          */
         USER_CANCELED,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_GOOD
+         * @see BiometricPrompt#ERROR_NO_BIOMETRICS
          */
-        GOOD,
+        NO_BIOMETRICS,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_PARTIAL
+         * @see BiometricPrompt#ERROR_HW_NOT_PRESENT
          */
-        PARTIAL,
+        HW_NOT_PRESENT,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_INSUFFICIENT
+         * @see BiometricPrompt#ERROR_NEGATIVE_BUTTON
          */
-        INSUFFICIENT,
+        NEGATIVE_BUTTON,
 
         /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_IMAGER_DIRTY
+         * @see BiometricPrompt#ERROR_NO_DEVICE_CREDENTIAL
          */
-        IMAGER_DIRTY,
-
-        /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_TOO_SLOW
-         */
-        TOO_SLOW,
-
-        /**
-         * @see FingerprintManager#FINGERPRINT_ACQUIRED_TOO_FAST
-         */
-        TOO_FAST,
+        NO_DEVICE_CREDENTIAL,
 
         /**
          * Dispatched when Fingerprint authentication is initialized correctly and
          * just before actual authentication is started. Can be used to update UI if necessary.
-         * <p>
-         * Example - You want to display Dialog only if initialization is successful.
          */
         AUTHENTICATION_START,
 
         /**
-         * @see FingerprintManager.AuthenticationCallback#onAuthenticationSucceeded(FingerprintManager.AuthenticationResult)
+         * @see BiometricPrompt.AuthenticationCallback#onAuthenticationSucceeded
          */
         AUTHENTICATION_SUCCESS,
 
         /**
-         * @see FingerprintManager.AuthenticationCallback#onAuthenticationFailed()
+         * @see BiometricPrompt.AuthenticationCallback#onAuthenticationFailed
          */
         AUTHENTICATION_FAIL,
 
@@ -289,12 +537,15 @@ public interface Goldfinger {
         UNKNOWN
     }
 
+    /**
+     * Describes the type of the result received in {@link Callback#onResult}
+     */
     enum Type {
 
         /**
          * Fingerprint authentication is successfully finished. {@link Goldfinger.Result}
-         * will contain value in case of {@link Goldfinger#decrypt(String, String, Callback)} or
-         * {@link Goldfinger#encrypt(String, String, Callback)} invocation.
+         * will contain value in case of {@link PromptParams.Builder#decrypt} or
+         * {@link PromptParams.Builder#encrypt} invocation.
          */
         SUCCESS,
 

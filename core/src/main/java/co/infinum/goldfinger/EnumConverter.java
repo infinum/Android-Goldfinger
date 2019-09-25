@@ -1,9 +1,9 @@
 package co.infinum.goldfinger;
 
-import android.hardware.fingerprint.FingerprintManager;
+import androidx.biometric.BiometricConstants;
 
 /**
- * Internal class used to convert Fingerprint IDs into meaningful enum.
+ * Internal class used to convert Biometric constants into meaningful enum.
  */
 class EnumConverter {
 
@@ -12,43 +12,32 @@ class EnumConverter {
 
     static Goldfinger.Reason errorToReason(int errorId) {
         switch (errorId) {
-            case FingerprintManager.FINGERPRINT_ERROR_HW_UNAVAILABLE:
+            case BiometricConstants.ERROR_HW_UNAVAILABLE:
                 return Goldfinger.Reason.HARDWARE_UNAVAILABLE;
-            case FingerprintManager.FINGERPRINT_ERROR_UNABLE_TO_PROCESS:
+            case BiometricConstants.ERROR_UNABLE_TO_PROCESS:
                 return Goldfinger.Reason.UNABLE_TO_PROCESS;
-            case FingerprintManager.FINGERPRINT_ERROR_TIMEOUT:
+            case BiometricConstants.ERROR_TIMEOUT:
                 return Goldfinger.Reason.TIMEOUT;
-            case FingerprintManager.FINGERPRINT_ERROR_NO_SPACE:
+            case BiometricConstants.ERROR_NO_SPACE:
                 return Goldfinger.Reason.NO_SPACE;
-            case FingerprintManager.FINGERPRINT_ERROR_CANCELED:
+            case BiometricConstants.ERROR_CANCELED:
                 return Goldfinger.Reason.CANCELED;
-            case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT:
+            case BiometricConstants.ERROR_LOCKOUT:
                 return Goldfinger.Reason.LOCKOUT;
-            case FingerprintManager.FINGERPRINT_ERROR_VENDOR:
+            case BiometricConstants.ERROR_VENDOR:
                 return Goldfinger.Reason.VENDOR;
-            case FingerprintManager.FINGERPRINT_ERROR_LOCKOUT_PERMANENT:
+            case BiometricConstants.ERROR_LOCKOUT_PERMANENT:
                 return Goldfinger.Reason.LOCKOUT_PERMANENT;
-            case FingerprintManager.FINGERPRINT_ERROR_USER_CANCELED:
+            case BiometricConstants.ERROR_USER_CANCELED:
                 return Goldfinger.Reason.USER_CANCELED;
-            default:
-                return Goldfinger.Reason.UNKNOWN;
-        }
-    }
-
-    static Goldfinger.Reason helpToReason(int helpId) {
-        switch (helpId) {
-            case FingerprintManager.FINGERPRINT_ACQUIRED_GOOD:
-                return Goldfinger.Reason.GOOD;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_PARTIAL:
-                return Goldfinger.Reason.PARTIAL;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_INSUFFICIENT:
-                return Goldfinger.Reason.INSUFFICIENT;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_IMAGER_DIRTY:
-                return Goldfinger.Reason.IMAGER_DIRTY;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_SLOW:
-                return Goldfinger.Reason.TOO_SLOW;
-            case FingerprintManager.FINGERPRINT_ACQUIRED_TOO_FAST:
-                return Goldfinger.Reason.TOO_FAST;
+            case BiometricConstants.ERROR_NO_BIOMETRICS:
+                return Goldfinger.Reason.NO_BIOMETRICS;
+            case BiometricConstants.ERROR_HW_NOT_PRESENT:
+                return Goldfinger.Reason.HW_NOT_PRESENT;
+            case BiometricConstants.ERROR_NEGATIVE_BUTTON:
+                return Goldfinger.Reason.NEGATIVE_BUTTON;
+            case BiometricConstants.ERROR_NO_DEVICE_CREDENTIAL:
+                return Goldfinger.Reason.NO_DEVICE_CREDENTIAL;
             default:
                 return Goldfinger.Reason.UNKNOWN;
         }

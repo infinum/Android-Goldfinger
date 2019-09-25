@@ -15,6 +15,7 @@ android {
 }
 
 dependencies {
+    implementation "androidx.biometric:biometric:${versions.biometric}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     testImplementation "junit:junit:${versions.junit}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"

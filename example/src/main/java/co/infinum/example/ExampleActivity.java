@@ -13,7 +13,7 @@ import co.infinum.goldfinger.Goldfinger;
 
 public class ExampleActivity extends AppCompatActivity {
 
-    private static final String KEY_NAME = "Example";
+    private static final String KEY_NAME = "key";
 
     private View authenticateButton;
     private View decryptButton;
@@ -25,7 +25,7 @@ public class ExampleActivity extends AppCompatActivity {
     private OnTextChangedListener onTextChangedListener = new OnTextChangedListener() {
         @Override
         void onTextChanged(String text) {
-            encryptButton.setEnabled(!text.isEmpty() && goldfinger.hasEnrolledFingerprint());
+            encryptButton.setEnabled(!text.isEmpty() && goldfinger.canAuthenticate());
         }
     };
     private EditText secretInputView;
@@ -37,15 +37,14 @@ public class ExampleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_example);
         fetchViews();
         initListeners();
-        goldfinger = new Goldfinger.Builder(this).setLogEnabled(BuildConfig.DEBUG).build();
+        goldfinger = new Goldfinger.Builder(this).logEnabled(BuildConfig.DEBUG).build();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (goldfinger.hasFingerprintHardware()
-            && goldfinger.hasEnrolledFingerprint()) {
+        if (goldfinger.canAuthenticate()) {
             authenticateButton.setEnabled(true);
         } else {
             authenticateButton.setEnabled(false);
@@ -62,7 +61,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void authenticateUserFingerprint() {
         cancelButton.setEnabled(true);
-        goldfinger.authenticate(new Goldfinger.Callback() {
+        goldfinger.authenticate(buildPromptParams(), new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();
@@ -75,9 +74,18 @@ public class ExampleActivity extends AppCompatActivity {
         });
     }
 
+    private Goldfinger.PromptParams buildPromptParams() {
+        return new Goldfinger.PromptParams.Builder(this)
+            .description("Description")
+            .subtitle("Subtitle")
+            .title("Title")
+            .negativeButtonText("Cancel")
+            .build();
+    }
+
     private void decryptEncryptedValue() {
         cancelButton.setEnabled(true);
-        goldfinger.decrypt(KEY_NAME, encryptedValue, new Goldfinger.Callback() {
+        goldfinger.decrypt(buildPromptParams(), KEY_NAME, encryptedValue, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();
@@ -92,7 +100,7 @@ public class ExampleActivity extends AppCompatActivity {
 
     private void encryptSecretValue() {
         cancelButton.setEnabled(true);
-        goldfinger.encrypt(KEY_NAME, secretInputView.getText().toString(), new Goldfinger.Callback() {
+        goldfinger.encrypt(buildPromptParams(), KEY_NAME, secretInputView.getText().toString(), new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 onGoldfingerError();
@@ -117,36 +125,24 @@ public class ExampleActivity extends AppCompatActivity {
     }
 
     private void initListeners() {
-        encryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                encryptSecretValue();
-            }
+        encryptButton.setOnClickListener(v -> {
+            resetStatusText();
+            encryptSecretValue();
         });
 
-        decryptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                decryptEncryptedValue();
-            }
+        decryptButton.setOnClickListener(v -> {
+            resetStatusText();
+            decryptEncryptedValue();
         });
 
-        authenticateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetStatusText();
-                authenticateUserFingerprint();
-            }
+        authenticateButton.setOnClickListener(v -> {
+            resetStatusText();
+            authenticateUserFingerprint();
         });
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelButton.setEnabled(false);
-                goldfinger.cancel();
-            }
+        cancelButton.setOnClickListener(v -> {
+            cancelButton.setEnabled(false);
+            goldfinger.cancel();
         });
 
         secretInputView.addTextChangedListener(onTextChangedListener);
