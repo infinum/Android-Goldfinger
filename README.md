@@ -41,6 +41,8 @@ if (goldfinger.canAuthenticate()) {
 
 #### Build params
 
+PromptParams are directly linked to [BiometricPrompt.PromptInfo](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder.html) so be sure to read which parameters are required.
+
 ```java
 Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
   .title("Title")
@@ -65,10 +67,6 @@ goldfinger.authenticate(params, new Goldfinger.Callback() {
     }
 });
 ```
-
-#### Goldfinger.PromptParams
-
-PromptParams are directly linked to [BiometricPrompt.PromptInfo](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder.html) so be sure to read which parameters are required.
 
 You can see all Goldfinger methods [here](./core/src/main/java/co/infinum/goldfinger/Goldfinger.java).
 
