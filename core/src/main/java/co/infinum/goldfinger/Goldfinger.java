@@ -41,7 +41,7 @@ public interface Goldfinger {
 
     /**
      * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptographyHandler} implementation is used to automatically encrypt given value.
+     * {@link CryptoProxy} implementation is used to automatically encrypt given value.
      * <p>
      * Use it when saving some data that should not be saved as plain text (e.g. password).
      * To decrypt the value use {@link Goldfinger#decrypt} method.
@@ -63,7 +63,7 @@ public interface Goldfinger {
 
     /**
      * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptographyHandler} implementation is used to automatically decrypt given value.
+     * {@link CryptoProxy} implementation is used to automatically decrypt given value.
      * <p>
      * Should be used together with {@link Goldfinger#encrypt} to decrypt saved data.
      *
@@ -89,8 +89,12 @@ public interface Goldfinger {
     class Builder {
 
         @NonNull private final Context context;
-        @Nullable private CryptoObjectFactory cryptoObjectFactory;
-        @Nullable private CryptographyHandler cryptographyHandler;
+        @Nullable private CipherFactory cipherFactory;
+        @Nullable private MacFactory macFactory;
+        @Nullable private SignatureFactory signatureFactory;
+        @Nullable private CipherCryptoHandler cipherCryptoHandler;
+        @Nullable private MacCryptoHandler macCryptoHandler;
+        @Nullable private SignatureCryptoHandler signatureCryptoHandler;
         @NonNull private Mode mode = Mode.AUTHENTICATION;
         @Nullable private String key;
         @Nullable private String value;
@@ -101,6 +105,8 @@ public interface Goldfinger {
 
         @NonNull
         public Goldfinger build() {
+            ensureParamsValid();
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 return buildMarshmallowInstance();
             } else {
@@ -109,14 +115,14 @@ public interface Goldfinger {
         }
 
         @NonNull
-        public Builder cryptoObjectFactory(@Nullable CryptoObjectFactory cryptoObjectFactory) {
-            this.cryptoObjectFactory = cryptoObjectFactory;
+        public Builder cipherCryptoHandler(@Nullable CipherCryptoHandler cipherCryptoHandler) {
+            this.cipherCryptoHandler = cipherCryptoHandler;
             return this;
         }
 
         @NonNull
-        public Builder cryptographyHandler(@Nullable CryptographyHandler cryptographyHandler) {
-            this.cryptographyHandler = cryptographyHandler;
+        public Builder cipherFactory(@Nullable CipherFactory cipherFactory) {
+            this.cipherFactory = cipherFactory;
             return this;
         }
 
@@ -127,15 +133,66 @@ public interface Goldfinger {
         }
 
         @NonNull
+        public Builder macCryptoHandler(@Nullable MacCryptoHandler macCryptoHandler) {
+            this.macCryptoHandler = macCryptoHandler;
+            return this;
+        }
+
+        @NonNull
+        public Builder macFactory(@Nullable MacFactory macFactory) {
+            this.macFactory = macFactory;
+            return this;
+        }
+
+        @NonNull
+        public Builder signatureCryptoHandler(@Nullable SignatureCryptoHandler signatureCryptoHandler) {
+            this.signatureCryptoHandler = signatureCryptoHandler;
+            return this;
+        }
+
+        @NonNull
+        public Builder signatureFactory(@Nullable SignatureFactory signatureFactory) {
+            this.signatureFactory = signatureFactory;
+            return this;
+        }
+
+        @NonNull
         @RequiresApi(Build.VERSION_CODES.M)
         private Goldfinger buildMarshmallowInstance() {
-            CryptographyHandler handler = cryptographyHandler != null ? cryptographyHandler : new CryptographyHandler.Default();
-            CryptoObjectFactory factory = cryptoObjectFactory != null ? cryptoObjectFactory : new CryptoObjectFactory.Default(context);
-            AsyncCryptoObjectFactory asyncFactory = new AsyncCryptoObjectFactory(factory);
-            return new MarshmallowGoldfinger(context, asyncFactory, handler);
+            if (macCryptoHandler == null && signatureCryptoHandler == null && cipherCryptoHandler == null) {
+                this.cipherCryptoHandler = new CipherCryptoHandler.Default();
+            }
+            if (macFactory == null && signatureFactory == null && cipherFactory == null) {
+                this.cipherFactory = new CipherFactory.Default(context);
+            }
+            AsyncCryptoObjectFactory asyncFactory = new AsyncCryptoObjectFactory(
+                new CryptoObjectFactory(cipherFactory, macFactory, signatureFactory)
+            );
+            CryptoProxy cryptoProxy = new CryptoProxy(cipherCryptoHandler, macCryptoHandler, signatureCryptoHandler);
+
+            return new MarshmallowGoldfinger(context, asyncFactory, cryptoProxy);
+        }
+
+        private void ensureParamsValid() {
+            if (macFactory != null && macCryptoHandler == null || macFactory == null && macCryptoHandler != null) {
+                throw new RuntimeException(
+                    "To use CryptoObject with MacObject you must provide both MacFactory and "
+                        + "MacCryptoHandler implementation. Use Goldfinger.Builder#macFactory(MacFactory) and "
+                        + "Goldfinger.Builder#macCryptoHandler(MacCryptoHandler) methods to set values."
+                );
+            }
+
+            if (signatureFactory != null && signatureCryptoHandler == null || signatureFactory == null && signatureCryptoHandler != null) {
+                throw new RuntimeException(
+                    "To use CryptoObject with SignatureObject you must provide both SignatureFactory and "
+                        + "SignatureCryptoHandler implementation. Use Goldfinger.Builder#signatureFactory(SignatureFactory) and "
+                        + "Goldfinger.Builder#signatureCryptoHandler(SignatureCryptoHandler) methods to set values."
+                );
+            }
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     class PromptParams {
 
         @NonNull private final Object dialogOwner;
@@ -430,12 +487,11 @@ public interface Goldfinger {
          * Returns fingerprint result and will be invoked multiple times during
          * fingerprint authentication as not all fingerprint results complete
          * the authentication.
-         *
+         * <p>
          * Result callback invoked for every fingerprint result (success, error or info).
          * It can be invoked multiple times during single fingerprint authentication.
          *
          * @param result contains fingerprint result information
-         *
          * @see Goldfinger.Result
          */
         void onResult(@NonNull Goldfinger.Result result);

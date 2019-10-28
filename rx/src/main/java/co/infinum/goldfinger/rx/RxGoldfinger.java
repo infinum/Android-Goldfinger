@@ -4,9 +4,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import co.infinum.goldfinger.CryptoObjectFactory;
-import co.infinum.goldfinger.CryptographyHandler;
+import co.infinum.goldfinger.CipherCryptoHandler;
+import co.infinum.goldfinger.CipherFactory;
 import co.infinum.goldfinger.Goldfinger;
+import co.infinum.goldfinger.MacCryptoHandler;
+import co.infinum.goldfinger.MacFactory;
+import co.infinum.goldfinger.SignatureCryptoHandler;
+import co.infinum.goldfinger.SignatureFactory;
 import io.reactivex.Observable;
 
 @SuppressWarnings("unused")
@@ -66,20 +70,44 @@ public interface RxGoldfinger {
         }
 
         @NonNull
-        public RxGoldfinger.Builder cryptoObjectFactory(@Nullable CryptoObjectFactory cryptoObjectFactory) {
-            goldfingerBuilder.cryptoObjectFactory(cryptoObjectFactory);
+        public RxGoldfinger.Builder cipherCryptoHandler(@Nullable CipherCryptoHandler cipherCryptoHandler) {
+            goldfingerBuilder.cipherCryptoHandler(cipherCryptoHandler);
             return this;
         }
 
         @NonNull
-        public RxGoldfinger.Builder cryptographyHandler(@Nullable CryptographyHandler cryptographyHandler) {
-            goldfingerBuilder.cryptographyHandler(cryptographyHandler);
+        public RxGoldfinger.Builder cipherFactory(@Nullable CipherFactory cipherFactory) {
+            goldfingerBuilder.cipherFactory(cipherFactory);
             return this;
         }
 
         @NonNull
         public RxGoldfinger.Builder logEnabled(boolean logEnabled) {
             goldfingerBuilder.logEnabled(logEnabled);
+            return this;
+        }
+
+        @NonNull
+        public RxGoldfinger.Builder macCryptoHandler(@Nullable MacCryptoHandler macCryptoHandler) {
+            goldfingerBuilder.macCryptoHandler(macCryptoHandler);
+            return this;
+        }
+
+        @NonNull
+        public RxGoldfinger.Builder macFactory(@Nullable MacFactory macFactory) {
+            goldfingerBuilder.macFactory(macFactory);
+            return this;
+        }
+
+        @NonNull
+        public RxGoldfinger.Builder signatureCryptoHandler(@Nullable SignatureCryptoHandler signatureCryptoHandler) {
+            goldfingerBuilder.signatureCryptoHandler(signatureCryptoHandler);
+            return this;
+        }
+
+        @NonNull
+        public RxGoldfinger.Builder signatureFactory(@Nullable SignatureFactory signatureFactory) {
+            goldfingerBuilder.signatureFactory(signatureFactory);
             return this;
         }
     }

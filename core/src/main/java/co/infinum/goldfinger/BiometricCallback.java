@@ -22,17 +22,17 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     boolean isAuthenticationActive = true;
 
     @NonNull private final Goldfinger.Callback callback;
-    @NonNull private final CryptographyHandler cryptographyHandler;
+    @NonNull private final CryptoProxy cryptoProxy;
     @NonNull private final Mode mode;
     @Nullable private final String value;
 
     BiometricCallback(
-        @NonNull CryptographyHandler cryptographyHandler,
+        @NonNull CryptoProxy cryptoProxy,
         @NonNull Mode mode,
         @Nullable String value,
         @NonNull Goldfinger.Callback callback
     ) {
-        this.cryptographyHandler = cryptographyHandler;
+        this.cryptoProxy = cryptoProxy;
         this.mode = mode;
         this.value = value;
         this.callback = callback;
@@ -122,9 +122,9 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     private void cipherValue(BiometricPrompt.CryptoObject cryptoObject) {
         String cipheredValue;
         if (mode == Mode.DECRYPTION) {
-            cipheredValue = cryptographyHandler.decrypt(cryptoObject, value);
+            cipheredValue = cryptoProxy.decrypt(cryptoObject, value);
         } else {
-            cipheredValue = cryptographyHandler.encrypt(cryptoObject, value);
+            cipheredValue = cryptoProxy.encrypt(cryptoObject, value);
         }
 
         if (cipheredValue != null) {

@@ -1,14 +1,19 @@
 package co.infinum.example;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import javax.crypto.Cipher;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import co.infinum.goldfinger.CipherCryptoHandler;
+import co.infinum.goldfinger.CipherFactory;
 import co.infinum.goldfinger.Goldfinger;
 
 public class ExampleActivity extends AppCompatActivity {
@@ -84,6 +89,13 @@ public class ExampleActivity extends AppCompatActivity {
     }
 
     private void decryptEncryptedValue() {
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            CipherCryptoHandler cipherCryptoHandler = new CipherCryptoHandler.Default();
+//            CipherFactory cipherFactory = new CipherFactory.Default(this);
+//            String value = cipherCryptoHandler.decrypt(cipherFactory.createDecryptionCipher(KEY_NAME), encryptedValue);
+//            Log.d("korman", "KORMAN");
+//            return;
+//        }
         cancelButton.setEnabled(true);
         goldfinger.decrypt(buildPromptParams(), KEY_NAME, encryptedValue, new Goldfinger.Callback() {
             @Override

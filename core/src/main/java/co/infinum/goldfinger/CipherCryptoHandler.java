@@ -2,6 +2,11 @@ package co.infinum.goldfinger;
 
 import android.util.Base64;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import javax.crypto.Cipher;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.biometric.BiometricPrompt;
@@ -14,7 +19,7 @@ import static co.infinum.goldfinger.LogUtils.log;
  * @see Goldfinger#encrypt
  * @see Goldfinger#decrypt
  */
-public interface CryptographyHandler {
+public interface CipherCryptoHandler {
 
     /**
      * Encrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
@@ -24,7 +29,7 @@ public interface CryptographyHandler {
      * @return encrypted value or null if encryption fails
      */
     @Nullable
-    String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);
+    String encrypt(@NonNull Cipher cipher, @NonNull String value);
 
     /**
      * Encrypt value with unlocked {@link BiometricPrompt.CryptoObject}.
@@ -34,17 +39,17 @@ public interface CryptographyHandler {
      * @return decrypted value or null if encryption fails
      */
     @Nullable
-    String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value);
+    String decrypt(@NonNull Cipher cipher, @NonNull String value);
 
     @SuppressWarnings("ConstantConditions")
-    class Default implements CryptographyHandler {
+    class Default implements CipherCryptoHandler {
 
         @Nullable
         @Override
-        public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {
+        public String decrypt(@NonNull Cipher cipher, @NonNull String value) {
             try {
-                byte[] decodedBytes = Base64.decode(value, Base64.DEFAULT);
-                return new String(cryptoObject.getCipher().doFinal(decodedBytes));
+                byte[] decodedBytes = Base64.decode(value, Base64.NO_WRAP);
+                return new String(cipher.doFinal(decodedBytes));
             } catch (Exception e) {
                 log(e);
                 return null;
@@ -53,10 +58,10 @@ public interface CryptographyHandler {
 
         @Nullable
         @Override
-        public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {
+        public String encrypt(@NonNull Cipher cipher, @NonNull String value) {
             try {
-                byte[] encryptedBytes = cryptoObject.getCipher().doFinal(value.getBytes());
-                return Base64.encodeToString(encryptedBytes, Base64.DEFAULT);
+                byte[] encryptedBytes = cipher.doFinal(value.getBytes("utf-8"));
+                return Base64.encodeToString(encryptedBytes, Base64.NO_WRAP);
             } catch (Exception e) {
                 log(e);
                 return null;
@@ -64,3 +69,4 @@ public interface CryptographyHandler {
         }
     }
 }
+
