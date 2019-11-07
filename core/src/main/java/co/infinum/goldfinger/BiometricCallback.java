@@ -22,12 +22,12 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     boolean isAuthenticationActive = true;
 
     @NonNull private final Goldfinger.Callback callback;
-    @NonNull private final CryptoProxy cryptoProxy;
+    @NonNull private final CrypterProxy cryptoProxy;
     @NonNull private final Mode mode;
     @Nullable private final String value;
 
     BiometricCallback(
-        @NonNull CryptoProxy cryptoProxy,
+        @NonNull CrypterProxy cryptoProxy,
         @NonNull Mode mode,
         @Nullable String value,
         @NonNull Goldfinger.Callback callback
@@ -88,20 +88,20 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
 
         isAuthenticationActive = false;
         log("onAuthenticationSucceeded");
-        MAIN_HANDLER.post(new Runnable() {
-            @Override
-            public void run() {
-                if (mode == Mode.AUTHENTICATION) {
+        if (mode == Mode.AUTHENTICATION) {
+            MAIN_HANDLER.post(new Runnable() {
+                @Override
+                public void run() {
                     Goldfinger.Result goldfingerResult = new Goldfinger.Result(
                         Goldfinger.Type.SUCCESS,
                         Goldfinger.Reason.AUTHENTICATION_SUCCESS
                     );
                     callback.onResult(goldfingerResult);
-                } else {
-                    cipherValue(result.getCryptoObject());
                 }
-            }
-        });
+            });
+        } else {
+            cipherValue(result.getCryptoObject());
+        }
     }
 
     /**
@@ -117,27 +117,32 @@ class BiometricCallback extends BiometricPrompt.AuthenticationCallback {
     /**
      * Cipher the value with unlocked {@link BiometricPrompt.CryptoObject}.
      *
-     * @param cryptoObject unlocked {@link BiometricPrompt.CryptoObject} that is ready to use
+     * @param cryptoObject unlocked {@link BiometricPrompt.CryptoObject} that is ready to use.
      */
     private void cipherValue(BiometricPrompt.CryptoObject cryptoObject) {
-        String cipheredValue;
+        final String cipheredValue;
         if (mode == Mode.DECRYPTION) {
             cipheredValue = cryptoProxy.decrypt(cryptoObject, value);
         } else {
             cipheredValue = cryptoProxy.encrypt(cryptoObject, value);
         }
 
-        if (cipheredValue != null) {
-            log("Ciphered [%s] => [%s]", value, cipheredValue);
-            callback.onResult(new Goldfinger.Result(
-                Goldfinger.Type.SUCCESS,
-                Goldfinger.Reason.AUTHENTICATION_SUCCESS,
-                cipheredValue,
-                null
-            ));
-        } else {
-            Exception e = (mode == Mode.DECRYPTION) ? new DecryptionException() : new EncryptionException();
-            callback.onError(e);
-        }
+        MAIN_HANDLER.post(new Runnable() {
+            @Override
+            public void run() {
+                if (cipheredValue != null) {
+                    log("Ciphered [%s] => [%s]", value, cipheredValue);
+                    callback.onResult(new Goldfinger.Result(
+                        Goldfinger.Type.SUCCESS,
+                        Goldfinger.Reason.AUTHENTICATION_SUCCESS,
+                        cipheredValue,
+                        null
+                    ));
+                } else {
+                    Exception e = (mode == Mode.DECRYPTION) ? new DecryptionException() : new EncryptionException();
+                    callback.onError(e);
+                }
+            }
+        });
     }
 }

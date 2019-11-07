@@ -4,13 +4,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import co.infinum.goldfinger.CipherCryptoHandler;
-import co.infinum.goldfinger.CipherFactory;
 import co.infinum.goldfinger.Goldfinger;
-import co.infinum.goldfinger.MacCryptoHandler;
-import co.infinum.goldfinger.MacFactory;
-import co.infinum.goldfinger.SignatureCryptoHandler;
-import co.infinum.goldfinger.SignatureFactory;
+import co.infinum.goldfinger.crypto.CipherCrypter;
+import co.infinum.goldfinger.crypto.CipherFactory;
+import co.infinum.goldfinger.crypto.MacCrypter;
+import co.infinum.goldfinger.crypto.MacFactory;
+import co.infinum.goldfinger.crypto.SignatureCrypter;
+import co.infinum.goldfinger.crypto.SignatureFactory;
 import io.reactivex.Observable;
 
 @SuppressWarnings("unused")
@@ -70,8 +70,8 @@ public interface RxGoldfinger {
         }
 
         @NonNull
-        public RxGoldfinger.Builder cipherCryptoHandler(@Nullable CipherCryptoHandler cipherCryptoHandler) {
-            goldfingerBuilder.cipherCryptoHandler(cipherCryptoHandler);
+        public RxGoldfinger.Builder cipherCrypter(@Nullable CipherCrypter cipherCrypter) {
+            goldfingerBuilder.cipherCrypter(cipherCrypter);
             return this;
         }
 
@@ -88,8 +88,8 @@ public interface RxGoldfinger {
         }
 
         @NonNull
-        public RxGoldfinger.Builder macCryptoHandler(@Nullable MacCryptoHandler macCryptoHandler) {
-            goldfingerBuilder.macCryptoHandler(macCryptoHandler);
+        public RxGoldfinger.Builder macCrypter(@Nullable MacCrypter macCrypter) {
+            goldfingerBuilder.macCrypter(macCrypter);
             return this;
         }
 
@@ -100,8 +100,8 @@ public interface RxGoldfinger {
         }
 
         @NonNull
-        public RxGoldfinger.Builder signatureCryptoHandler(@Nullable SignatureCryptoHandler signatureCryptoHandler) {
-            goldfingerBuilder.signatureCryptoHandler(signatureCryptoHandler);
+        public RxGoldfinger.Builder signatureCrypter(@Nullable SignatureCrypter signatureCrypter) {
+            goldfingerBuilder.signatureCrypter(signatureCrypter);
             return this;
         }
 

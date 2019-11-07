@@ -11,7 +11,7 @@ This version is compatible with `androidx.biometric`. If you do not want to use 
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0-RC2'
+implementation 'co.infinum:goldfinger:2.0.0-RC3'
 ```
 
 #### Initialize
@@ -66,8 +66,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0-RC2'
-implementation 'co.infinum:goldfinger-rx:2.0.0-RC2'
+implementation 'co.infinum:goldfinger:2.0.0-RC3'
+implementation 'co.infinum:goldfinger-rx:2.0.0-RC3'
 ```
 
 #### Initialize

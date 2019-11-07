@@ -11,6 +11,14 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import co.infinum.goldfinger.crypto.CipherCrypter;
+import co.infinum.goldfinger.crypto.CipherFactory;
+import co.infinum.goldfinger.crypto.MacCrypter;
+import co.infinum.goldfinger.crypto.MacFactory;
+import co.infinum.goldfinger.crypto.SignatureCrypter;
+import co.infinum.goldfinger.crypto.SignatureFactory;
+import co.infinum.goldfinger.crypto.impl.AesCipherFactory;
+import co.infinum.goldfinger.crypto.impl.Base64CipherCrypter;
 
 @SuppressWarnings("unused")
 public interface Goldfinger {
@@ -41,7 +49,7 @@ public interface Goldfinger {
 
     /**
      * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptoProxy} implementation is used to automatically encrypt given value.
+     * {@link CrypterProxy} implementation is used to automatically encrypt given value.
      * <p>
      * Use it when saving some data that should not be saved as plain text (e.g. password).
      * To decrypt the value use {@link Goldfinger#decrypt} method.
@@ -63,7 +71,7 @@ public interface Goldfinger {
 
     /**
      * Authenticate user via Fingerprint. If user is successfully authenticated,
-     * {@link CryptoProxy} implementation is used to automatically decrypt given value.
+     * {@link CrypterProxy} implementation is used to automatically decrypt given value.
      * <p>
      * Should be used together with {@link Goldfinger#encrypt} to decrypt saved data.
      *
@@ -92,9 +100,9 @@ public interface Goldfinger {
         @Nullable private CipherFactory cipherFactory;
         @Nullable private MacFactory macFactory;
         @Nullable private SignatureFactory signatureFactory;
-        @Nullable private CipherCryptoHandler cipherCryptoHandler;
-        @Nullable private MacCryptoHandler macCryptoHandler;
-        @Nullable private SignatureCryptoHandler signatureCryptoHandler;
+        @Nullable private CipherCrypter cipherCrypter;
+        @Nullable private MacCrypter macCrypter;
+        @Nullable private SignatureCrypter signatureCrypter;
         @NonNull private Mode mode = Mode.AUTHENTICATION;
         @Nullable private String key;
         @Nullable private String value;
@@ -110,13 +118,13 @@ public interface Goldfinger {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 return buildMarshmallowInstance();
             } else {
-                return new LegacyGoldfinger();
+                return new GoldfingerMock();
             }
         }
 
         @NonNull
-        public Builder cipherCryptoHandler(@Nullable CipherCryptoHandler cipherCryptoHandler) {
-            this.cipherCryptoHandler = cipherCryptoHandler;
+        public Builder cipherCrypter(@Nullable CipherCrypter cipherCrypter) {
+            this.cipherCrypter = cipherCrypter;
             return this;
         }
 
@@ -133,8 +141,8 @@ public interface Goldfinger {
         }
 
         @NonNull
-        public Builder macCryptoHandler(@Nullable MacCryptoHandler macCryptoHandler) {
-            this.macCryptoHandler = macCryptoHandler;
+        public Builder macCrypter(@Nullable MacCrypter macCrypter) {
+            this.macCrypter = macCrypter;
             return this;
         }
 
@@ -145,8 +153,8 @@ public interface Goldfinger {
         }
 
         @NonNull
-        public Builder signatureCryptoHandler(@Nullable SignatureCryptoHandler signatureCryptoHandler) {
-            this.signatureCryptoHandler = signatureCryptoHandler;
+        public Builder signatureCrypter(@Nullable SignatureCrypter signatureCrypter) {
+            this.signatureCrypter = signatureCrypter;
             return this;
         }
 
@@ -159,34 +167,34 @@ public interface Goldfinger {
         @NonNull
         @RequiresApi(Build.VERSION_CODES.M)
         private Goldfinger buildMarshmallowInstance() {
-            if (macCryptoHandler == null && signatureCryptoHandler == null && cipherCryptoHandler == null) {
-                this.cipherCryptoHandler = new CipherCryptoHandler.Default();
+            if (macCrypter == null && signatureCrypter == null && cipherCrypter == null) {
+                this.cipherCrypter = new Base64CipherCrypter();
             }
             if (macFactory == null && signatureFactory == null && cipherFactory == null) {
-                this.cipherFactory = new CipherFactory.Default(context);
+                this.cipherFactory = new AesCipherFactory(context);
             }
             AsyncCryptoObjectFactory asyncFactory = new AsyncCryptoObjectFactory(
                 new CryptoObjectFactory(cipherFactory, macFactory, signatureFactory)
             );
-            CryptoProxy cryptoProxy = new CryptoProxy(cipherCryptoHandler, macCryptoHandler, signatureCryptoHandler);
+            CrypterProxy cryptoProxy = new CrypterProxy(cipherCrypter, macCrypter, signatureCrypter);
 
-            return new MarshmallowGoldfinger(context, asyncFactory, cryptoProxy);
+            return new GoldfingerImpl(context, asyncFactory, cryptoProxy);
         }
 
         private void ensureParamsValid() {
-            if (macFactory != null && macCryptoHandler == null || macFactory == null && macCryptoHandler != null) {
+            if (macFactory != null && macCrypter == null || macFactory == null && macCrypter != null) {
                 throw new RuntimeException(
                     "To use CryptoObject with MacObject you must provide both MacFactory and "
-                        + "MacCryptoHandler implementation. Use Goldfinger.Builder#macFactory(MacFactory) and "
-                        + "Goldfinger.Builder#macCryptoHandler(MacCryptoHandler) methods to set values."
+                        + "MacCrypter implementation. Use Goldfinger.Builder#macFactory(MacFactory) and "
+                        + "Goldfinger.Builder#macCrypter(MacCrypter) methods to set values."
                 );
             }
 
-            if (signatureFactory != null && signatureCryptoHandler == null || signatureFactory == null && signatureCryptoHandler != null) {
+            if (signatureFactory != null && signatureCrypter == null || signatureFactory == null && signatureCrypter != null) {
                 throw new RuntimeException(
                     "To use CryptoObject with SignatureObject you must provide both SignatureFactory and "
-                        + "SignatureCryptoHandler implementation. Use Goldfinger.Builder#signatureFactory(SignatureFactory) and "
-                        + "Goldfinger.Builder#signatureCryptoHandler(SignatureCryptoHandler) methods to set values."
+                        + "SignatureCrypter implementation. Use Goldfinger.Builder#signatureFactory(SignatureFactory) and "
+                        + "Goldfinger.Builder#signatureCrypter(SignatureCrypter) methods to set values."
                 );
             }
         }

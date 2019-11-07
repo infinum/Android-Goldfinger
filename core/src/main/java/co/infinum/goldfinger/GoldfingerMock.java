@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 /**
  * Legacy implementation for pre-Marshmallow devices.
  */
-class LegacyGoldfinger implements Goldfinger {
+class GoldfingerMock implements Goldfinger {
 
     @Override
     public void authenticate(@NonNull PromptParams params, @NonNull Callback callback) {

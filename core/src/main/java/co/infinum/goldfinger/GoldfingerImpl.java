@@ -19,24 +19,24 @@ import static co.infinum.goldfinger.LogUtils.log;
 
 /**
  * Goldfinger implementation for Android Marshmallow and newer.
- * Older versions use {@link LegacyGoldfinger}.
+ * Older versions use {@link GoldfingerMock}.
  */
 @RequiresApi(Build.VERSION_CODES.M)
-class MarshmallowGoldfinger implements Goldfinger {
+class GoldfingerImpl implements Goldfinger {
 
     @NonNull private final AsyncCryptoObjectFactory asyncCryptoFactory;
     @Nullable private AsyncCryptoObjectFactory.Callback asyncCryptoFactoryCallback;
     @Nullable private BiometricPrompt biometricPrompt;
-    @NonNull private final CryptoProxy cryptoProxy;
+    @NonNull private final CrypterProxy cryptoProxy;
     @NonNull private final BiometricManager biometricManager;
     @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
     @Nullable private BiometricCallback biometricCallback;
     private boolean creatingCryptoObject = false;
 
-    MarshmallowGoldfinger(
+    GoldfingerImpl(
         @NonNull Context context,
         @NonNull AsyncCryptoObjectFactory asyncCryptoFactory,
-        @NonNull CryptoProxy cryptoProxy
+        @NonNull CrypterProxy cryptoProxy
     ) {
         this.biometricManager = BiometricManager.from(context);
         this.asyncCryptoFactory = asyncCryptoFactory;
