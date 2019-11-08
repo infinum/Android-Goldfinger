@@ -11,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class ChooseImplementationActivity extends AppCompatActivity {
 
-    private View exampleButton;
-    private View rxExampleButton;
+    private View pinLoginExampleButton;
+    private View pinLoginRxExampleButton;
+    private View paymentExampleButton;
+    private View paymentRxExampleButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,18 +32,29 @@ public class ChooseImplementationActivity extends AppCompatActivity {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private void initListeners() {
-        this.exampleButton.setOnClickListener(v -> navigateToSetPinActivity(false));
-        this.rxExampleButton.setOnClickListener(v -> navigateToSetPinActivity(true));
+        this.pinLoginExampleButton.setOnClickListener(v -> navigateToSetPinActivity(false));
+        this.pinLoginRxExampleButton.setOnClickListener(v -> navigateToSetPinActivity(true));
+        this.paymentExampleButton.setOnClickListener(v -> navigateToPaymentActivity(false));
+        this.paymentRxExampleButton.setOnClickListener(v -> navigateToPaymentActivity(true));
     }
 
     private void initViews() {
-        this.exampleButton = findViewById(R.id.exampleButton);
-        this.rxExampleButton = findViewById(R.id.rxExampleButton);
+        this.pinLoginExampleButton = findViewById(R.id.pinLoginExampleButton);
+        this.pinLoginRxExampleButton = findViewById(R.id.pinLoginRxExampleButton);
+        this.paymentExampleButton = findViewById(R.id.paymentExampleButton);
+        this.paymentRxExampleButton = findViewById(R.id.paymentRxExampleButton);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private void navigateToPaymentActivity(boolean isRxExample) {
+        Class<?> cls = isRxExample ? RxPaymentActivity.class : PaymentActivity.class;
+        startActivity(new Intent(this, cls));
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private void navigateToSetPinActivity(boolean isRxExample) {
         SharedPrefs.setRxExample(isRxExample);
         startActivity(new Intent(this, SetPinActivity.class));
+        finish();
     }
 }

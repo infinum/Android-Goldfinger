@@ -7,20 +7,38 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/exampleButton"
+        android:id="@+id/paymentExampleButton"
         style="@style/Button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Example"
+        android:text="Payment example"
         />
 
     <TextView
-        android:id="@+id/rxExampleButton"
+        android:id="@+id/paymentRxExampleButton"
         style="@style/Button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Rx Example"
+        android:text="Payment Rx example"
+        />
+
+    <TextView
+        android:id="@+id/pinLoginExampleButton"
+        style="@style/Button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Pin Login example"
+        />
+
+    <TextView
+        android:id="@+id/pinLoginRxExampleButton"
+        style="@style/Button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Pin Login Rx Example"
         />
 
 </LinearLayout>
