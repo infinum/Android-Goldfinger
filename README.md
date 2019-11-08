@@ -41,6 +41,8 @@ Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
   .build();
 ```
 
+I also suggest looking at [ValidateUtils](./core/src/main/java/co/infinum/goldfinger/ValidateUtils.java) class to understand what is allowed by the Biometric library.
+
 #### Authenticate
 
 ```java
@@ -100,81 +102,67 @@ goldfinger.authenticate(params).subscribe(new DisposableObserver<Goldfinger.Resu
 
 You can see all RxGoldfinger methods [here](./rx/src/main/java/co/infinum/goldfinger/rx/RxGoldfinger.java).
 
-## Fingerprint authentication flow
-
-To use the Android Fingerprint API you must:
-
-- Create a new or load an existing `SecretKey`
-- Create a `Cipher` with a created or loaded `SecretKey`
-- Create a `CryptoObject` with a created `Cipher`
-- Start Fingerprint authentication with a created `CryptoObject`
-- Create `BiometricPrompt.PromptInfo` object
-- Handle possible exceptions at every step due to complexity of the Android Fingerprint API
-
-The `CryptoObject` is **locked** when created and it is **unlocked** when the user successfully authenticates. Once it is unlocked, you can use it to cipher data.
-
-Fingerprint authentication is used to either:
-
-1) Authenticate the user, e.g. for payment
-2) Perform encryption or decryption operations over user’s case-sensitive information, e.g. passwords
-
-Goldfinger wraps everything mentioned and provides an intuitive and easy-to-use interface.
-
 ## Configuration
 
-If you don’t like Default implementations, you can easily modify them using `Goldfinger.Builder` object.
+If you don’t like default implementations, you can easily modify them using `Goldfinger.Builder` object.
 
 ```java
 Goldfinger.Builder(context)
   .logEnabled(true)
-  .cryptoObjectFactory(factory)
-  .cryptographyHandler(cryptographyHandler)
+  .cipherFactory(factory)
+  .cipherCrypter(crypter)
   .build()
 ```
+
+**Important**: Both Factory and Crypter should use same object type. If MacFactory is used, be sure to also provide MacCrypter!
+
+#### Factory (Cipher, Mac, Signature)
+
+Factory class should be used to create `Cipher`/`Mac`/`Signature` which will be used internally when `CryptoObject` is created. 
+
+```java
+new CipherFactory() {
+  @Nullable
+  @Override
+  public Cipher createEncryptionCrypter(String key) {
+     /* Create Cipher for encryption */
+  }
+  
+  @Nullable
+  @Override
+  public Cipher createDecryptionCrypter(String key) {
+    /* Create Cipher for decryption */
+  }
+};
+```
+
+Goldfinger will default to [AesCipherFactory](./core/src/main/java/co/infinum/goldfinger/crypto/impl/AesCipherFactory.java) if other implementation is not provided.
+
+#### Crypter (Cipher, Mac, Signature)
+
+Crypter class should be used to encrypt/decrypt data with `Cipher`/`Mac`/`Signature` which was created with `Factory` above.
+
+```java
+new CipherCrypter() {
+  @Nullable
+  @Override
+  public String encrypt(@NonNull Cipher crypter, @NonNull String value) {
+    /* Encrypt data with given crypter */
+  }
+
+  @Nullable
+  @Override
+  public String decrypt(@NonNull Cipher crypter, @NonNull String value) {
+    /* Decrypt data with given crypter */
+  }
+};
+```
+
+Goldfinger will default to [Base64CipherCrypter](./core/src/main/java/co/infinum/goldfinger/crypto/impl/Base64CipherCrypter.java) if other implementation is not provided.
 
 #### Logging
 
 Logging is **off** by default. You can enable it by calling `Goldfinger.Builder(context).logEnabled(true)`.
-
-#### `CryptoObjectFactory`
-
-Creating a `CryptoObject` is a complicated process that has multiple steps. `CryptoObjectFactory` allows you to modify `CryptoObject` creation and adjust it to your needs.
-
-```java
-new CryptoObjectFactory() {
-  @Nullable
-  @Override
-  public BiometricPrompt.CryptoObject createEncryptionCryptoObject(@NonNull String keyName) {}
-
-  @Nullable
-  @Override
-  public BiometricPrompt.CryptoObject createDecryptionCryptoObject(@NonNull String keyName) {}
-};
-```
-
-All methods should return a `CryptoObject` instance or a `null` value if an error happens during object creation.
-
-You can find the default implementation [here](./core/src/main/java/co/infinum/goldfinger/CryptoObjectFactory.java).
-
-#### CryptographyHandler
-
-Goldfinger automatically handles encryption and decryption operations via a `CryptographyHandler` implementation which you can implement yourself in case you want a custom cipher.
-
-```java
-new CryptographyHandler() {
-  @Nullable
-  @Override
-  public String encrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {}
-
-  @Nullable
-  @Override
-  public String decrypt(@NonNull BiometricPrompt.CryptoObject cryptoObject, @NonNull String value) {}
-}
-```
-
-`CryptographyHandler` methods receive an unlocked `CryptoObject` and a `String` value. The return value should be ciphered `value` or `null` if an error happens.
-
-The default `CryptographyHandler` implementation can be found [here](./core/src/main/java/co/infinum/goldfinger/CryptographyHandler.java).
 
 ## Known issues
 
