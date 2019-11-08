@@ -36,7 +36,7 @@ class ValidateUtils {
      * Return list of prompt params errors. If no errors detected, list will be empty.
      */
     @NonNull
-    static List<String> validatePromptParams(@NonNull Goldfinger.PromptParams params) {
+    static List<String> validatePromptParams(@NonNull Mode mode, @NonNull Goldfinger.PromptParams params) {
         List<String> errors = new ArrayList<>();
 
         if (!(params.dialogOwner() instanceof Fragment) && !(params.dialogOwner() instanceof FragmentActivity)) {
@@ -49,6 +49,10 @@ class ValidateUtils {
 
         if (!params.deviceCredentialsAllowed() && StringUtils.isBlankOrNull(params.negativeButtonText())) {
             errors.add("NegativeButtonText is required!");
+        }
+
+        if (params.deviceCredentialsAllowed() && mode != Mode.AUTHENTICATION) {
+            errors.add("DeviceCredentials are allowed only for Goldfinger#authenticate method.");
         }
 
         return errors;

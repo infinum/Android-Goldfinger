@@ -153,7 +153,7 @@ class GoldfingerImpl implements Goldfinger {
             return true;
         }
 
-        List<String> promptParams = ValidateUtils.validatePromptParams(params);
+        List<String> promptParams = ValidateUtils.validatePromptParams(mode, params);
         if (!promptParams.isEmpty()) {
             callback.onError(new InvalidParametersException(promptParams));
             return true;

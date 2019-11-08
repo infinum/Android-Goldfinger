@@ -7,15 +7,18 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".ChooseImplementationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".ExampleActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".RxExampleActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SetPinActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".RxLoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".RxSettingsActivity" android:screenOrientation="portrait"/>
 
     </application>
 

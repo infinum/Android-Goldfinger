@@ -32,7 +32,7 @@ public class ValidateUtilsTest {
             .deviceCredentialsAllowed(true)
             .confirmationRequired(true)
             .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ValidateUtilsTest {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
             .build();
-        assertEquals(1, ValidateUtils.validatePromptParams(params).size());
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ValidateUtilsTest {
             .deviceCredentialsAllowed(true)
             .confirmationRequired(true)
             .build();
-        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
     }
 
     @Test
@@ -62,12 +62,16 @@ public class ValidateUtilsTest {
             .title(TITLE)
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .build();
-        assertTrue(ValidateUtils.validatePromptParams(params).isEmpty());
+        assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
     }
 
     @Test
     public void auth_valid_negativeTextIgnoredIfDeviceCredentialsTrue() {
-        assertTrue(ValidateUtils.validateCipherParams(Mode.ENCRYPTION, KEY, VALUE).isEmpty());
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
+            .title(TITLE)
+            .deviceCredentialsAllowed(true)
+            .build();
+        assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
     }
 
     @Test
@@ -78,6 +82,15 @@ public class ValidateUtilsTest {
     @Test
     public void decrypt_invalid_emptyValue() {
         assertEquals(1, ValidateUtils.validateCipherParams(Mode.DECRYPTION, KEY, "").size());
+    }
+
+    @Test
+    public void decrypt_invalid_withDeviceCredentialsTrue() {
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
+            .title(TITLE)
+            .deviceCredentialsAllowed(true)
+            .build();
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.DECRYPTION, params).size());
     }
 
     @Test
@@ -93,6 +106,15 @@ public class ValidateUtilsTest {
     @Test
     public void encrypt_invalid_emptyValue() {
         assertEquals(1, ValidateUtils.validateCipherParams(Mode.ENCRYPTION, KEY, "").size());
+    }
+
+    @Test
+    public void encrypt_invalid_withDeviceCredentialsTrue() {
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
+            .title(TITLE)
+            .deviceCredentialsAllowed(true)
+            .build();
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.ENCRYPTION, params).size());
     }
 
     @Test

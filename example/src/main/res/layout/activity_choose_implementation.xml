@@ -6,20 +6,21 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <Button
+    <TextView
         android:id="@+id/exampleButton"
-        android:layout_width="match_parent"
+        style="@style/Button"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:padding="16dp"
-        android:text="Example"/>
+        android:text="Example"
+        />
 
-    <Button
+    <TextView
         android:id="@+id/rxExampleButton"
-        android:layout_width="match_parent"
+        style="@style/Button"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:padding="16dp"
-        android:text="Rx Example"/>
+        android:layout_marginTop="32dp"
+        android:text="Rx Example"
+        />
 
 </LinearLayout>

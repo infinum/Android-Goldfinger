@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.2"
+        android:padding="32dp"
+        android:text="This is an example for Fingerprint Authentication which does not work on pre-lollipop devices. Start the example on a newer device to see Goldfinger in action."/>
+
+</LinearLayout>

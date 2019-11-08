@@ -116,7 +116,7 @@ public interface Goldfinger {
             ensureParamsValid();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                return buildMarshmallowInstance();
+                return buildGoldfinger();
             } else {
                 return new GoldfingerMock();
             }
@@ -166,7 +166,7 @@ public interface Goldfinger {
 
         @NonNull
         @RequiresApi(Build.VERSION_CODES.M)
-        private Goldfinger buildMarshmallowInstance() {
+        private Goldfinger buildGoldfinger() {
             if (macCrypter == null && signatureCrypter == null && cipherCrypter == null) {
                 this.cipherCrypter = new Base64CipherCrypter();
             }
