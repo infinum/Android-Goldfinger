@@ -5,7 +5,8 @@ package co.infinum.goldfinger;
  *
  * @see BiometricCallback#onAuthenticationSucceeded
  */
-class DecryptionException extends Exception {
+@SuppressWarnings("WeakerAccess")
+public class DecryptionException extends Exception {
 
     DecryptionException() {
         super("Goldfinger failed to decrypt your data.");

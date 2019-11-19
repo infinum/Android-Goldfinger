@@ -2,6 +2,8 @@ package co.infinum.goldfinger;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -19,28 +21,30 @@ import static co.infinum.goldfinger.LogUtils.log;
 
 /**
  * Goldfinger implementation for Android Marshmallow and newer.
- * Older versions use {@link LegacyGoldfinger}.
+ * Older versions use {@link GoldfingerMock}.
  */
 @RequiresApi(Build.VERSION_CODES.M)
-class MarshmallowGoldfinger implements Goldfinger {
+class GoldfingerImpl implements Goldfinger {
+
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     @NonNull private final AsyncCryptoObjectFactory asyncCryptoFactory;
     @Nullable private AsyncCryptoObjectFactory.Callback asyncCryptoFactoryCallback;
     @Nullable private BiometricPrompt biometricPrompt;
-    @NonNull private final CryptographyHandler cryptographyHandler;
+    @NonNull private final CrypterProxy cryptoProxy;
     @NonNull private final BiometricManager biometricManager;
     @NonNull private final Executor executor = Executors.newSingleThreadExecutor();
     @Nullable private BiometricCallback biometricCallback;
     private boolean creatingCryptoObject = false;
 
-    MarshmallowGoldfinger(
+    GoldfingerImpl(
         @NonNull Context context,
         @NonNull AsyncCryptoObjectFactory asyncCryptoFactory,
-        @NonNull CryptographyHandler cryptographyHandler
+        @NonNull CrypterProxy cryptoProxy
     ) {
         this.biometricManager = BiometricManager.from(context);
         this.asyncCryptoFactory = asyncCryptoFactory;
-        this.cryptographyHandler = cryptographyHandler;
+        this.cryptoProxy = cryptoProxy;
     }
 
     /**
@@ -113,7 +117,6 @@ class MarshmallowGoldfinger implements Goldfinger {
         return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void initializeCryptoObject(
         @NonNull final PromptParams params,
         @NonNull final Mode mode,
@@ -154,7 +157,7 @@ class MarshmallowGoldfinger implements Goldfinger {
             return true;
         }
 
-        List<String> promptParams = ValidateUtils.validatePromptParams(params);
+        List<String> promptParams = ValidateUtils.validatePromptParams(mode, params);
         if (!promptParams.isEmpty()) {
             callback.onError(new InvalidParametersException(promptParams));
             return true;
@@ -171,19 +174,18 @@ class MarshmallowGoldfinger implements Goldfinger {
 
     @SuppressWarnings("ConstantConditions")
     private void startNativeFingerprintAuthentication(
-        @NonNull PromptParams params,
-        @NonNull Mode mode,
-        @Nullable String key,
-        @Nullable String value,
+        @NonNull final PromptParams params,
+        @NonNull final Mode mode,
+        @Nullable final String key,
+        @Nullable final String value,
         @NonNull final Callback callback,
-        @Nullable BiometricPrompt.CryptoObject cryptoObject
+        @Nullable final BiometricPrompt.CryptoObject cryptoObject
     ) {
-        callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
         /*
          * Use proxy callback because some devices do not cancel authentication when error is received.
          * Cancel authentication manually and proxy the result to real callback.
          */
-        this.biometricCallback = new BiometricCallback(cryptographyHandler, mode, value, new Callback() {
+        this.biometricCallback = new BiometricCallback(cryptoProxy, mode, value, new Callback() {
             @Override
             public void onError(@NonNull Exception e) {
                 cancel();
@@ -206,14 +208,26 @@ class MarshmallowGoldfinger implements Goldfinger {
             this.biometricPrompt = new BiometricPrompt((Fragment) params.dialogOwner(), executor, biometricCallback);
         }
 
-        if (mode == Mode.AUTHENTICATION) {
-            /* Simple Authentication call */
-            log("Starting authentication");
-            this.biometricPrompt.authenticate(params.buildPromptInfo());
-        } else {
-            /* Encryption/Decryption call with initialized CryptoObject */
-            log("Starting authentication [keyName=%s; value=%s]", key, value);
-            this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
-        }
+        /* Delay with post because Navigation and Prompt both work with Fragment transactions */
+        MAIN_HANDLER.post(new Runnable() {
+            @Override
+            public void run() {
+                if (GoldfingerImpl.this.biometricPrompt == null) {
+                    return;
+                }
+
+                if (mode == Mode.AUTHENTICATION) {
+                    /* Simple Authentication call */
+                    log("Starting authentication");
+                    callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
+                    GoldfingerImpl.this.biometricPrompt.authenticate(params.buildPromptInfo());
+                } else {
+                    /* Encryption/Decryption call with initialized CryptoObject */
+                    log("Starting authentication [keyName=%s; value=%s]", key, value);
+                    callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
+                    GoldfingerImpl.this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
+                }
+            }
+        });
     }
 }
