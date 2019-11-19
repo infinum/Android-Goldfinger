@@ -14,8 +14,7 @@ import co.infinum.goldfinger.crypto.CipherCrypter;
 
 /**
  * Implementation uses unlocked cipher to encrypt or decrypt the data.
- * Used by default if other {@link co.infinum.goldfinger.crypto.Crypter} implementation
- * is not used.
+ * Used by default if other Crypter implementation is not used.
  *
  * @see CipherCrypter
  */

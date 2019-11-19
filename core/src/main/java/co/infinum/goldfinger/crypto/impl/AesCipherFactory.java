@@ -22,7 +22,7 @@ import co.infinum.goldfinger.crypto.CipherFactory;
 /**
  * AES Cipher implementation. By default the given Cipher is created with
  * Key which requires user authentication.
- * This implementation is used by default if other {@link co.infinum.goldfinger.crypto.Factory} is not provided.
+ * This implementation is used by default if other Factory is not provided.
  */
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class AesCipherFactory implements CipherFactory {

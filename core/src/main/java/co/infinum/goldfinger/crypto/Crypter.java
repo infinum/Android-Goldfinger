@@ -5,8 +5,7 @@ import androidx.annotation.Nullable;
 
 /**
  * Base interface for encryption and decryption. The interface is used internally after
- * user successfully authenticates and the library has to encrypt or decrypt given value
- * inside {@link co.infinum.goldfinger.BiometricCallback}.
+ * user successfully authenticates and the library has to encrypt or decrypt given value.
  *
  * @param <T> Object used to encrypt or decrypt data, one of:
  *            {@link java.security.Signature}, {@link javax.crypto.Cipher} or {@link javax.crypto.Mac}
