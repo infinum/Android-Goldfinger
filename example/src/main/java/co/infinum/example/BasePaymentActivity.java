@@ -2,6 +2,7 @@ package co.infinum.example;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,7 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
     protected abstract void initGoldfinger();
 
     private View paymentButton;
-    private View userAuthenticatedView;
+    private TextView userResultView;
 
     protected Goldfinger.PromptParams buildPromptParams() {
         return new Goldfinger.PromptParams.Builder(this)
@@ -26,8 +27,10 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
     }
 
     protected void handleGoldfingerResult(Goldfinger.Result result) {
-        if (result.type() == Goldfinger.Type.SUCCESS) {
-            userAuthenticatedView.setVisibility(View.VISIBLE);
+        userResultView.setVisibility(View.VISIBLE);
+        if (result.type() == Goldfinger.Type.SUCCESS || result.type() == Goldfinger.Type.ERROR) {
+            String formattedResult = String.format("%s - %s", result.type().toString(), result.reason().toString());
+            userResultView.setText(formattedResult);
         }
     }
 
@@ -44,18 +47,18 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        userAuthenticatedView.setVisibility(View.GONE);
+        userResultView.setVisibility(View.GONE);
     }
 
     private void initListeners() {
         paymentButton.setOnClickListener(v -> {
-            userAuthenticatedView.setVisibility(View.GONE);
+            userResultView.setVisibility(View.GONE);
             authenticateUser();
         });
     }
 
     private void initViews() {
         paymentButton = findViewById(R.id.paymentButton);
-        userAuthenticatedView = findViewById(R.id.userAuthenticatedView);
+        userResultView = findViewById(R.id.userResultView);
     }
 }

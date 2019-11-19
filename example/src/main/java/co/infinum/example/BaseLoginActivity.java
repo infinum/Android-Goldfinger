@@ -55,6 +55,10 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
     protected void handleGoldfingerResult(@NonNull Goldfinger.Result result) {
         if (result.type() == Goldfinger.Type.SUCCESS) {
             loginService.login(result.value(), callback);
+        } else if (result.type() == Goldfinger.Type.ERROR) {
+            errorView.setVisibility(View.VISIBLE);
+            String formattedResult = String.format("%s - %s", result.type().toString(), result.reason().toString());
+            errorView.setText(formattedResult);
         }
     }
 

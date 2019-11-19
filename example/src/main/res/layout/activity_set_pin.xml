@@ -14,10 +14,11 @@
 
     <EditText
         android:id="@+id/pinInputView"
-        android:layout_width="100dp"
+        android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:gravity="center"
+        android:hint="Set PIN"
         android:inputType="number"
         android:maxLength="4"
         android:padding="16dp"
