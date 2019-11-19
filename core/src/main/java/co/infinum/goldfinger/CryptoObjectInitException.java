@@ -6,7 +6,8 @@ package co.infinum.goldfinger;
  *
  * Also be aware of https://issuetracker.google.com/issues/65578763
  */
-class CryptoObjectInitException extends Exception {
+@SuppressWarnings("WeakerAccess")
+public class CryptoObjectInitException extends Exception {
 
     CryptoObjectInitException() {
         super("CryptoObject failed to create.");
