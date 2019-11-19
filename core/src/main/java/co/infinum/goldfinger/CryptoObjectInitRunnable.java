@@ -15,17 +15,17 @@ class CryptoObjectInitRunnable implements Runnable {
     private final static Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     @NonNull private final AsyncCryptoObjectFactory.Callback callback;
-    @NonNull private final CryptoObjectFactory cryptoFactory;
+    @NonNull private final CryptoObjectFactory cryptoObjectFactory;
     @NonNull private final Mode mode;
     @NonNull private final String key;
 
     CryptoObjectInitRunnable(
-        @NonNull CryptoObjectFactory cryptoFactory,
+        @NonNull CryptoObjectFactory cryptoObjectFactory,
         @NonNull Mode mode,
         @NonNull String key,
         @NonNull AsyncCryptoObjectFactory.Callback callback
     ) {
-        this.cryptoFactory = cryptoFactory;
+        this.cryptoObjectFactory = cryptoObjectFactory;
         this.mode = mode;
         this.key = key;
         this.callback = callback;
@@ -33,18 +33,7 @@ class CryptoObjectInitRunnable implements Runnable {
 
     @Override
     public void run() {
-        final BiometricPrompt.CryptoObject cryptoObject;
-        switch (mode) {
-            case DECRYPTION:
-                cryptoObject = cryptoFactory.createDecryptionCryptoObject(key);
-                break;
-            case ENCRYPTION:
-                cryptoObject = cryptoFactory.createEncryptionCryptoObject(key);
-                break;
-            default:
-                cryptoObject = null;
-                break;
-        }
+        final BiometricPrompt.CryptoObject cryptoObject = cryptoObjectFactory.createCryptoObject(key, mode);
 
         if (!callback.canceled) {
             /* Return callback back to main thread as this is executed in the background */

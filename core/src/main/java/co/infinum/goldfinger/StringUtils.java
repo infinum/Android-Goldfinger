@@ -11,6 +11,9 @@ class StringUtils {
         return s == null || s.trim().isEmpty();
     }
 
+    /**
+     * Join list of strings into single string.
+     */
     static String join(List<String> list) {
         StringBuilder builder = new StringBuilder();
         for (String error : list) {

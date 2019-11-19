@@ -6,11 +6,14 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <!-- Do not set layout values in styles in production! -->
     <style name="Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/selector_button</item>
         <item name="android:foreground">?selectableItemBackground</item>
         <item name="android:gravity">center</item>
-        <item name="android:padding">8dp</item>
+        <item name="android:padding">16dp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">#fff</item>
     </style>
