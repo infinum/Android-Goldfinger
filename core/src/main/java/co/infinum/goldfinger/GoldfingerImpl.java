@@ -212,7 +212,7 @@ class GoldfingerImpl implements Goldfinger {
         MAIN_HANDLER.post(new Runnable() {
             @Override
             public void run() {
-                if (MarshmallowGoldfinger.this.biometricPrompt == null) {
+                if (GoldfingerImpl.this.biometricPrompt == null) {
                     return;
                 }
 
@@ -220,12 +220,12 @@ class GoldfingerImpl implements Goldfinger {
                     /* Simple Authentication call */
                     log("Starting authentication");
                     callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
-                    MarshmallowGoldfinger.this.biometricPrompt.authenticate(params.buildPromptInfo());
+                    GoldfingerImpl.this.biometricPrompt.authenticate(params.buildPromptInfo());
                 } else {
                     /* Encryption/Decryption call with initialized CryptoObject */
                     log("Starting authentication [keyName=%s; value=%s]", key, value);
                     callback.onResult(new Result(Type.INFO, Reason.AUTHENTICATION_START));
-                    MarshmallowGoldfinger.this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
+                    GoldfingerImpl.this.biometricPrompt.authenticate(params.buildPromptInfo(), cryptoObject);
                 }
             }
         });
