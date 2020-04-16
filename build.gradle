@@ -7,7 +7,7 @@ buildscript {
 
     ext.versions = [
         appcompat : '1.1.0',
-        biometric : '1.0.0',
+        biometric : '1.0.1',
         goldfinger: '2.0.0',
         junit     : '4.12',
         mockito   : '2.28.2',
@@ -20,7 +20,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.6.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
