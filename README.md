@@ -11,7 +11,7 @@ This version is compatible with `androidx.biometric`. If you do not want to use 
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0'
+implementation 'co.infinum:goldfinger:2.0.1'
 ```
 
 #### Initialize
@@ -68,8 +68,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.0'
-implementation 'co.infinum:goldfinger-rx:2.0.0'
+implementation 'co.infinum:goldfinger:2.0.1'
+implementation 'co.infinum:goldfinger-rx:2.0.1'
 ```
 
 #### Initialize
@@ -118,7 +118,7 @@ Goldfinger.Builder(context)
 
 #### Factory (Cipher, Mac, Signature)
 
-Factory class should be used to create `Cipher`/`Mac`/`Signature` which will be used internally when `CryptoObject` is created. 
+Factory class should be used to create `Cipher`/`Mac`/`Signature` which will be used internally when `CryptoObject` is created.
 
 ```java
 new CipherFactory() {
