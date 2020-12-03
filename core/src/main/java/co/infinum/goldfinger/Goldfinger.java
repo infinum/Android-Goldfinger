@@ -580,6 +580,11 @@ public interface Goldfinger {
         NO_DEVICE_CREDENTIAL,
 
         /**
+         * @see BiometricPrompt#ERROR_SECURITY_UPDATE_REQUIRED
+         */
+        SECURITY_UPDATE_REQUIRED,
+
+        /**
          * Dispatched when Fingerprint authentication is initialized correctly and
          * just before actual authentication is started. Can be used to update UI if necessary.
          */

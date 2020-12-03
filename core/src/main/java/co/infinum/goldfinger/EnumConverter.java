@@ -38,6 +38,8 @@ class EnumConverter {
                 return Goldfinger.Reason.NEGATIVE_BUTTON;
             case BiometricPrompt.ERROR_NO_DEVICE_CREDENTIAL:
                 return Goldfinger.Reason.NO_DEVICE_CREDENTIAL;
+            case BiometricPrompt.ERROR_SECURITY_UPDATE_REQUIRED:
+                return Goldfinger.Reason.SECURITY_UPDATE_REQUIRED;
             default:
                 return Goldfinger.Reason.UNKNOWN;
         }
