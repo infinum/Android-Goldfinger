@@ -103,7 +103,7 @@ public interface Goldfinger {
         @Nullable private CipherCrypter cipherCrypter;
         @Nullable private MacCrypter macCrypter;
         @Nullable private SignatureCrypter signatureCrypter;
-        @NonNull private Mode mode = Mode.AUTHENTICATION;
+        private int allowedAuthenticators;
         @Nullable private String key;
         @Nullable private String value;
 
@@ -210,6 +210,7 @@ public interface Goldfinger {
         @Nullable private final String title;
         private final boolean confirmationRequired;
         private final boolean deviceCredentialsAllowed;
+        private final int allowedAuthenticators;
 
         private PromptParams(
             @NonNull Object dialogOwner,
@@ -218,7 +219,8 @@ public interface Goldfinger {
             @Nullable String negativeButtonText,
             @Nullable String subtitle,
             boolean confirmationRequired,
-            boolean deviceCredentialsAllowed
+            boolean deviceCredentialsAllowed,
+            int allowedAuthenticators
         ) {
             this.dialogOwner = dialogOwner;
             this.title = title;
@@ -227,24 +229,22 @@ public interface Goldfinger {
             this.subtitle = subtitle;
             this.confirmationRequired = confirmationRequired;
             this.deviceCredentialsAllowed = deviceCredentialsAllowed;
-        }
-
-        public boolean confirmationRequired() {
-            return confirmationRequired;
-        }
-
-        @Nullable
-        public String description() {
-            return description;
-        }
-
-        public boolean deviceCredentialsAllowed() {
-            return deviceCredentialsAllowed;
+            this.allowedAuthenticators = allowedAuthenticators;
         }
 
         @NonNull
         public Object dialogOwner() {
             return dialogOwner;
+        }
+
+        @Nullable
+        public String title() {
+            return title;
+        }
+
+        @Nullable
+        public String description() {
+            return description;
         }
 
         @Nullable
@@ -257,9 +257,16 @@ public interface Goldfinger {
             return subtitle;
         }
 
-        @Nullable
-        public String title() {
-            return title;
+        public boolean confirmationRequired() {
+            return confirmationRequired;
+        }
+
+        public boolean deviceCredentialsAllowed() {
+            return deviceCredentialsAllowed;
+        }
+
+        public int allowedAuthenticators() {
+            return allowedAuthenticators;
         }
 
         /**
@@ -287,13 +294,13 @@ public interface Goldfinger {
 
             /* Dialog dialogOwner can be either Fragment or FragmentActivity */
             @NonNull private Object dialogOwner;
-            @NonNull private Mode mode = Mode.AUTHENTICATION;
             @Nullable private String description;
             @Nullable private String negativeButtonText;
             @Nullable private String subtitle;
             @Nullable private String title;
             private boolean confirmationRequired;
             private boolean deviceCredentialsAllowed;
+            private int allowedAuthenticators;
 
             public Builder(@NonNull FragmentActivity activity) {
                 this.dialogOwner = activity;
@@ -312,16 +319,26 @@ public interface Goldfinger {
                     negativeButtonText,
                     subtitle,
                     confirmationRequired,
-                    deviceCredentialsAllowed
+                    deviceCredentialsAllowed,
+                    allowedAuthenticators
                 );
             }
 
             /**
-             * @see BiometricPrompt.PromptInfo.Builder#setConfirmationRequired
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle
              */
             @NonNull
-            public Builder confirmationRequired(boolean confirmationRequired) {
-                this.confirmationRequired = confirmationRequired;
+            public Builder title(@NonNull String title) {
+                this.title = title;
+                return this;
+            }
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             */
+            @NonNull
+            public Builder title(@StringRes int resId) {
+                this.title = getString(resId);
                 return this;
             }
 
@@ -340,15 +357,6 @@ public interface Goldfinger {
             @NonNull
             public Builder description(@StringRes int resId) {
                 this.description = getString(resId);
-                return this;
-            }
-
-            /**
-             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
-             */
-            @NonNull
-            public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
-                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
                 return this;
             }
 
@@ -389,20 +397,30 @@ public interface Goldfinger {
             }
 
             /**
-             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             * @see BiometricPrompt.PromptInfo.Builder#setConfirmationRequired
              */
             @NonNull
-            public Builder title(@NonNull String title) {
-                this.title = title;
+            public Builder confirmationRequired(boolean confirmationRequired) {
+                this.confirmationRequired = confirmationRequired;
                 return this;
             }
 
             /**
-             * @see BiometricPrompt.PromptInfo.Builder#setTitle
+             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
              */
             @NonNull
-            public Builder title(@StringRes int resId) {
-                this.title = getString(resId);
+            public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
+                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
+                return this;
+            }
+
+
+            /**
+             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
+             */
+            @NonNull
+            public Builder allowedAuthenticators(boolean deviceCredentialsAllowed) {
+                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
                 return this;
             }
 
