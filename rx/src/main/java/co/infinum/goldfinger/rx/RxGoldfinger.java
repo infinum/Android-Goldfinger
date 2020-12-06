@@ -17,19 +17,19 @@ import io.reactivex.Observable;
 public interface RxGoldfinger {
 
     /**
-     * @see Goldfinger#canAuthenticate
+     * @see Goldfinger#canAuthenticate(int)
      */
-    boolean canAuthenticate();
+    boolean canAuthenticate(int authenticators);
 
     /**
-     * @see Goldfinger#hasFingerprintHardware
+     * @see Goldfinger#hasFingerprintHardware(int)
      */
-    boolean hasFingerprintHardware();
+    boolean hasFingerprintHardware(int authenticators);
 
     /**
-     * @see Goldfinger#hasEnrolledFingerprint
+     * @see Goldfinger#hasEnrolledFingerprint(int)
      */
-    boolean hasEnrolledFingerprint();
+    boolean hasEnrolledFingerprint(int authenticators);
 
     /**
      * @see Goldfinger#authenticate

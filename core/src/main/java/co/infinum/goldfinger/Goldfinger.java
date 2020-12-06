@@ -26,17 +26,17 @@ public interface Goldfinger {
     /**
      * Returns true if user has fingerprint hardware, false otherwise.
      */
-    boolean hasFingerprintHardware();
+    boolean hasFingerprintHardware(int authenticators);
 
     /**
      * Returns true if user has enrolled fingerprint, false otherwise.
      */
-    boolean hasEnrolledFingerprint();
+    boolean hasEnrolledFingerprint(int authenticators);
 
     /**
-     * @see BiometricManager#canAuthenticate()
+     * @see BiometricManager#canAuthenticate(int)
      */
-    boolean canAuthenticate();
+    boolean canAuthenticate(int authenticators);
 
     /**
      * Authenticate user via Fingerprint.
@@ -282,11 +282,10 @@ public interface Goldfinger {
                 .setSubtitle(subtitle)
                 .setDescription(description)
                 .setDeviceCredentialAllowed(deviceCredentialsAllowed)
+                .setAllowedAuthenticators(allowedAuthenticators)
+                .setNegativeButtonText(negativeButtonText)
                 .setConfirmationRequired(confirmationRequired);
 
-            if (!deviceCredentialsAllowed) {
-                builder.setNegativeButtonText(negativeButtonText);
-            }
             return builder.build();
         }
 
@@ -407,20 +406,21 @@ public interface Goldfinger {
 
             /**
              * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
+             * @deprecated Use {@link #allowedAuthenticators(int)} instead.
              */
             @NonNull
+            @Deprecated
             public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
                 this.deviceCredentialsAllowed = deviceCredentialsAllowed;
                 return this;
             }
 
-
             /**
-             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
+             * @see BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)
              */
             @NonNull
-            public Builder allowedAuthenticators(boolean deviceCredentialsAllowed) {
-                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
+            public Builder allowedAuthenticators(int allowedAuthenticators) {
+                this.allowedAuthenticators = allowedAuthenticators;
                 return this;
             }
 

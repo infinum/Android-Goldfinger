@@ -12,7 +12,7 @@ class GoldfingerMock implements Goldfinger {
     }
 
     @Override
-    public boolean canAuthenticate() {
+    public boolean canAuthenticate(int authenticators) {
         return false;
     }
 
@@ -29,12 +29,12 @@ class GoldfingerMock implements Goldfinger {
     }
 
     @Override
-    public boolean hasEnrolledFingerprint() {
+    public boolean hasEnrolledFingerprint(int authenticators) {
         return false;
     }
 
     @Override
-    public boolean hasFingerprintHardware() {
+    public boolean hasFingerprintHardware(int authenticators) {
         return false;
     }
 }

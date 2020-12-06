@@ -64,8 +64,8 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @Override
-    public boolean canAuthenticate() {
-        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+    public boolean canAuthenticate(int authenticators) {
+        return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS;
     }
 
     /**
@@ -108,13 +108,15 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @Override
-    public boolean hasEnrolledFingerprint() {
-        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED;
+    public boolean hasEnrolledFingerprint(int authenticators) {
+        return biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     @Override
-    public boolean hasFingerprintHardware() {
-        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
+    public boolean hasFingerprintHardware(int authenticators) {
+        return biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            && biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     private void initializeCryptoObject(
@@ -147,12 +149,12 @@ class GoldfingerImpl implements Goldfinger {
             return true;
         }
 
-        if (!hasFingerprintHardware()) {
+        if (!hasFingerprintHardware(params.allowedAuthenticators())) {
             callback.onError(new MissingHardwareException());
             return true;
         }
 
-        if (!hasEnrolledFingerprint()) {
+        if (!hasEnrolledFingerprint(params.allowedAuthenticators())) {
             callback.onError(new NoEnrolledFingerprintException());
             return true;
         }

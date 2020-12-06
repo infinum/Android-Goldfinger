@@ -21,7 +21,8 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
             .title("Payment")
             .description("Authenticate Fingerprint to proceed with payment")
             /* Device credentials can be used here */
-            //            .deviceCredentialsAllowed(true)
+//                        .deviceCredentialsAllowed(true)
+//            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .negativeButtonText("Cancel")
             .build();
     }
