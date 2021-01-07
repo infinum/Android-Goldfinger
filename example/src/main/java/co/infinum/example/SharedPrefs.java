@@ -17,7 +17,6 @@ import co.infinum.goldfinger.crypto.impl.UnlockedAesCipherFactory;
  * Encrypted Shared prefs wrapper which encrypts and decrypts PIN
  * automatically using Goldfinger's exposed API.
  */
-@RequiresApi(Build.VERSION_CODES.M)
 public class SharedPrefs {
 
     private static SharedPreferences PREFS;
@@ -28,15 +27,18 @@ public class SharedPrefs {
         PREFS.edit().clear().apply();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     public static void clearFingerprintPin() {
         PREFS.edit().remove("fp_pin").apply();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     public static String getFingerprintPin() {
         return PREFS.getString("fp_pin", null);
     }
 
     @Nullable
+    @RequiresApi(Build.VERSION_CODES.M)
     public static String getPin() {
         String encryptedPin = PREFS.getString("pin", "");
         if ("".equals(encryptedPin)) {
@@ -54,6 +56,7 @@ public class SharedPrefs {
     /**
      * Please do not do this in production.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public static void init(Context context) {
         PREFS = context.getSharedPreferences("My awesome app prefs", Context.MODE_PRIVATE);
         CRYPTER = new Base64CipherCrypter();
@@ -80,5 +83,13 @@ public class SharedPrefs {
 
     public static void setRxExample(boolean isRxExample) {
         PREFS.edit().putBoolean("isRx", isRxExample).commit();
+    }
+
+    public static void setAuthenticators(int authenticators) {
+        PREFS.edit().putInt("authenticators", authenticators).commit();
+    }
+
+    public static int getAuthenticators() {
+        return PREFS.getInt("authenticators", 0);
     }
 }

@@ -20,10 +20,8 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
         return new Goldfinger.PromptParams.Builder(this)
             .title("Payment")
             .description("Authenticate Fingerprint to proceed with payment")
-            /* Device credentials can be used here */
-//                        .deviceCredentialsAllowed(true)
-//            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .negativeButtonText("Cancel")
+            .allowedAuthenticators(SharedPrefs.getAuthenticators())
             .build();
     }
 

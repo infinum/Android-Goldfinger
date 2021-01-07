@@ -281,9 +281,9 @@ public interface Goldfinger {
                 .setTitle(title)
                 .setSubtitle(subtitle)
                 .setDescription(description)
-                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
+//                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
                 .setAllowedAuthenticators(allowedAuthenticators)
-                .setNegativeButtonText(negativeButtonText)
+//                .setNegativeButtonText(negativeButtonText)
                 .setConfirmationRequired(confirmationRequired);
 
             return builder.build();
@@ -299,7 +299,7 @@ public interface Goldfinger {
             @Nullable private String title;
             private boolean confirmationRequired;
             private boolean deviceCredentialsAllowed;
-            private int allowedAuthenticators;
+            private int allowedAuthenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK;
 
             public Builder(@NonNull FragmentActivity activity) {
                 this.dialogOwner = activity;

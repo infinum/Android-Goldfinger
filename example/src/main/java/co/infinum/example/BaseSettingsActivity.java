@@ -29,6 +29,7 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
             .title("Settings")
             .description("Confirm Fingerprint to enable Fingerprint Login")
             .negativeButtonText("Cancel")
+            .allowedAuthenticators(SharedPrefs.getAuthenticators())
             .build();
     }
 
