@@ -282,8 +282,8 @@ public interface Goldfinger {
                 .setSubtitle(subtitle)
                 .setDescription(description)
 //                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
-                .setAllowedAuthenticators(allowedAuthenticators)
-//                .setNegativeButtonText(negativeButtonText)
+//                .setAllowedAuthenticators(allowedAuthenticators)
+                .setNegativeButtonText(negativeButtonText)
                 .setConfirmationRequired(confirmationRequired);
 
             return builder.build();
