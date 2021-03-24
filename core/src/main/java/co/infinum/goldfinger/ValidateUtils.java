@@ -47,9 +47,13 @@ class ValidateUtils {
             errors.add("Title is required!");
         }
 
-//        if (!params.deviceCredentialsAllowed() && StringUtils.isBlankOrNull(params.negativeButtonText())) {
-//            errors.add("NegativeButtonText is required!");
-//        }
+        if (params.deviceCredentialsAllowed() && !StringUtils.isBlankOrNull(params.negativeButtonText())) {
+            errors.add("Can not use NegativeButtonText and BiometricManager.Authenticators.DEVICE_CREDENTIAL");
+        }
+
+        if (!params.deviceCredentialsAllowed() && StringUtils.isBlankOrNull(params.negativeButtonText())) {
+            errors.add("NegativeButtonText is required!");
+        }
 
         if (params.deviceCredentialsAllowed() && mode != Mode.AUTHENTICATION) {
             errors.add("DeviceCredentials are allowed only for Goldfinger#authenticate method.");

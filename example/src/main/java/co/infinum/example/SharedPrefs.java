@@ -85,6 +85,30 @@ public class SharedPrefs {
         PREFS.edit().putBoolean("isRx", isRxExample).commit();
     }
 
+    public static void setStrongAuth(boolean strongAuth) {
+        PREFS.edit().putBoolean("strongAuth", strongAuth).commit();
+    }
+
+    public static boolean getStrongAuth() {
+        return PREFS.getBoolean("strongAuth", false);
+    }
+
+    public static void setWeakAuth(boolean weakAuth) {
+        PREFS.edit().putBoolean("weakAuth", weakAuth).commit();
+    }
+
+    public static boolean getWeakAuth() {
+        return PREFS.getBoolean("weakAuth", false);
+    }
+
+    public static void setDeviceCredentialsAuth(boolean deviceCredentialsAuth) {
+        PREFS.edit().putBoolean("deviceCredentialsAuth", deviceCredentialsAuth).commit();
+    }
+
+    public static boolean getDeviceCredentialsAuth() {
+        return PREFS.getBoolean("deviceCredentialsAuth", false);
+    }
+
     public static void setAuthenticators(int authenticators) {
         PREFS.edit().putInt("authenticators", authenticators).commit();
     }

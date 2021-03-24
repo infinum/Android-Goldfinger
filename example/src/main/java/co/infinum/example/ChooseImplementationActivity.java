@@ -16,10 +16,15 @@ public class ChooseImplementationActivity extends AppCompatActivity {
 
     private CheckBox strongCheckBox;
     private TextView strongAuthenticator;
+
     private CheckBox weakCheckBox;
     private TextView weakAuthenticator;
+
+    private CheckBox deviceCredentialsCheckBox;
+
     private View pinLoginExampleButton;
     private View pinLoginRxExampleButton;
+
     private View paymentExampleButton;
     private View paymentRxExampleButton;
 
@@ -41,30 +46,53 @@ public class ChooseImplementationActivity extends AppCompatActivity {
     private void initListeners() {
         this.pinLoginExampleButton.setOnClickListener(v -> navigateToSetPinActivity(false));
         this.pinLoginRxExampleButton.setOnClickListener(v -> navigateToSetPinActivity(true));
+
         this.paymentExampleButton.setOnClickListener(v -> navigateToPaymentActivity(false));
         this.paymentRxExampleButton.setOnClickListener(v -> navigateToPaymentActivity(true));
+
         this.strongCheckBox.setOnCheckedChangeListener((compoundButton, b) -> updateAuthenticators());
+
         this.weakCheckBox.setOnCheckedChangeListener((compoundButton, b) -> updateAuthenticators());
+
+        this.deviceCredentialsCheckBox.setOnCheckedChangeListener((compoundButton, b) -> updateAuthenticators());
     }
 
     private void updateAuthenticators() {
         int authenticators = 0;
+
+        SharedPrefs.setStrongAuth(strongCheckBox.isChecked());
         if (strongCheckBox.isChecked()) {
             authenticators |= BiometricManager.Authenticators.BIOMETRIC_STRONG;
         }
+
+        SharedPrefs.setWeakAuth(weakCheckBox.isChecked());
         if (weakCheckBox.isChecked()) {
             authenticators |= BiometricManager.Authenticators.BIOMETRIC_WEAK;
         }
+
+        SharedPrefs.setDeviceCredentialsAuth(deviceCredentialsCheckBox.isChecked());
+        if (deviceCredentialsCheckBox.isChecked()) {
+            authenticators |= BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+        }
+
         SharedPrefs.setAuthenticators(authenticators);
     }
 
     private void initViews() {
         this.strongCheckBox = findViewById(R.id.strongCheckBox);
+        this.strongCheckBox.setChecked(SharedPrefs.getStrongAuth());
         this.strongAuthenticator = findViewById(R.id.strongAuthenticator);
+
         this.weakCheckBox = findViewById(R.id.weakCheckBox);
+        this.weakCheckBox.setChecked(SharedPrefs.getWeakAuth());
         this.weakAuthenticator = findViewById(R.id.weakAuthenticator);
+
+        this.deviceCredentialsCheckBox = findViewById(R.id.deviceCredentialsCheckBox);
+        this.deviceCredentialsCheckBox.setChecked(SharedPrefs.getDeviceCredentialsAuth());
+
         this.pinLoginExampleButton = findViewById(R.id.pinLoginExampleButton);
         this.pinLoginRxExampleButton = findViewById(R.id.pinLoginRxExampleButton);
+
         this.paymentExampleButton = findViewById(R.id.paymentExampleButton);
         this.paymentRxExampleButton = findViewById(R.id.paymentRxExampleButton);
     }
@@ -74,6 +102,7 @@ public class ChooseImplementationActivity extends AppCompatActivity {
 
         strongCheckBox.setEnabled(goldfinger.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG));
         strongAuthenticator.setText(constructBiometricsInfoString(goldfinger, BiometricManager.Authenticators.BIOMETRIC_STRONG));
+
         weakCheckBox.setEnabled(goldfinger.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK));
         weakAuthenticator.setText(constructBiometricsInfoString(goldfinger, BiometricManager.Authenticators.BIOMETRIC_WEAK));
     }
@@ -107,6 +136,5 @@ public class ChooseImplementationActivity extends AppCompatActivity {
     private void navigateToSetPinActivity(boolean isRxExample) {
         SharedPrefs.setRxExample(isRxExample);
         startActivity(new Intent(this, SetPinActivity.class));
-        finish();
     }
 }

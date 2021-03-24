@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import androidx.biometric.BiometricManager;
 import androidx.fragment.app.FragmentActivity;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +30,7 @@ public class ValidateUtilsTest {
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
             .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK & BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .confirmationRequired(true)
             .build();
         assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
@@ -50,7 +51,7 @@ public class ValidateUtilsTest {
             .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
             .subtitle(SUBTITLE)
-            .deviceCredentialsAllowed(true)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK & BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .confirmationRequired(true)
             .build();
         assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
@@ -69,7 +70,7 @@ public class ValidateUtilsTest {
     public void auth_valid_negativeTextIgnoredIfDeviceCredentialsTrue() {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
-            .deviceCredentialsAllowed(true)
+            .allowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build();
         assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
     }
@@ -88,7 +89,7 @@ public class ValidateUtilsTest {
     public void decrypt_invalid_withDeviceCredentialsTrue() {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
-            .deviceCredentialsAllowed(true)
+            .allowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build();
         assertEquals(1, ValidateUtils.validatePromptParams(Mode.DECRYPTION, params).size());
     }
@@ -112,7 +113,7 @@ public class ValidateUtilsTest {
     public void encrypt_invalid_withDeviceCredentialsTrue() {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
-            .deviceCredentialsAllowed(true)
+            .allowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build();
         assertEquals(1, ValidateUtils.validatePromptParams(Mode.ENCRYPTION, params).size());
     }

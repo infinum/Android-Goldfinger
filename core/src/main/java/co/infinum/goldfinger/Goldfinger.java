@@ -103,7 +103,6 @@ public interface Goldfinger {
         @Nullable private CipherCrypter cipherCrypter;
         @Nullable private MacCrypter macCrypter;
         @Nullable private SignatureCrypter signatureCrypter;
-        private int allowedAuthenticators;
         @Nullable private String key;
         @Nullable private String value;
 
@@ -281,8 +280,7 @@ public interface Goldfinger {
                 .setTitle(title)
                 .setSubtitle(subtitle)
                 .setDescription(description)
-//                .setDeviceCredentialAllowed(deviceCredentialsAllowed)
-//                .setAllowedAuthenticators(allowedAuthenticators)
+                .setAllowedAuthenticators(allowedAuthenticators)
                 .setNegativeButtonText(negativeButtonText)
                 .setConfirmationRequired(confirmationRequired);
 
@@ -298,7 +296,6 @@ public interface Goldfinger {
             @Nullable private String subtitle;
             @Nullable private String title;
             private boolean confirmationRequired;
-            private boolean deviceCredentialsAllowed;
             private int allowedAuthenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK;
 
             public Builder(@NonNull FragmentActivity activity) {
@@ -311,6 +308,8 @@ public interface Goldfinger {
 
             @NonNull
             public PromptParams build() {
+                boolean deviceCredentialAllowed = (allowedAuthenticators & BiometricManager.Authenticators.DEVICE_CREDENTIAL) != 0;
+
                 return new PromptParams(
                     dialogOwner,
                     title,
@@ -318,7 +317,7 @@ public interface Goldfinger {
                     negativeButtonText,
                     subtitle,
                     confirmationRequired,
-                    deviceCredentialsAllowed,
+                    deviceCredentialAllowed,
                     allowedAuthenticators
                 );
             }
@@ -401,17 +400,6 @@ public interface Goldfinger {
             @NonNull
             public Builder confirmationRequired(boolean confirmationRequired) {
                 this.confirmationRequired = confirmationRequired;
-                return this;
-            }
-
-            /**
-             * @see BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed
-             * @deprecated Use {@link #allowedAuthenticators(int)} instead.
-             */
-            @NonNull
-            @Deprecated
-            public Builder deviceCredentialsAllowed(boolean deviceCredentialsAllowed) {
-                this.deviceCredentialsAllowed = deviceCredentialsAllowed;
                 return this;
             }
 
