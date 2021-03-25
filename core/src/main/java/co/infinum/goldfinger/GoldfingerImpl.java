@@ -109,14 +109,16 @@ class GoldfingerImpl implements Goldfinger {
 
     @Override
     public boolean hasEnrolledFingerprint(int authenticators) {
-        return biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
-            && biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     @Override
     public boolean hasFingerprintHardware(int authenticators) {
-        return biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
-            && biometricManager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     private void initializeCryptoObject(
