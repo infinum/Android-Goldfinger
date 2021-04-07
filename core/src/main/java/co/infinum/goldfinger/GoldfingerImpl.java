@@ -151,8 +151,6 @@ class GoldfingerImpl implements Goldfinger {
             return true;
         }
 
-        // TODO add control for supported auth combination
-
         if (!hasFingerprintHardware(params.allowedAuthenticators())) {
             callback.onError(new MissingHardwareException());
             return true;
