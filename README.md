@@ -11,7 +11,7 @@ This version is compatible with `androidx.biometric`. If you do not want to use 
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.1'
+implementation 'co.infinum:goldfinger:2.1.0'
 ```
 
 #### Initialize
@@ -23,7 +23,7 @@ Goldfinger.Builder(context).build()
 #### Check prerequisites
 
 ```java
-if (goldfinger.canAuthenticate()) {
+if (goldfinger.canAuthenticate(@AuthenticatorTypes int authenticators)) {
   /* Authenticate */
 }
 ```
@@ -68,8 +68,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.1'
-implementation 'co.infinum:goldfinger-rx:2.0.1'
+implementation 'co.infinum:goldfinger:2.1.0'
+implementation 'co.infinum:goldfinger-rx:2.1.0'
 ```
 
 #### Initialize
@@ -127,7 +127,7 @@ new CipherFactory() {
   public Cipher createEncryptionCrypter(String key) {
      /* Create Cipher for encryption */
   }
-  
+
   @Nullable
   @Override
   public Cipher createDecryptionCrypter(String key) {
