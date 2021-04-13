@@ -48,7 +48,7 @@ class ValidateUtils {
         }
 
         if (params.deviceCredentialsAllowed() && !StringUtils.isBlankOrNull(params.negativeButtonText())) {
-            errors.add("Can not use NegativeButtonText and BiometricManager.Authenticators.DEVICE_CREDENTIAL");
+            errors.add("It is not possible to set NegativeButtonText while using BiometricManager.Authenticators.DEVICE_CREDENTIAL");
         }
 
         if (!params.deviceCredentialsAllowed() && StringUtils.isBlankOrNull(params.negativeButtonText())) {

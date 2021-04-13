@@ -27,10 +27,35 @@ public class ValidateUtilsTest {
     @Test
     public void auth_invalid_emptyTitle() {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
+            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .subtitle(SUBTITLE)
-            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK & BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+            .confirmationRequired(true)
+            .build();
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
+    }
+
+    @Test
+    public void auth_invalid_negativeButtonSet() {
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
+            .description(DESCRIPTION)
+            .title(TITLE)
+            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
+            .subtitle(SUBTITLE)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .confirmationRequired(true)
+            .build();
+        assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
+    }
+
+    @Test
+    public void auth_invalid_negativeButtonRequired() {
+        Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
+            .description(DESCRIPTION)
+            .title(TITLE)
+            .subtitle(SUBTITLE)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
             .confirmationRequired(true)
             .build();
         assertEquals(1, ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).size());
@@ -48,10 +73,9 @@ public class ValidateUtilsTest {
     public void auth_valid() {
         Goldfinger.PromptParams params = new Goldfinger.PromptParams.Builder(activity)
             .title(TITLE)
-            .negativeButtonText(NEGATIVE_BUTTON_TEXT)
             .description(DESCRIPTION)
             .subtitle(SUBTITLE)
-            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK & BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            .allowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .confirmationRequired(true)
             .build();
         assertTrue(ValidateUtils.validatePromptParams(Mode.AUTHENTICATION, params).isEmpty());
