@@ -64,6 +64,11 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @Override
+    public boolean canAuthenticate() {
+        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
+    }
+
+    @Override
     public boolean canAuthenticate(int authenticators) {
         return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS;
     }
@@ -108,9 +113,23 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @Override
+    public boolean hasEnrolledFingerprint() {
+        int authenticationStatus = biometricManager.canAuthenticate();
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
     public boolean hasEnrolledFingerprint(int authenticators) {
         int authenticationStatus = biometricManager.canAuthenticate(authenticators);
         return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
+    public boolean hasFingerprintHardware() {
+        int authenticationStatus = biometricManager.canAuthenticate();
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
             && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 

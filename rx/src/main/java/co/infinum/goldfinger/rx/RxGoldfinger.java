@@ -17,9 +17,10 @@ import io.reactivex.Observable;
 public interface RxGoldfinger {
 
     /**
-     * @see Goldfinger#canAuthenticate(int)
+     * @deprecated Use {@link #hasFingerprintHardware(int)} instead.
      */
-    boolean canAuthenticate(int authenticators);
+    @Deprecated
+    boolean hasFingerprintHardware();
 
     /**
      * @see Goldfinger#hasFingerprintHardware(int)
@@ -27,9 +28,26 @@ public interface RxGoldfinger {
     boolean hasFingerprintHardware(int authenticators);
 
     /**
+     * @deprecated Use {@link #hasEnrolledFingerprint(int)} instead.
+     */
+    @Deprecated
+    boolean hasEnrolledFingerprint();
+
+    /**
      * @see Goldfinger#hasEnrolledFingerprint(int)
      */
     boolean hasEnrolledFingerprint(int authenticators);
+
+    /**
+     * @deprecated Use {@link #canAuthenticate(int)} instead.
+     */
+    @Deprecated
+    boolean canAuthenticate();
+
+    /**
+     * @see Goldfinger#canAuthenticate(int)
+     */
+    boolean canAuthenticate(int authenticators);
 
     /**
      * @see Goldfinger#authenticate

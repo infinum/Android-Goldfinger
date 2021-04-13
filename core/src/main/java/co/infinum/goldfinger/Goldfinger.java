@@ -24,14 +24,32 @@ import co.infinum.goldfinger.crypto.impl.Base64CipherCrypter;
 public interface Goldfinger {
 
     /**
+     * @deprecated Use {@link #hasFingerprintHardware(int)} instead.
+     */
+    @Deprecated
+    boolean hasFingerprintHardware();
+
+    /**
      * Returns true if user has fingerprint hardware, false otherwise.
      */
     boolean hasFingerprintHardware(int authenticators);
 
     /**
+     * @deprecated Use {@link #hasEnrolledFingerprint(int)} instead.
+     */
+    @Deprecated
+    boolean hasEnrolledFingerprint();
+
+    /**
      * Returns true if user has enrolled fingerprint, false otherwise.
      */
     boolean hasEnrolledFingerprint(int authenticators);
+
+    /**
+     * @deprecated Use {@link #canAuthenticate(int)} instead.
+     */
+    @Deprecated
+    boolean canAuthenticate();
 
     /**
      * @see BiometricManager#canAuthenticate(int)
