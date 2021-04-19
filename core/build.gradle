@@ -22,6 +22,6 @@ dependencies {
 }
 
 apply from: '../tasks.gradle'
-apply from: 'bintray.gradle'
+apply from: "publish.gradle"
 
 preBuild.dependsOn ':core:generateReadme'

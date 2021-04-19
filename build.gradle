@@ -1,5 +1,7 @@
 buildscript {
 
+    apply from: "maven.gradle"
+
     ext.sdk = [
         min   : 14,
         target: 29,
@@ -16,7 +18,7 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
@@ -28,10 +30,12 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply from: "deploy.gradle"

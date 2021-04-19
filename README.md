@@ -8,6 +8,17 @@ This version is compatible with `androidx.biometric`. If you do not want to use 
 
 ## Quick guide
 
+#### Add mavenCentral
+
+To include Goldfinger in your project, you have to add buildscript dependencies in your project level `build.gradle`:
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 #### Add dependency
 
 ```gradle
@@ -127,7 +138,7 @@ new CipherFactory() {
   public Cipher createEncryptionCrypter(String key) {
      /* Create Cipher for encryption */
   }
-  
+
   @Nullable
   @Override
   public Cipher createDecryptionCrypter(String key) {

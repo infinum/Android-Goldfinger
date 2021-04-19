@@ -1,16 +1,15 @@
 apply plugin: "maven-publish"
 apply plugin: "signing"
 
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from android.sourceSets.main.kotlin.srcDirs
+task sourcesJar(type: Jar, dependsOn: assemble) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.source
 }
 
-// Dokka is optional but recommended.
 // Sonatype will not accept a published artifact without at least an empty Javadoc JAR.
-task javadocsJar(type: Jar, dependsOn: "dokkaJavadoc") {
-    archiveClassifier.set("javadoc")
-    from dokkaJavadoc.outputDirectory
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    classifier = 'javadoc'
+    from javadocs.destinationDir
 }
 
 afterEvaluate {
@@ -27,10 +26,10 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
-                groupId = releaseConfig.group
-                version = releaseConfig.version
+                groupId = 'co.infinum'
+                version = versions.goldfinger
 
-                artifactId = 'goldfinger'
+                artifactId = 'core'
 
                 artifact bundleReleaseAar
                 artifact sourcesJar
