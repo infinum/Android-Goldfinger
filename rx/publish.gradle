@@ -26,7 +26,7 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
-                groupId = 'co.infinum'
+                groupId = 'co.infinum.goldfinger'
                 version = versions.goldfinger
 
                 artifactId = 'rx'
