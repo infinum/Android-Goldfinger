@@ -16,6 +16,10 @@ buildscript {
         rxjava    : '2.2.12',
     ]
 
+    ext.releaseConfig = [
+        "groupId"   : 'co.infinum',
+    ]
+
     repositories {
         google()
         mavenCentral()
