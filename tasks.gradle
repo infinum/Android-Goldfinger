@@ -9,16 +9,6 @@ afterEvaluate {
     })
 }
 
-task javadocsJar(type: Jar, dependsOn: javadocs) {
-    classifier = 'javadoc'
-    from javadocs.destinationDir
-}
-
-task sourcesJar(type: Jar, dependsOn: assemble) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.source
-}
-
 task generateReadme {
     doFirst {
         def readmeFile = new File("${project.rootDir}/README.md")
