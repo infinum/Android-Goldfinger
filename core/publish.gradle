@@ -26,10 +26,10 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
-                groupId = 'co.infinum.goldfinger'
+                groupId = 'co.infinum'
                 version = versions.goldfinger
 
-                artifactId = 'core'
+                artifactId = 'goldfinger'
 
                 artifact bundleReleaseAar
                 artifact sourcesJar
