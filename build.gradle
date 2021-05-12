@@ -12,6 +12,8 @@ buildscript {
         junit     : '4.12',
         mockito   : '2.28.2',
         rxjava    : '2.2.12',
+        kotlin    : '1.4.32',
+        coroutines: '1.4.3'
     ]
 
     repositories {
@@ -20,8 +22,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.32'
     }
 }
 
