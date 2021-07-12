@@ -37,7 +37,7 @@ interface GoldfingerKtx {
 
     fun cancel()
 
-    class Builder(private val context: Context) {
+    class Builder(context: Context) {
 
         private val baseBuilder: Goldfinger.Builder = Goldfinger.Builder(context)
 
