@@ -19,17 +19,17 @@ interface GoldfingerKtx {
 
     fun canAuthenticate(): Boolean
 
-    suspend fun authenticate(
+    fun authenticate(
         params: PromptParams,
     ): Flow<Goldfinger.Result>
 
-    suspend fun encrypt(
+    fun encrypt(
         params: PromptParams,
         key: String,
         value: String,
     ): Flow<Goldfinger.Result>
 
-    suspend fun decrypt(
+    fun decrypt(
         params: PromptParams,
         key: String,
         value: String,

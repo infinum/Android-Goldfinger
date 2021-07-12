@@ -33,14 +33,14 @@ class GoldfingerKtxImpl (private val goldfinger: Goldfinger) : GoldfingerKtx {
 
     override fun canAuthenticate(): Boolean = goldfinger.canAuthenticate()
 
-    override suspend fun authenticate(params: Goldfinger.PromptParams): Flow<Goldfinger.Result> = inGoldfingerFlow { callback ->
+    override fun authenticate(params: Goldfinger.PromptParams): Flow<Goldfinger.Result> = inGoldfingerFlow { callback ->
         goldfinger.authenticate(
             params,
             callback,
         )
     }
 
-    override suspend fun encrypt(
+    override fun encrypt(
         params: Goldfinger.PromptParams,
         key: String,
         value: String,
@@ -53,7 +53,7 @@ class GoldfingerKtxImpl (private val goldfinger: Goldfinger) : GoldfingerKtx {
         )
     }
 
-    override suspend fun decrypt(
+    override fun decrypt(
         params: Goldfinger.PromptParams,
         key: String,
         value: String,
