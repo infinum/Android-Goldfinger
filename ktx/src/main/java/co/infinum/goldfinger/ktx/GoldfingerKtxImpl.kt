@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
 
 @ExperimentalCoroutinesApi
-class GoldfingerKtxImpl (private val goldfinger: Goldfinger) : GoldfingerKtx {
+class GoldfingerKtxImpl(private val goldfinger: Goldfinger) : GoldfingerKtx {
 
     private fun inGoldfingerFlow(doWithCallback: (GoldfingerKtxCallback) -> Unit) =
         callbackFlow {
@@ -23,6 +23,7 @@ class GoldfingerKtxImpl (private val goldfinger: Goldfinger) : GoldfingerKtx {
             awaitClose { goldfinger.cancel() }
         }
             .buffer(
+                capacity = 1,
                 onBufferOverflow = BufferOverflow.DROP_OLDEST,
             )
             .cancellable()
