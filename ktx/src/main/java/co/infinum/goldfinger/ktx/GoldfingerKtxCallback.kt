@@ -12,7 +12,7 @@ class GoldfingerKtxCallback(
     override fun onResult(result: Goldfinger.Result) {
         with(producerScope) {
             if (!isClosedForSend) {
-                channel.offer(result)
+                channel.trySend(result)
                 if (result.type() == Goldfinger.Type.SUCCESS || result.type() == Goldfinger.Type.ERROR) {
                     channel.close()
                 }
