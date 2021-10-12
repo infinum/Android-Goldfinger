@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion sdk.target
+
+    defaultConfig {
+        minSdkVersion sdk.min
+        targetSdkVersion sdk.target
+        versionName versions.goldfinger
+    }
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
+
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "org.mockito:mockito-core:${versions.mockito}"
+}
+
+apply from: '../tasks.gradle'
+apply from: 'bintray.gradle'
