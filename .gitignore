@@ -274,3 +274,6 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 .idea/
 # End of https://www.gitignore.io/api/java,macos,gradle,android,intellij,androidstudio
+
+publish.properties
+*.gpg

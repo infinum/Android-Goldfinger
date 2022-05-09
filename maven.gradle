@@ -1,0 +1,12 @@
+import com.infinum.maven.SonatypeConfiguration
+
+SonatypeConfiguration.metaClass.constructor = { ->
+    def constructor = SonatypeConfiguration.class.getConstructor()
+    def instance = constructor.newInstance()
+    instance.load()
+    instance
+}
+
+ext {
+    sonatype = new SonatypeConfiguration()
+}

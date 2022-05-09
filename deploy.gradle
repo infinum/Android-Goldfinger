@@ -1,0 +1,15 @@
+task deployGoldfingerCore(dependsOn: [
+        ':core:clean',
+        ':core:publishReleasePublicationToSonatypeRepository'
+]) {
+    group = "Deploy"
+    description = "Deploy module to repositories"
+}
+
+task deployGoldfingerRx(dependsOn: [
+        ':rx:clean',
+        ':rx:publishReleasePublicationToSonatypeRepository'
+]) {
+    group = "Deploy"
+    description = "Deploy module to repositories"
+}

@@ -1,5 +1,7 @@
 buildscript {
 
+    apply from: "maven.gradle"
+
     ext.sdk = [
         min   : 14,
         target: 29,
@@ -14,24 +16,29 @@ buildscript {
         rxjava    : '2.2.12',
     ]
 
+    ext.releaseConfig = [
+        "groupId"   : 'co.infinum',
+    ]
+
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply from: "deploy.gradle"
