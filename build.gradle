@@ -1,37 +1,44 @@
 buildscript {
 
+    apply from: "maven.gradle"
+
     ext.sdk = [
         min   : 14,
-        target: 29,
+        target: 30,
     ]
 
     ext.versions = [
         appcompat : '1.1.0',
-        biometric : '1.0.1',
-        goldfinger: '2.0.1',
+        biometric : '1.1.0',
+        goldfinger: '2.1.0',
         junit     : '4.12',
         mockito   : '2.28.2',
         rxjava    : '2.2.12',
     ]
 
+    ext.releaseConfig = [
+        "groupId"   : 'co.infinum',
+    ]
+
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.2'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply from: "deploy.gradle"

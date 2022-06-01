@@ -3,42 +3,149 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="center_vertical"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/paymentExampleButton"
-        style="@style/Button"
-        android:layout_width="200dp"
+        android:id="@+id/availableAuthenticators"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Payment example"
-        />
+        android:layout_marginHorizontal="16dp"
+        android:text="Available authenticators:"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/strongCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Strong "
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/strongAuthenticator"
+            android:layout_width="wrap_content"
+            android:paddingBottom="8dp"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/weakCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weak "
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/weakAuthenticator"
+            android:layout_width="wrap_content"
+            android:paddingBottom="8dp"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/deviceCredentialsCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device Credentials "
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/deviceCredentialsAuthenticator"
+            android:layout_width="wrap_content"
+            android:paddingBottom="8dp"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/paymentRxExampleButton"
-        style="@style/Button"
-        android:layout_width="200dp"
+        android:id="@+id/examples"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="32dp"
-        android:text="Payment Rx example"
-        />
+        android:text="Examples:"
+        android:textStyle="bold"/>
 
-    <TextView
-        android:id="@+id/pinLoginExampleButton"
-        style="@style/Button"
-        android:layout_width="200dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Pin Login example"
-        />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/pinLoginRxExampleButton"
-        style="@style/Button"
-        android:layout_width="200dp"
+        <TextView
+            android:id="@+id/paymentExampleButton"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:text="Payment"/>
+
+        <TextView
+            android:id="@+id/pinLoginExampleButton"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:text="Pin Login"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Pin Login Rx Example"
-        />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/paymentRxExampleButton"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:text="Payment Rx"/>
+
+        <TextView
+            android:id="@+id/pinLoginRxExampleButton"
+            style="@style/Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:text="Pin Login Rx"/>
+
+    </LinearLayout>
 
 </LinearLayout>

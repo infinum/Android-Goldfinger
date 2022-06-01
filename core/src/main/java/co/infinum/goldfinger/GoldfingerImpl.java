@@ -68,6 +68,11 @@ class GoldfingerImpl implements Goldfinger {
         return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS;
     }
 
+    @Override
+    public boolean canAuthenticate(int authenticators) {
+        return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS;
+    }
+
     /**
      * @see Goldfinger#cancel
      */
@@ -109,12 +114,30 @@ class GoldfingerImpl implements Goldfinger {
 
     @Override
     public boolean hasEnrolledFingerprint() {
-        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED;
+        int authenticationStatus = biometricManager.canAuthenticate();
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
+    public boolean hasEnrolledFingerprint(int authenticators) {
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     @Override
     public boolean hasFingerprintHardware() {
-        return biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
+        int authenticationStatus = biometricManager.canAuthenticate();
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
+    public boolean hasFingerprintHardware(int authenticators) {
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
     }
 
     private void initializeCryptoObject(
@@ -147,12 +170,12 @@ class GoldfingerImpl implements Goldfinger {
             return true;
         }
 
-        if (!hasFingerprintHardware()) {
+        if (!hasFingerprintHardware(params.allowedAuthenticators())) {
             callback.onError(new MissingHardwareException());
             return true;
         }
 
-        if (!hasEnrolledFingerprint()) {
+        if (!hasEnrolledFingerprint(params.allowedAuthenticators())) {
             callback.onError(new NoEnrolledFingerprintException());
             return true;
         }

@@ -1,4 +1,4 @@
-# Goldfinger [![JCenter](https://api.bintray.com/packages/infinum/android/goldfinger/images/download.svg)](https://bintray.com/infinum/android/goldfinger/_latestVersion) [![Build Status](https://app.bitrise.io/app/bc0cdf2da387a5c3/status.svg?token=eHOSr1ZB1HzNnKZfxYjxbA&branch=master)](https://bintray.com/infinum/android/goldfinger/_latestVersion)
+# Goldfinger [![Build Status](https://app.bitrise.io/app/bc0cdf2da387a5c3/status.svg?token=eHOSr1ZB1HzNnKZfxYjxbA&branch=master)](https://bintray.com/infinum/android/goldfinger/_latestVersion)
 
 <img src='./logo.svg' width='264'/>
 
@@ -8,10 +8,22 @@ This version is compatible with `androidx.biometric`. If you do not want to use 
 
 ## Quick guide
 
+#### Add mavenCentral
+
+To include Goldfinger in your project, you have to add buildscript dependencies in your project level `build.gradle`:
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+```
+
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.1'
+implementation 'co.infinum:goldfinger:2.1.0'
 ```
 
 #### Initialize
@@ -23,7 +35,7 @@ Goldfinger.Builder(context).build()
 #### Check prerequisites
 
 ```java
-if (goldfinger.canAuthenticate()) {
+if (goldfinger.canAuthenticate(@AuthenticatorTypes int authenticators)) {
   /* Authenticate */
 }
 ```
@@ -68,8 +80,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.0.1'
-implementation 'co.infinum:goldfinger-rx:2.0.1'
+implementation 'co.infinum:goldfinger:2.1.0'
+implementation 'co.infinum:goldfinger-rx:2.1.0'
 ```
 
 #### Initialize
@@ -127,7 +139,7 @@ new CipherFactory() {
   public Cipher createEncryptionCrypter(String key) {
      /* Create Cipher for encryption */
   }
-  
+
   @Nullable
   @Override
   public Cipher createDecryptionCrypter(String key) {
