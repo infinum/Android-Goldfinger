@@ -28,9 +28,14 @@ class RxGoldfingerImpl implements RxGoldfinger {
         });
     }
 
-    @Override
+     @Override
     public boolean canAuthenticate() {
         return goldfinger.canAuthenticate();
+    }
+
+    @Override
+    public boolean canAuthenticate(int authenticators) {
+        return goldfinger.canAuthenticate(authenticators);
     }
 
     @Override
@@ -77,7 +82,17 @@ class RxGoldfingerImpl implements RxGoldfinger {
     }
 
     @Override
+    public boolean hasEnrolledFingerprint(int authenticators) {
+        return goldfinger.hasEnrolledFingerprint(authenticators);
+    }
+
+    @Override
     public boolean hasFingerprintHardware() {
         return goldfinger.hasFingerprintHardware();
+    }
+
+    @Override
+    public boolean hasFingerprintHardware(int authenticators) {
+        return goldfinger.hasFingerprintHardware(authenticators);
     }
 }
