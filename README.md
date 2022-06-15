@@ -206,6 +206,11 @@ limitations under the License.
 
 Maintained and sponsored by [Infinum](http://www.infinum.co).
 
-<a href='https://infinum.co'>
-  <img src='https://infinum.co/infinum.png' href='https://infinum.co' width='264'>
-</a>
+<p align="center">
+  <a href='https://infinum.com'>
+    <picture>
+        <source srcset="https://assets.infinum.com/brand/logo/static/white.svg" media="(prefers-color-scheme: dark)">
+        <img src="https://assets.infinum.com/brand/logo/static/default.svg">
+    </picture>
+  </a>
+</p>
