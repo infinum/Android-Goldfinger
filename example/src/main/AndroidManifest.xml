@@ -8,20 +8,20 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".ChooseImplementationActivity">
+        <activity android:name=".ChooseImplementationActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".SetPinActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".RxLoginActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".RxSettingsActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".PaymentActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".RxPaymentActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SetPinActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".RxLoginActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".RxSettingsActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".PaymentActivity" android:screenOrientation="portrait" android:exported="true"/>
+        <activity android:name=".RxPaymentActivity" android:screenOrientation="portrait" android:exported="true"/>
 
     </application>
 

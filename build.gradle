@@ -4,7 +4,7 @@ buildscript {
 
     ext.sdk = [
         min   : 14,
-        target: 30,
+        target: 31,
     ]
 
     ext.versions = [
