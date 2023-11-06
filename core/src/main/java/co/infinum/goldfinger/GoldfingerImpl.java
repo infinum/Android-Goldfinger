@@ -176,7 +176,7 @@ class GoldfingerImpl implements Goldfinger {
         }
 
         if (!hasEnrolledFingerprint(params.allowedAuthenticators())) {
-            callback.onError(new NoEnrolledFingerprintException());
+            callback.onError(new NoEnrolledBiometricsException());
             return true;
         }
 
