@@ -57,22 +57,22 @@ public interface Goldfinger {
     boolean canAuthenticate(int authenticators);
 
     /**
-     * Authenticate user via Fingerprint.
+     * Authenticate user via Biometrics.
      * <p>
-     * Example - Process payment after successful fingerprint authentication.
+     * Example - Process payment after successful biometric authentication.
      *
      * @see PromptParams
      */
     void authenticate(@NonNull PromptParams params, @NonNull Callback callback);
 
     /**
-     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * Authenticate user via Biometrics. If user is successfully authenticated,
      * {@link CrypterProxy} implementation is used to automatically encrypt given value.
      * <p>
      * Use it when saving some data that should not be saved as plain text (e.g. password).
      * To decrypt the value use {@link Goldfinger#decrypt} method.
      * <p>
-     * Example - Allow auto-login via Fingerprint.
+     * Example - Allow auto-login via Biometrics.
      *
      * @param params   parameters used to build {@link BiometricPrompt} instance
      * @param key      unique key identifier, used to store cipher IV internally
@@ -88,7 +88,7 @@ public interface Goldfinger {
     );
 
     /**
-     * Authenticate user via Fingerprint. If user is successfully authenticated,
+     * Authenticate user via Biometrics. If user is successfully authenticated,
      * {@link CrypterProxy} implementation is used to automatically decrypt given value.
      * <p>
      * Should be used together with {@link Goldfinger#encrypt} to decrypt saved data.
@@ -104,7 +104,7 @@ public interface Goldfinger {
     );
 
     /**
-     * Cancel current active Fingerprint authentication.
+     * Cancel current active Biometrics authentication.
      */
     void cancel();
 
@@ -447,7 +447,7 @@ public interface Goldfinger {
 
     /**
      * Result wrapper class containing all the useful information about
-     * fingerprint authentication and value for encryption/decryption operations.
+     * biometric authentication and value for encryption/decryption operations.
      */
     class Result {
 
@@ -516,20 +516,20 @@ public interface Goldfinger {
     interface Callback {
 
         /**
-         * Returns fingerprint result and will be invoked multiple times during
-         * fingerprint authentication as not all fingerprint results complete
+         * Returns biometric result and will be invoked multiple times during
+         * biometric authentication as not all biometric results complete
          * the authentication.
          * <p>
-         * Result callback invoked for every fingerprint result (success, error or info).
-         * It can be invoked multiple times during single fingerprint authentication.
+         * Result callback invoked for every biometric result (success, error or info).
+         * It can be invoked multiple times during single biometric authentication.
          *
-         * @param result contains fingerprint result information
+         * @param result contains biometric result information
          * @see Goldfinger.Result
          */
         void onResult(@NonNull Goldfinger.Result result);
 
         /**
-         * Critical error happened and fingerprint authentication is stopped.
+         * Critical error happened and biometric authentication is stopped.
          */
         void onError(@NonNull Exception e);
     }
@@ -609,7 +609,7 @@ public interface Goldfinger {
         SECURITY_UPDATE_REQUIRED,
 
         /**
-         * Dispatched when Fingerprint authentication is initialized correctly and
+         * Dispatched when Biometrics authentication is initialized correctly and
          * just before actual authentication is started. Can be used to update UI if necessary.
          */
         AUTHENTICATION_START,
@@ -636,20 +636,20 @@ public interface Goldfinger {
     enum Type {
 
         /**
-         * Fingerprint authentication is successfully finished. {@link Goldfinger.Result}
+         * Biometrics authentication is successfully finished. {@link Goldfinger.Result}
          * will contain value in case of {@link PromptParams.Builder#decrypt} or
          * {@link PromptParams.Builder#encrypt} invocation.
          */
         SUCCESS,
 
         /**
-         * Fingerprint authentication is still active. {@link Goldfinger.Result} contains
-         * additional information about currently active fingerprint authentication.
+         * Biometrics authentication is still active. {@link Goldfinger.Result} contains
+         * additional information about currently active biometric authentication.
          */
         INFO,
 
         /**
-         * Fingerprint authentication is unsuccessfully finished. {@link Goldfinger.Result}
+         * Biometrics authentication is unsuccessfully finished. {@link Goldfinger.Result}
          * contains the reason why the authentication failed.
          */
         ERROR
