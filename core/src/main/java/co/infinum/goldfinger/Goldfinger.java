@@ -30,9 +30,15 @@ public interface Goldfinger {
     boolean hasFingerprintHardware();
 
     /**
-     * Returns true if user has fingerprint hardware, false otherwise.
+     * @deprecated Use {@link #hasBiometricHardware(int)} instead.
      */
+    @Deprecated
     boolean hasFingerprintHardware(int authenticators);
+
+    /**
+     * Returns true if user has biometrics hardware, false otherwise.
+     */
+    boolean hasBiometricHardware(int authenticators);
 
     /**
      * @deprecated Use {@link #hasEnrolledFingerprint(int)} instead.
@@ -41,9 +47,15 @@ public interface Goldfinger {
     boolean hasEnrolledFingerprint();
 
     /**
-     * Returns true if user has enrolled fingerprint, false otherwise.
+     * @deprecated Use {@link #hasEnrolledBiometrics(int)} instead.
      */
+    @Deprecated
     boolean hasEnrolledFingerprint(int authenticators);
+
+    /**
+     * Returns true if user has enrolled biometrics, false otherwise.
+     */
+    boolean hasEnrolledBiometrics(int authenticators);
 
     /**
      * @deprecated Use {@link #canAuthenticate(int)} instead.

@@ -109,8 +109,8 @@ public class ChooseImplementationActivity extends AppCompatActivity {
 
     private String constructBiometricsInfoString(Goldfinger goldfinger, int authenticator) {
         boolean hasAvailableAuthentication = goldfinger.canAuthenticate(authenticator);
-        boolean hasBiometricEnrolled = goldfinger.hasEnrolledFingerprint(authenticator);
-        boolean hasBiometricHardware = goldfinger.hasFingerprintHardware(authenticator);
+        boolean hasBiometricEnrolled = goldfinger.hasEnrolledBiometrics(authenticator);
+        boolean hasBiometricHardware = goldfinger.hasBiometricHardware(authenticator);
 
         StringBuilder stringBuilder = new StringBuilder(
             String.format("authenticator %s available", hasAvailableAuthentication ? "is" : "NOT")
