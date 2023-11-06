@@ -60,7 +60,7 @@ class GoldfingerImpl implements Goldfinger {
         }
 
         log("Starting authentication");
-        startNativeFingerprintAuthentication(params, Mode.AUTHENTICATION, null, null, callback, null);
+        startNativeBiometricAuthentication(params, Mode.AUTHENTICATION, null, null, callback, null);
     }
 
     @Override
@@ -153,7 +153,7 @@ class GoldfingerImpl implements Goldfinger {
             void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject) {
                 creatingCryptoObject = false;
                 if (cryptoObject != null) {
-                    startNativeFingerprintAuthentication(params, mode, key, value, callback, cryptoObject);
+                    startNativeBiometricAuthentication(params, mode, key, value, callback, cryptoObject);
                 } else {
                     log("Failed to create CryptoObject");
                     callback.onError(new CryptoObjectInitException());
@@ -196,7 +196,7 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void startNativeFingerprintAuthentication(
+    private void startNativeBiometricAuthentication(
         @NonNull final PromptParams params,
         @NonNull final Mode mode,
         @Nullable final String key,
