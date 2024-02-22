@@ -97,7 +97,7 @@ goldfinger.authenticate(params).subscribe(new DisposableObserver<Goldfinger.Resu
 
   @Override
   public void onComplete() {
-    /* Fingerprint authentication is finished */
+    /* Biometrics authentication is finished */
   }
 
   @Override

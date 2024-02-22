@@ -60,7 +60,7 @@ class GoldfingerImpl implements Goldfinger {
         }
 
         log("Starting authentication");
-        startNativeFingerprintAuthentication(params, Mode.AUTHENTICATION, null, null, callback, null);
+        startNativeBiometricAuthentication(params, Mode.AUTHENTICATION, null, null, callback, null);
     }
 
     @Override
@@ -127,6 +127,13 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @Override
+    public boolean hasEnrolledBiometrics(int authenticators) {
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
     public boolean hasFingerprintHardware() {
         int authenticationStatus = biometricManager.canAuthenticate();
         return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
@@ -135,6 +142,13 @@ class GoldfingerImpl implements Goldfinger {
 
     @Override
     public boolean hasFingerprintHardware(int authenticators) {
+        int authenticationStatus = biometricManager.canAuthenticate(authenticators);
+        return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
+    }
+
+    @Override
+    public boolean hasBiometricHardware(int authenticators) {
         int authenticationStatus = biometricManager.canAuthenticate(authenticators);
         return authenticationStatus != BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
             && authenticationStatus != BiometricManager.BIOMETRIC_STATUS_UNKNOWN;
@@ -153,7 +167,7 @@ class GoldfingerImpl implements Goldfinger {
             void onCryptoObjectCreated(@Nullable BiometricPrompt.CryptoObject cryptoObject) {
                 creatingCryptoObject = false;
                 if (cryptoObject != null) {
-                    startNativeFingerprintAuthentication(params, mode, key, value, callback, cryptoObject);
+                    startNativeBiometricAuthentication(params, mode, key, value, callback, cryptoObject);
                 } else {
                     log("Failed to create CryptoObject");
                     callback.onError(new CryptoObjectInitException());
@@ -176,7 +190,7 @@ class GoldfingerImpl implements Goldfinger {
         }
 
         if (!hasEnrolledFingerprint(params.allowedAuthenticators())) {
-            callback.onError(new NoEnrolledFingerprintException());
+            callback.onError(new NoEnrolledBiometricsException());
             return true;
         }
 
@@ -196,7 +210,7 @@ class GoldfingerImpl implements Goldfinger {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void startNativeFingerprintAuthentication(
+    private void startNativeBiometricAuthentication(
         @NonNull final PromptParams params,
         @NonNull final Mode mode,
         @Nullable final String key,

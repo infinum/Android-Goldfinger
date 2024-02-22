@@ -16,6 +16,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
     testImplementation "junit:junit:${versions.junit}"
     testImplementation "org.mockito:mockito-core:${versions.mockito}"
+    testImplementation project(path: ':rx')
 }
 
 apply from: '../tasks.gradle'

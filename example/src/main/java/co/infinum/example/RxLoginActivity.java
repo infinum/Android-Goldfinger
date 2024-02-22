@@ -13,7 +13,7 @@ public class RxLoginActivity extends BaseLoginActivity {
     private RxGoldfinger goldfinger;
 
     @Override
-    protected void decryptFingerprintPin(String encryptedPin) {
+    protected void decryptBiometricPin(String encryptedPin) {
         goldfinger.decrypt(buildPromptParams(), "fp_pin", encryptedPin)
             .subscribe(new DisposableObserver<Goldfinger.Result>() {
                 @Override

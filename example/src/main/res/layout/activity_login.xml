@@ -34,12 +34,12 @@
         />
 
     <TextView
-        android:id="@+id/fingerprintLoginButton"
+        android:id="@+id/biometricsLoginButton"
         style="@style/Button"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Login with fingerprint"
+        android:text="Login with biometrics"
         />
 
     <TextView

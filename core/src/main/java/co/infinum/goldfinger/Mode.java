@@ -1,7 +1,7 @@
 package co.infinum.goldfinger;
 
 /**
- * Internal enum used to differentiate Fingerprint authentication modes.
+ * Internal enum used to differentiate Biometric authentication modes.
  * Authentication does not have to work with cipher, while both
  * Decryption and Encryption should.
  * <p>

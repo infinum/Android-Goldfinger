@@ -23,7 +23,7 @@ public class SharedPrefs {
     private static CipherCrypter CRYPTER;
     private static CipherFactory FACTORY;
 
-    private static final String FINGERPRINT_PIN = "FINGERPRINT_PIN";
+    private static final String BIOMETRIC_PIN = "BIOMETRIC_PIN";
     private static final String PIN = "PIN";
     private static final String IS_RX = "IS_RX";
     private static final String AUTHENTICATORS = "AUTHENTICATORS";
@@ -36,13 +36,13 @@ public class SharedPrefs {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    public static void clearFingerprintPin() {
-        PREFS.edit().remove(FINGERPRINT_PIN).apply();
+    public static void clearBiometricPin() {
+        PREFS.edit().remove(BIOMETRIC_PIN).apply();
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    public static String getFingerprintPin() {
-        return PREFS.getString(FINGERPRINT_PIN, null);
+    public static String getBiometricPin() {
+        return PREFS.getString(BIOMETRIC_PIN, null);
     }
 
     @Nullable
@@ -75,8 +75,8 @@ public class SharedPrefs {
         return PREFS.getBoolean(IS_RX, false);
     }
 
-    public static void setFingerprintPin(String encryptedPin) {
-        PREFS.edit().putString(FINGERPRINT_PIN, encryptedPin).apply();
+    public static void setBiometricPin(String encryptedPin) {
+        PREFS.edit().putString(BIOMETRIC_PIN, encryptedPin).apply();
     }
 
     public static void setPin(String pin) {

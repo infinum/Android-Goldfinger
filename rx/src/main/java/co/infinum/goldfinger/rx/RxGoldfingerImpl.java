@@ -87,6 +87,11 @@ class RxGoldfingerImpl implements RxGoldfinger {
     }
 
     @Override
+    public boolean hasEnrolledBiometrics(int authenticators) {
+        return goldfinger.hasEnrolledBiometrics(authenticators);
+    }
+
+    @Override
     public boolean hasFingerprintHardware() {
         return goldfinger.hasFingerprintHardware();
     }
@@ -94,5 +99,10 @@ class RxGoldfingerImpl implements RxGoldfinger {
     @Override
     public boolean hasFingerprintHardware(int authenticators) {
         return goldfinger.hasFingerprintHardware(authenticators);
+    }
+
+    @Override
+    public boolean hasBiometricHardware(int authenticators) {
+        return goldfinger.hasBiometricHardware(authenticators);
     }
 }
