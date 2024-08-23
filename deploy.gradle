@@ -14,7 +14,7 @@ task deployGoldfingerRx(dependsOn: [
     description = "Deploy module to repositories"
 }
 
-task deployDebug(dependsOn: [
+task deployLocal(dependsOn: [
     ':rx:clean',
     ':core:clean',
     ':rx:publishReleasePublicationToMavenLocal',
