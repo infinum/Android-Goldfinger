@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation project(':core')
+    implementation project(path: ':core')
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "io.reactivex.rxjava2:rxjava:${versions.rxjava}"
     testImplementation "junit:junit:${versions.junit}"
@@ -20,4 +20,4 @@ dependencies {
 }
 
 apply from: '../tasks.gradle'
-apply from: "publish.gradle"
+apply from: 'publish.gradle'
