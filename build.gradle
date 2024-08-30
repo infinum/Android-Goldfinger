@@ -17,7 +17,7 @@ buildscript {
     ]
 
     ext.releaseConfig = [
-        "groupId"   : 'co.infinum',
+        "groupId"   : 'com.infinum',
     ]
 
     repositories {
