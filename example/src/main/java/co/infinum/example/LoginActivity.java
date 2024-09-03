@@ -12,7 +12,7 @@ public class LoginActivity extends BaseLoginActivity {
     private Goldfinger goldfinger;
 
     @Override
-    protected void decryptFingerprintPin(String encryptedPin) {
+    protected void decryptBiometricPin(String encryptedPin) {
         goldfinger.decrypt(buildPromptParams(), "fp_pin", encryptedPin, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {

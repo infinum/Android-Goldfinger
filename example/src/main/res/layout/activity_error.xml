@@ -11,6 +11,6 @@
         android:gravity="center"
         android:lineSpacingMultiplier="1.2"
         android:padding="32dp"
-        android:text="This is an example for Fingerprint Authentication which does not work on pre-lollipop devices. Start the example on a newer device to see Goldfinger in action."/>
+        android:text="This is an example for Biometric Authentication which does not work on pre-lollipop devices. Start the example on a newer device to see Goldfinger in action."/>
 
 </LinearLayout>

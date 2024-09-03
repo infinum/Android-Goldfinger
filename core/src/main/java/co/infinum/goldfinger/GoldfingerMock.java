@@ -44,12 +44,22 @@ class GoldfingerMock implements Goldfinger {
     }
 
     @Override
+    public boolean hasEnrolledBiometrics(int authenticators) {
+        return false;
+    }
+
+    @Override
     public boolean hasEnrolledFingerprint() {
         return false;
     }
 
     @Override
     public boolean hasFingerprintHardware(int authenticators) {
+        return false;
+    }
+
+    @Override
+    public boolean hasBiometricHardware(int authenticators) {
         return false;
     }
 }

@@ -19,7 +19,7 @@ public abstract class BasePaymentActivity extends AppCompatActivity {
     protected Goldfinger.PromptParams buildPromptParams() {
         return new Goldfinger.PromptParams.Builder(this)
             .title("Payment")
-            .description("Authenticate Fingerprint to proceed with payment")
+            .description("Authenticate Biometrics to proceed with payment")
             .negativeButtonText("Cancel")
             .allowedAuthenticators(SharedPrefs.getAuthenticators())
             .build();

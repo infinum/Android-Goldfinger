@@ -2,13 +2,13 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 task sourcesJar(type: Jar, dependsOn: assemble) {
-    classifier = 'sources'
+    archiveClassifier.set("sources")
     from android.sourceSets.main.java.source
 }
 
 // Sonatype will not accept a published artifact without at least an empty Javadoc JAR.
 task javadocsJar(type: Jar, dependsOn: javadocs) {
-    classifier = 'javadoc'
+    archiveClassifier.set("javadoc")
     from javadocs.destinationDir
 }
 
@@ -26,16 +26,18 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
+                from components.release
+
                 groupId = releaseConfig.groupId
                 version = versions.goldfinger
 
                 artifactId = 'goldfinger'
 
-                artifact bundleReleaseAar
                 artifact sourcesJar
                 artifact javadocsJar
 
                 pom {
+                    packaging = "aar"
                     name = 'Goldfinger'
                     description = 'Android library to simplify Biometric authentication implementation.'
                     url = 'https://github.com/infinum/Android-Goldfinger'
@@ -56,16 +58,6 @@ afterEvaluate {
                         connection = 'https://github.com/infinum/Android-Goldfinger.git'
                         developerConnection = 'https://github.com/infinum/Android-Goldfinger.git'
                         url = 'https://github.com/infinum/Android-Goldfinger'
-                    }
-                }
-                pom.withXml {
-                    def root = asNode()
-                    def dependenciesNode = root.appendNode('dependencies')
-                    configurations.implementation.allDependencies.each {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
                     }
                 }
                 signing {

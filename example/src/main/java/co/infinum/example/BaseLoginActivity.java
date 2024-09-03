@@ -17,12 +17,12 @@ import co.infinum.goldfinger.Goldfinger;
 @RequiresApi(Build.VERSION_CODES.M)
 public abstract class BaseLoginActivity extends AppCompatActivity {
 
-    protected abstract void decryptFingerprintPin(String encryptedPin);
+    protected abstract void decryptBiometricPin(String encryptedPin);
     protected abstract void initGoldfinger();
 
     private EditText pinInputView;
     private View pinLoginButton;
-    private View fingerprintLoginButton;
+    private View biometricsLoginButton;
     private TextView errorView;
     private View resetButton;
     private MockLoginService loginService = new MockLoginService();
@@ -42,7 +42,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
     protected Goldfinger.PromptParams buildPromptParams() {
         return new Goldfinger.PromptParams.Builder(this)
             .title("Login")
-            .description("Confirm Fingerprint to Login")
+            .description("Confirm Biometrics to Login")
             .negativeButtonText("Cancel")
             .allowedAuthenticators(SharedPrefs.getAuthenticators())
             .build();
@@ -50,7 +50,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
 
     protected void handleGoldfingerError() {
         errorView.setVisibility(View.VISIBLE);
-        errorView.setText("Fingerprint exception - check log.");
+        errorView.setText("Biometrics exception - check log.");
     }
 
     protected void handleGoldfingerResult(@NonNull Goldfinger.Result result) {
@@ -78,7 +78,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
         super.onStart();
 
         pinLoginButton.setEnabled(pinInputView.getText().toString().length() == 4);
-        fingerprintLoginButton.setEnabled(SharedPrefs.getFingerprintPin() != null);
+        biometricsLoginButton.setEnabled(SharedPrefs.getBiometricPin() != null);
     }
 
     @SuppressLint("SetTextI18n")
@@ -97,10 +97,10 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
             loginService.login(pinInputView.getText().toString(), callback);
         });
 
-        fingerprintLoginButton.setOnClickListener(v -> {
+        biometricsLoginButton.setOnClickListener(v -> {
             errorView.setVisibility(View.GONE);
-            String encryptedPin = SharedPrefs.getFingerprintPin();
-            decryptFingerprintPin(encryptedPin);
+            String encryptedPin = SharedPrefs.getBiometricPin();
+            decryptBiometricPin(encryptedPin);
         });
 
         resetButton.setOnClickListener(v -> {
@@ -113,7 +113,7 @@ public abstract class BaseLoginActivity extends AppCompatActivity {
     private void initViews() {
         pinInputView = findViewById(R.id.pinInputView);
         pinLoginButton = findViewById(R.id.pinLoginButton);
-        fingerprintLoginButton = findViewById(R.id.fingerprintLoginButton);
+        biometricsLoginButton = findViewById(R.id.biometricsLoginButton);
         errorView = findViewById(R.id.errorView);
         resetButton = findViewById(R.id.resetButton);
     }

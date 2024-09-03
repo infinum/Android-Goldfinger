@@ -19,7 +19,7 @@ public class SettingsActivity extends BaseSettingsActivity {
     }
 
     @Override
-    protected void encryptFingerprintPin(String pin) {
+    protected void encryptBiometricPin(String pin) {
         goldfinger.encrypt(buildPromptParams(), "fp_pin", pin, new Goldfinger.Callback() {
             @Override
             public void onError(@NonNull Exception e) {

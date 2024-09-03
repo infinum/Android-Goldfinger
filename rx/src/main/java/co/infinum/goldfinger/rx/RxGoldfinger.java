@@ -23,9 +23,15 @@ public interface RxGoldfinger {
     boolean hasFingerprintHardware();
 
     /**
-     * @see Goldfinger#hasFingerprintHardware(int)
+     * @deprecated Use {@link #hasBiometricHardware(int)} instead.
      */
+    @Deprecated
     boolean hasFingerprintHardware(int authenticators);
+
+    /**
+     * @see Goldfinger#hasBiometricHardware(int)
+     */
+    boolean hasBiometricHardware(int authenticators);
 
     /**
      * @deprecated Use {@link #hasEnrolledFingerprint(int)} instead.
@@ -34,9 +40,15 @@ public interface RxGoldfinger {
     boolean hasEnrolledFingerprint();
 
     /**
-     * @see Goldfinger#hasEnrolledFingerprint(int)
+     * @deprecated Use {@link #hasEnrolledBiometrics(int)} instead.
      */
+    @Deprecated
     boolean hasEnrolledFingerprint(int authenticators);
+
+    /**
+     * @see Goldfinger#hasEnrolledBiometrics(int)
+     */
+    boolean hasEnrolledBiometrics(int authenticators);
 
     /**
      * @deprecated Use {@link #canAuthenticate(int)} instead.

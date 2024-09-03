@@ -23,7 +23,7 @@ buildscript {
 #### Add dependency
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.1.0'
+implementation 'com.infinum:goldfinger:2.2.0'
 ```
 
 #### Initialize
@@ -80,8 +80,8 @@ Goldfinger has separate Rx module in case you want to use reactive approach.
 #### Add dependencies
 
 ```gradle
-implementation 'co.infinum:goldfinger:2.1.0'
-implementation 'co.infinum:goldfinger-rx:2.1.0'
+implementation 'com.infinum:goldfinger:2.2.0'
+implementation 'com.infinum:goldfinger-rx:2.2.0'
 ```
 
 #### Initialize
@@ -97,7 +97,7 @@ goldfinger.authenticate(params).subscribe(new DisposableObserver<Goldfinger.Resu
 
   @Override
   public void onComplete() {
-    /* Fingerprint authentication is finished */
+    /* Biometrics authentication is finished */
   }
 
   @Override

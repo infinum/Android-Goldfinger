@@ -13,3 +13,13 @@ task deployGoldfingerRx(dependsOn: [
     group = "Deploy"
     description = "Deploy module to repositories"
 }
+
+task deployLocal(dependsOn: [
+    ':rx:clean',
+    ':core:clean',
+    ':rx:publishReleasePublicationToMavenLocal',
+    ':core:publishReleasePublicationToMavenLocal',
+]) {
+    group = "Deploy"
+    description = "Deploy all modules to Mavel Local repository"
+}

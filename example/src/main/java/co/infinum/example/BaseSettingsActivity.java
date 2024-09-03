@@ -16,12 +16,12 @@ import co.infinum.goldfinger.Goldfinger;
 public abstract class BaseSettingsActivity extends AppCompatActivity {
 
     protected abstract void initGoldfinger();
-    protected abstract void encryptFingerprintPin(String pin);
+    protected abstract void encryptBiometricPin(String pin);
 
     private TextView currentPinView;
     private EditText pinInputView;
     private View changePinButton;
-    private CompoundButton fingerprintSwitchView;
+    private CompoundButton biometricSwitchView;
     private View logoutButton;
 
     protected Goldfinger.PromptParams buildPromptParams() {
@@ -34,14 +34,14 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
     }
 
     protected void handleGoldfingerError() {
-        fingerprintSwitchView.setChecked(false);
+        biometricSwitchView.setChecked(false);
     }
 
     protected void handleGoldfingerResult(Goldfinger.Result result) {
         if (result.type() == Goldfinger.Type.SUCCESS) {
-            SharedPrefs.setFingerprintPin(result.value());
+            SharedPrefs.setBiometricPin(result.value());
         } else if (result.type() == Goldfinger.Type.ERROR) {
-            fingerprintSwitchView.setChecked(false);
+            biometricSwitchView.setChecked(false);
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
             return;
         }
 
-        encryptFingerprintPin(pin);
+        encryptBiometricPin(pin);
     }
 
     private void initListeners() {
@@ -74,11 +74,11 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
 
         logoutButton.setOnClickListener(v -> finish());
 
-        fingerprintSwitchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        biometricSwitchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 activateFingerprint();
             } else {
-                SharedPrefs.clearFingerprintPin();
+                SharedPrefs.clearBiometricPin();
             }
         });
 
@@ -86,7 +86,7 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
             String pin = pinInputView.getText().toString();
             SharedPrefs.setPin(pin);
 
-            fingerprintSwitchView.setChecked(false);
+            biometricSwitchView.setChecked(false);
             currentPinView.setText("Current PIN is = " + pin);
         });
     }
@@ -95,11 +95,11 @@ public abstract class BaseSettingsActivity extends AppCompatActivity {
         currentPinView = findViewById(R.id.currentPinView);
         pinInputView = findViewById(R.id.pinInputView);
         changePinButton = findViewById(R.id.changePinButton);
-        fingerprintSwitchView = findViewById(R.id.fingerprintSwitchView);
+        biometricSwitchView = findViewById(R.id.biometricSwitchView);
         logoutButton = findViewById(R.id.logoutButton);
 
         currentPinView.setText("Current PIN is = " + SharedPrefs.getPin());
-        fingerprintSwitchView.setChecked(SharedPrefs.getFingerprintPin() != null);
+        biometricSwitchView.setChecked(SharedPrefs.getBiometricPin() != null);
         changePinButton.setEnabled(false);
     }
 }
